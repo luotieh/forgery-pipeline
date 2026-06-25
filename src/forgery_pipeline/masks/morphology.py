@@ -29,10 +29,14 @@ def boundary_blur(mask: np.ndarray, ksize: int = 5) -> np.ndarray:
 
 
 def make_irregular(mask: np.ndarray, seed: int = 0, ksize: int = 5) -> np.ndarray:
-    """在膨胀与腐蚀之间按随机场切换，制造不规则边界。"""
+    """在膨胀与腐蚀之间按平滑随机场切换，制造不规则但连贯的边界。
+
+    随机场经高斯平滑以避免椒盐式碎片化，使边界扰动呈连贯波状。
+    """
     rng = np.random.default_rng(seed)
     d = cv2.dilate(_binarize(mask), _kernel(ksize))
     e = cv2.erode(_binarize(mask), _kernel(ksize))
-    choice = rng.random(mask.shape) < 0.5
-    out = np.where(choice, d, e).astype(np.uint8)
+    field = rng.random(mask.shape).astype(np.float32)
+    field = cv2.GaussianBlur(field, (0, 0), sigmaX=4.0)
+    out = np.where(field < 0.5, d, e).astype(np.uint8)
     return _binarize(out)
