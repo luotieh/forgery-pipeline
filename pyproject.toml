@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forgery-pipeline"
+version = "0.1.0"
+description = "Forgery detection dataset generation pipeline (D0-D4, manifest, QC, split)"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2",
+    "numpy",
+    "Pillow",
+    "opencv-python-headless",
+    "scikit-image",
+    "imagehash",
+    "pyyaml",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+real = ["torch", "diffusers", "transformers"]
+sam = ["segment-anything"]
+clip = ["open-clip-torch"]
+mllm = ["openai", "anthropic"]
+
+[project.scripts]
+forgery-pipeline = "forgery_pipeline.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
