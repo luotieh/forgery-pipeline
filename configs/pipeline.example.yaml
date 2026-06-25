@@ -1,0 +1,9 @@
+out_dir: data/run
+seed: 1234
+backend: mock
+postprocess_prob: 0.5
+stages: {d0: true, d1: true, d2: true, d3: true, d4: true,
+         qc: true, postprocess: true, split: true}
+scales: {d0: 40, d1_per_generator: 3, d2: 24, d3: 12, d4: 8}
+generators_config: configs/generators.yaml
+split_config: configs/split.yaml

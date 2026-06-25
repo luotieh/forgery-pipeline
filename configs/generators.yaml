@@ -1,0 +1,15 @@
+# 生成器清单（强调多样性；mock 后端忽略具体权重，仅用 name/family 打标签）
+generators:
+  - {name: stable-diffusion-1-5, family: diffusion, kind: txt2img}
+  - {name: stable-diffusion-xl,  family: diffusion, kind: txt2img}
+  - {name: flux-1,               family: diffusion, kind: txt2img}
+  - {name: openjourney,          family: diffusion, kind: txt2img}
+  - {name: stylegan2,            family: GAN,       kind: unconditional}
+  - {name: biggan,               family: GAN,       kind: conditional}
+  - {name: progan,               family: GAN,       kind: unconditional}
+  - {name: dalle-3,              family: autoregressive, kind: txt2img}
+  - {name: midjourney-v6,        family: diffusion, kind: txt2img}
+  - {name: ideogram,             family: diffusion, kind: txt2img}
+inpainters:
+  - {name: stable-diffusion-inpaint, family: diffusion, kind: inpaint}
+  - {name: glide-inpaint,            family: diffusion, kind: inpaint}

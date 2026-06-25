@@ -1,0 +1,82 @@
+"""Manifest 数据契约：每行一个 Sample（对应报告 §13）。"""
+from __future__ import annotations
+from enum import Enum
+from typing import Literal, Optional, Union
+from pydantic import BaseModel, Field, field_validator, model_validator
+from forgery_pipeline.labels import validate_labels
+
+
+class TaskType(str, Enum):
+    real_pristine = "real_pristine"
+    whole_image_detection = "whole_image_detection"
+    localization = "localization"
+    explainable = "explainable"
+
+
+class Postprocess(BaseModel):
+    jpeg_quality: Union[int, Literal["none"]] = "none"
+    resize: str = "none"
+    blur: str = "none"
+    noise: str = "none"
+
+
+class Explanation(BaseModel):
+    location_description: str
+    visual_artifact_description: str
+    semantic_reasoning: str
+    forensic_conclusion: str
+
+
+class Sample(BaseModel):
+    image_id: str
+    image_path: str
+    real_image_path: Optional[str] = None
+    mask_path: Optional[str] = None
+    is_fake: int
+    task_type: TaskType
+    manipulation_level1: Optional[str] = None
+    manipulation_level2: Optional[str] = None
+    manipulation_level3: Optional[str] = None
+    manipulation_level4: Optional[str] = None
+    source_dataset: Optional[str] = None
+    generator_name: Optional[str] = None
+    generator_family: Optional[str] = None
+    prompt: Optional[str] = None
+    negative_prompt: Optional[str] = None
+    seed: Optional[int] = None
+    sampler: Optional[str] = None
+    steps: Optional[int] = None
+    cfg_scale: Optional[float] = None
+    mask_source: Optional[str] = None
+    mask_area_ratio: Optional[float] = None
+    postprocess: Postprocess = Field(default_factory=Postprocess)
+    quality_score: Optional[float] = None
+    quality_bucket: Optional[str] = None
+    split: Optional[str] = None
+    license: Optional[str] = None
+    explanation: Optional[Explanation] = None
+
+    @field_validator("is_fake")
+    @classmethod
+    def _check_is_fake(cls, v: int) -> int:
+        if v not in (0, 1):
+            raise ValueError("is_fake 必须是 0 或 1")
+        return v
+
+    @field_validator("mask_area_ratio", "quality_score")
+    @classmethod
+    def _check_unit_interval(cls, v):
+        if v is not None and not (0.0 <= v <= 1.0):
+            raise ValueError("取值必须落在 [0, 1]")
+        return v
+
+    @model_validator(mode="after")
+    def _check_label_consistency(self):
+        errs = validate_labels(
+            self.is_fake, self.task_type.value, self.mask_path,
+            self.manipulation_level1, self.manipulation_level2,
+            self.manipulation_level3,
+        )
+        if errs:
+            raise ValueError("; ".join(errs))
+        return self
