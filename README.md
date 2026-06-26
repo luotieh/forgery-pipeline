@@ -68,6 +68,16 @@ bash examples/run_mock_pipeline.sh
 - `data/run/stats.json`：规模与划分统计
 - `data/run/D0_real_pristine/ … D4_*`：图像与 mask 文件
 
+### 可视化检视生成的数据集
+
+```bash
+forgery-pipeline viewer --run data/run        # 生成 data/run/viewer.html
+# 或生成后自动用浏览器打开：
+forgery-pipeline viewer --run data/run --open
+```
+
+浏览器打开 `data/run/viewer.html`：缩略图画廊 + 按 `split / 篡改类型 / 生成器 / 真假` 筛选 + image_id 搜索；点击样本看 **原图 | 伪造图 | mask 叠加** 三联 + 层级标签 + 解释文本。纯静态页面（无服务器、零新依赖）。
+
 ## 目录结构
 
 ```
