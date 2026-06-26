@@ -45,3 +45,11 @@ class Explainer(ABC):
     def explain(self, image: Image, mask: Optional[Mask],
                 context: dict) -> Explanation:
         ...
+
+
+class Img2ImgGenerator(ABC):
+    """img2img / SDEdit 重绘（probe / 全图算子）。strength 控制起始噪声级 t0。"""
+    @abstractmethod
+    def img2img(self, image: Image, prompt: str, strength: float,
+                params: dict) -> tuple[Image, dict]:
+        ...

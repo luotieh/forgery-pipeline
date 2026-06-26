@@ -140,3 +140,25 @@ class MockExplainer(base.Explainer):
                                 "do not match the rest of the scene."),
             forensic_conclusion=f"The image is likely manipulated by {mtype}.",
         )
+
+
+class MockImg2Img(base.Img2ImgGenerator):
+    def __init__(self, name: str = "stable-diffusion-img2img",
+                 family: str = "diffusion"):
+        self.name, self.family = name, family
+
+    def img2img(self, image: np.ndarray, prompt: str, strength: float,
+                params: dict) -> tuple[np.ndarray, dict]:
+        seed = int(params.get("seed", 0))
+        rng = np.random.default_rng((seed + stable_hash(prompt)) & 0x7FFFFFFF)
+        h, w = image.shape[:2]
+        regen = synth_image(rng, h, w)                       # 模型“重绘”内容
+        a = float(np.clip(strength, 0.0, 1.0))               # 强度越大越偏离原图
+        out = np.clip((1 - a) * image.astype(np.float64)
+                      + a * regen.astype(np.float64), 0, 255).astype(np.uint8)
+        meta = {"generator_name": self.name, "generator_family": self.family,
+                "seed": seed, "strength": a,
+                "sampler": params.get("sampler", "DPM++ 2M"),
+                "steps": int(params.get("steps", 30)),
+                "cfg_scale": float(params.get("cfg_scale", 7.5))}
+        return out, meta

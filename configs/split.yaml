@@ -2,7 +2,8 @@
 ratios: {train: 0.70, val: 0.10, test_a: 0.05, test_b: 0.05, test_c: 0.03,
          test_d: 0.03, test_e: 0.02, test_f: 0.02}
 # 指定哪些生成器仅出现在 cross-generator 测试集（Test-B）
-holdout_generators: [ideogram, progan]
+# 含一个 inpainter（kandinsky-inpaint），让 D2 局部篡改也有 cross-generator test_b
+holdout_generators: [ideogram, progan, kandinsky-inpaint]
 # 指定哪类篡改仅出现在 cross-manipulation 测试集（Test-C）
 holdout_manipulation: [text_editing]
 # 指定哪些来源域仅出现在 cross-domain 测试集（Test-D）

@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Literal, Optional, Union
 from pydantic import BaseModel, Field, field_validator, model_validator
-from forgery_pipeline.labels import validate_labels
+from forgery_pipeline.labels import validate_labels, validate_operator
 
 
 class TaskType(str, Enum):
@@ -55,6 +55,11 @@ class Sample(BaseModel):
     split: Optional[str] = None
     license: Optional[str] = None
     explanation: Optional[Explanation] = None
+    # 新增：编辑算子参数（Gate 1/2 与算子逆估计所需）
+    strength: Optional[float] = None        # img2img/SDEdit 去噪强度 ∈ [0,1]，≈ 起始噪声级 t0/T
+    init_timestep: Optional[int] = None     # SDEdit 起始 timestep（可选，便于直接读 t0）
+    operator: Optional[str] = None          # 显式编辑算子（对齐闸门口径），取值见 labels.EDIT_OPERATORS
+    postprocess_of: Optional[str] = None    # 退化样本回链原始 fake 的 image_id；原图为 None
 
     @field_validator("is_fake")
     @classmethod
@@ -63,7 +68,7 @@ class Sample(BaseModel):
             raise ValueError("is_fake 必须是 0 或 1")
         return v
 
-    @field_validator("mask_area_ratio", "quality_score")
+    @field_validator("mask_area_ratio", "quality_score", "strength")
     @classmethod
     def _check_unit_interval(cls, v):
         if v is not None and not (0.0 <= v <= 1.0):
@@ -77,6 +82,7 @@ class Sample(BaseModel):
             self.manipulation_level1, self.manipulation_level2,
             self.manipulation_level3,
         )
+        errs += validate_operator(self.operator)
         if errs:
             raise ValueError("; ".join(errs))
         return self

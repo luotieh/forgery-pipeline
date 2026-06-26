@@ -44,3 +44,9 @@ def get_explainer(backend: str) -> base.Explainer:
     if backend == "mock":
         return mock.MockExplainer()
     _unsupported(backend)
+
+
+def get_img2img(backend: str, name: str, family: str) -> base.Img2ImgGenerator:
+    if backend == "mock":
+        return mock.MockImg2Img(name=name, family=family)
+    _unsupported(backend)

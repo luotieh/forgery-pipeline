@@ -56,6 +56,21 @@ def _cmd_viewer(args) -> int:
     return 0
 
 
+def _cmd_probe(args) -> int:
+    from forgery_pipeline.builders.probe import run_probe
+    cfg = load_config(args.config)
+    st = run_probe(
+        args.out, n_base=args.n_base,
+        strengths=[round(0.1 * i, 1) for i in range(1, 10)],
+        operators=["img2img", "inpaint", "outpaint",
+                   "object_replacement", "background_editing"],
+        img2img_specs=cfg.img2img, inpainter_specs=cfg.inpainters,
+        backend=cfg.backend, seed=cfg.seed,
+    )
+    print(json.dumps(st, ensure_ascii=False, indent=2))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="forgery-pipeline",
                                      description="伪造检测数据集生成 pipeline")
@@ -80,6 +95,12 @@ def main(argv: list[str] | None = None) -> int:
     p_view.add_argument("--max", type=int, default=None, help="最多渲染样本数")
     p_view.add_argument("--open", action="store_true", help="生成后尝试用浏览器打开")
     p_view.set_defaults(func=_cmd_viewer)
+
+    p_probe = sub.add_parser("probe", help="生成 Gate 1/2 受控 probe 子集")
+    p_probe.add_argument("--config", required=True)
+    p_probe.add_argument("--out", default="data/probe")
+    p_probe.add_argument("--n-base", type=int, default=40, dest="n_base")
+    p_probe.set_defaults(func=_cmd_probe)
 
     args = parser.parse_args(argv)
     return args.func(args)

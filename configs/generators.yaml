@@ -11,5 +11,10 @@ generators:
   - {name: midjourney-v6,        family: diffusion, kind: txt2img}
   - {name: ideogram,             family: diffusion, kind: txt2img}
 inpainters:
-  - {name: stable-diffusion-inpaint, family: diffusion, kind: inpaint}
-  - {name: glide-inpaint,            family: diffusion, kind: inpaint}
+  - {name: stable-diffusion-inpaint, family: diffusion,       kind: inpaint}
+  - {name: glide-inpaint,            family: diffusion,       kind: inpaint}
+  - {name: kandinsky-inpaint,        family: kandinsky,       kind: inpaint}   # 不同族
+  - {name: brushnet-sdxl,            family: diffusion-sdxl,   kind: inpaint}
+img2img:                                                                       # 新增：全图 img2img/SDEdit 算子
+  - {name: stable-diffusion-img2img, family: diffusion,       kind: img2img}
+  - {name: sdxl-img2img,             family: diffusion-sdxl,   kind: img2img}

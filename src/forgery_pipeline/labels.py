@@ -54,3 +54,17 @@ def validate_labels(is_fake: int, task_type: str, mask_path: Optional[str],
         if l2 is not None and l2 not in _WHOLE_ONLY_L2:
             errs.append(f"whole_generated 不应配 level2={l2!r}")
     return errs
+
+
+# 显式编辑算子词表（对齐闸门 {img2img, inpaint, outpaint, replace, background}）
+EDIT_OPERATORS = {
+    "img2img", "inpaint", "outpaint",
+    "object_insertion", "object_replacement", "object_removal",
+    "background_editing", "attribute_editing", "text_editing", "face_editing",
+}
+
+
+def validate_operator(op: Optional[str]) -> list[str]:
+    if op is None or op in EDIT_OPERATORS:
+        return []
+    return [f"operator 非法: {op!r}"]

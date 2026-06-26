@@ -9,3 +9,5 @@ venv/
 .pytest_cache/
 data/
 !data/.gitkeep
+# Windows 下载产生的 NTFS 备用数据流文件
+*:Zone.Identifier

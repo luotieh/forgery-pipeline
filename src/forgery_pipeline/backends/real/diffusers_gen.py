@@ -27,3 +27,19 @@ class DiffusersInpainter(base.Inpainter):
 
     def inpaint(self, image, mask, prompt, params):
         raise NotImplementedError
+
+
+class DiffusersImg2Img(base.Img2ImgGenerator):
+    def __init__(self, model_id: str, device: str = "cuda"):
+        try:
+            from diffusers import AutoPipelineForImage2Image  # noqa: F401
+        except ImportError as e:
+            raise NotImplementedError(
+                "未安装 diffusers：`pip install .[real]`。") from e
+        # TODO: self.pipe = AutoPipelineForImage2Image.from_pretrained(model_id).to(device)
+        raise NotImplementedError("参考骨架：加载 pipeline 并实现 img2img()。")
+
+    def img2img(self, image, prompt, strength, params):
+        # TODO: return self.pipe(prompt=prompt, image=PIL(image),
+        #            strength=strength, num_inference_steps=params.get("steps", 30)) ...
+        raise NotImplementedError
