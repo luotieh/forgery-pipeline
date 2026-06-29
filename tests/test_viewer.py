@@ -63,6 +63,21 @@ def test_build_viewer_max_samples(tmp_path):
     assert len(_embedded_samples(out)) == 3
 
 
+def test_viewer_includes_operator_strength(tmp_path):
+    from forgery_pipeline.schema import Sample, TaskType
+    from forgery_pipeline import image_io
+    run = tmp_path / "run"
+    image_io.save_image(np.zeros((32, 32, 3), np.uint8), run / "probe/g1/x.png")
+    s = Sample(image_id="probe_s_x", image_path="probe/g1/x.png", is_fake=1,
+               task_type=TaskType.whole_image_detection,
+               manipulation_level1="whole_generated", manipulation_level2="diffusion",
+               operator="img2img", strength=0.5)
+    manifest.write_jsonl(run / "manifest.jsonl", [s])
+    rec = _embedded_samples(build_viewer(run))[0]
+    assert rec["operator"] == "img2img" and rec["strength"] == 0.5
+    assert "postprocess_of" in rec
+
+
 # ---------- Task 3: CLI ----------
 
 def test_viewer_cli_ok(tmp_path):

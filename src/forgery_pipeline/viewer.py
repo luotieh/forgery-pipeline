@@ -34,7 +34,7 @@ table{border-collapse:collapse;margin-top:12px;font-size:12px}td{border:1px soli
 <div class="detail" id="detail"><p style="color:#9aa4b2">点击左侧缩略图查看详情</p></div></main>
 <script>
 const SAMPLES = __SAMPLES__;
-const FIELDS=[["split","split"],["task_type","task"],["manipulation_level1","level1"],["manipulation_level3","level3"],["generator_family","gen"]];
+const FIELDS=[["split","split"],["task_type","task"],["operator","op"],["manipulation_level1","level1"],["manipulation_level3","level3"],["generator_family","gen"]];
 const state={};
 function esc(x){return String(x==null?'':x).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 function distinct(f){return [...new Set(SAMPLES.map(s=>s[f]).filter(v=>v!=null))].sort();}
@@ -67,7 +67,7 @@ function showDetail(s){const e=s.explanation;
  document.getElementById('detail').innerHTML=
   `<div><span class="badge ${s.is_fake?'b-fake':'b-real'}">${s.is_fake?'FAKE':'REAL'}</span><b>${esc(s.image_id)}</b></div>`+
   `<div class="imgs">${imgs||'<p style=\\'color:#9aa4b2\\'>无图像</p>'}</div>`+
-  `<table>${row('task_type',s.task_type)}${row('split',s.split)}${row('level1',s.manipulation_level1)}${row('level3',s.manipulation_level3)}${row('generator',s.generator_name)}${row('family',s.generator_family)}${row('quality_score',s.quality_score)}${row('prompt',s.prompt)}</table>`+expl;}
+  `<table>${row('task_type',s.task_type)}${row('split',s.split)}${row('operator',s.operator)}${row('strength',s.strength)}${row('level1',s.manipulation_level1)}${row('level3',s.manipulation_level3)}${row('generator',s.generator_name)}${row('family',s.generator_family)}${row('quality_score',s.quality_score)}${row('postprocess_of',s.postprocess_of)}${row('prompt',s.prompt)}</table>`+expl;}
 buildFilters();render();
 </script></body></html>
 """
@@ -143,6 +143,8 @@ def build_viewer(run_dir, out_html=None, max_samples=None) -> Path:
             "generator_family": s.generator_family,
             "generator_name": s.generator_name,
             "quality_score": s.quality_score, "prompt": s.prompt,
+            "operator": s.operator, "strength": s.strength,
+            "postprocess_of": s.postprocess_of,
             "explanation": s.explanation.model_dump() if s.explanation else None,
             "paths": {"real": real_rel, "fake": _rel(fake_abs, out_dir),
                       "overlay": overlay_rel, "thumb": _rel(thumb_abs, out_dir)},
