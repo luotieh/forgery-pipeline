@@ -57,15 +57,22 @@ def _cmd_viewer(args) -> int:
 
 
 def _cmd_probe(args) -> int:
+    import yaml
+    from forgery_pipeline.config import load_generators
     from forgery_pipeline.builders.probe import run_probe
-    cfg = load_config(args.config)
+    data = yaml.safe_load(Path(args.config).read_text(encoding="utf-8"))
+    _, inps, imgs = load_generators(data["generators_config"])
+    out = args.out or data.get("out_dir", "data/probe")
+    n_base = args.n_base if args.n_base is not None else int(data.get("n_base", 40))
     st = run_probe(
-        args.out, n_base=args.n_base,
-        strengths=[round(0.1 * i, 1) for i in range(1, 10)],
-        operators=["img2img", "inpaint", "outpaint",
-                   "object_replacement", "background_editing"],
-        img2img_specs=cfg.img2img, inpainter_specs=cfg.inpainters,
-        backend=cfg.backend, seed=cfg.seed,
+        out, n_base=n_base,
+        strengths=data.get("strengths", [round(0.1 * i, 1) for i in range(1, 10)]),
+        operators=data.get("operators",
+                           ["img2img", "inpaint", "outpaint",
+                            "object_replacement", "background_editing"]),
+        img2img_specs=imgs, inpainter_specs=inps,
+        holdout_generators=set(data.get("holdout_generators", [])),
+        backend=data.get("backend", "mock"), seed=int(data.get("seed", 0)),
     )
     print(json.dumps(st, ensure_ascii=False, indent=2))
     return 0
@@ -98,8 +105,9 @@ def main(argv: list[str] | None = None) -> int:
 
     p_probe = sub.add_parser("probe", help="生成 Gate 1/2 受控 probe 子集")
     p_probe.add_argument("--config", required=True)
-    p_probe.add_argument("--out", default="data/probe")
-    p_probe.add_argument("--n-base", type=int, default=40, dest="n_base")
+    p_probe.add_argument("--out", default=None, help="输出目录，默认取 config 的 out_dir")
+    p_probe.add_argument("--n-base", type=int, default=None, dest="n_base",
+                         help="底图数，默认取 config 的 n_base")
     p_probe.set_defaults(func=_cmd_probe)
 
     args = parser.parse_args(argv)

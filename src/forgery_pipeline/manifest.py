@@ -48,5 +48,8 @@ def stats(samples: list[Sample]) -> dict:
         "by_task_type": dict(Counter(s.task_type.value for s in samples)),
         "by_generator_family": dict(
             Counter(s.generator_family for s in samples if s.generator_family)),
+        "by_generator_name": dict(
+            Counter(s.generator_name for s in samples if s.generator_name)),
+        "by_operator": dict(Counter(s.operator for s in samples if s.operator)),
         "by_split": dict(Counter(s.split for s in samples if s.split)),
     }

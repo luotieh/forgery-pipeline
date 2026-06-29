@@ -78,6 +78,14 @@ forgery-pipeline viewer --run data/run --open
 
 浏览器打开 `data/run/viewer.html`：缩略图画廊 + 按 `split / 篡改类型 / 生成器 / 真假` 筛选 + image_id 搜索；点击样本看 **原图 | 伪造图 | mask 叠加** 三联 + 层级标签 + 解释文本。纯静态页面（无服务器、零新依赖）。
 
+### 闸门实验数据（论文 Inverting the Edit）
+
+```bash
+forgery-pipeline probe --config configs/probe.yaml --out data/probe
+```
+
+产出受控 probe 子集（强度网格 + 算子×族网格 + 留出生成器 `test_b`）。每个闸门用哪个产物/字段见 [`docs/GATE_DATA.md`](docs/GATE_DATA.md)。
+
 ## 目录结构
 
 ```

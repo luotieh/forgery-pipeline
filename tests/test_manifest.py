@@ -38,3 +38,16 @@ def test_stats_counts():
     s = manifest.stats([_real(0), _fake(0), _fake(1)])
     assert s["by_task_type"]["whole_image_detection"] == 2
     assert s["by_generator_family"]["diffusion"] == 2
+
+
+def test_stats_includes_generator_name_and_operator():
+    from forgery_pipeline.schema import Sample, TaskType
+
+    def _i2i(i):
+        return Sample(image_id=f"a{i}", image_path=f"x{i}.png", is_fake=1,
+                      task_type=TaskType.whole_image_detection,
+                      manipulation_level1="whole_generated", manipulation_level2="diffusion",
+                      generator_name="sd-img2img", operator="img2img")
+    s = manifest.stats([_i2i(0), _i2i(1)])
+    assert s["by_generator_name"]["sd-img2img"] == 2
+    assert s["by_operator"]["img2img"] == 2

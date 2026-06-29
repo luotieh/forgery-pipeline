@@ -1,0 +1,9 @@
+out_dir: data/probe
+seed: 1234
+backend: mock
+generators_config: configs/generators.yaml
+n_base: 40
+strengths: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+operators: [img2img, inpaint, outpaint, object_replacement, background_editing]
+# 留出族（cross-generator 测试，闸门 3b）：一个 inpainter + 一个 img2img 模型
+holdout_generators: [kandinsky-inpaint, sdxl-img2img]

@@ -13,6 +13,13 @@ from forgery_pipeline.builders.d0_real import build_d0
 from forgery_pipeline.config import GeneratorSpec
 from forgery_pipeline.schema import Sample, TaskType
 
+_NUM_TRAIN_TIMESTEPS = 1000
+
+
+def _split_for(name, holdout) -> str:
+    return "test_b" if name in set(holdout) else "train"
+
+
 # 算子 -> (level1, level2, level3, 掩码类型)；img2img 为全图、无掩码
 _OP_SPEC = {
     "img2img":            ("whole",   "diffusion",   None,                   None),
@@ -47,8 +54,9 @@ def _mask_for(kind, h, w, rng):
 
 
 def build_probe_strength(out_dir, bases: list[Sample], img2img_specs: list[GeneratorSpec],
-                         strengths, backend: str, seed: int) -> list[Sample]:
-    """Gate 1：每个底图 × 每个强度做一次 img2img，记录 strength。"""
+                         strengths, backend: str, seed: int,
+                         holdout_generators=()) -> list[Sample]:
+    """Gate 1：每个底图 × 每个强度做一次 img2img，记录 strength + init_timestep + split。"""
     out = Path(out_dir)
     samples: list[Sample] = []
     for bi, base in enumerate(bases):
@@ -61,13 +69,15 @@ def build_probe_strength(out_dir, bases: list[Sample], img2img_specs: list[Gener
             iid = ids.make_image_id("probe_s", f"{base.image_id}-{spec.name}-{s}")
             rel = f"probe/gate1_strength/{iid}.png"
             image_io.save_image(fake, out / rel)
+            st = float(meta.get("strength", s))
             samples.append(Sample(
                 image_id=iid, image_path=rel, real_image_path=base.image_path, is_fake=1,
                 task_type=TaskType.whole_image_detection,
                 manipulation_level1="whole_generated", manipulation_level2="diffusion",
                 manipulation_level4=spec.name, generator_name=spec.name,
                 generator_family=spec.family, operator="img2img",
-                strength=float(meta.get("strength", s)), seed=sd,
+                strength=st, init_timestep=int(round(st * _NUM_TRAIN_TIMESTEPS)),
+                seed=sd, split=_split_for(spec.name, holdout_generators),
                 source_dataset=base.source_dataset,
             ))
     return samples
@@ -75,8 +85,8 @@ def build_probe_strength(out_dir, bases: list[Sample], img2img_specs: list[Gener
 
 def build_probe_operator(out_dir, bases: list[Sample], img2img_specs: list[GeneratorSpec],
                          inpainter_specs: list[GeneratorSpec], operators,
-                         backend: str, seed: int) -> list[Sample]:
-    """Gate 2：每个底图 × 每个算子 × 每个生成器族各一份，记录 operator + generator_family。"""
+                         backend: str, seed: int, holdout_generators=()) -> list[Sample]:
+    """Gate 2：每个底图 × 每个算子 × 每个生成器，记录 operator + generator_family + split。"""
     out = Path(out_dir)
     seg = registry.get_segmenter(backend, seed=seed)  # noqa: F841 (预留真实分割)
     samples: list[Sample] = []
@@ -90,19 +100,21 @@ def build_probe_operator(out_dir, bases: list[Sample], img2img_specs: list[Gener
                 sd = seed + bi * 1000 + (stable_hash(f"{op}-{spec.name}") % 500)
                 rng = np.random.default_rng(sd & 0x7FFFFFFF)
                 iid = ids.make_image_id("probe_op", f"{base.image_id}-{op}-{spec.name}")
+                sp = _split_for(spec.name, holdout_generators)
                 if op == "img2img":
                     gen = registry.get_img2img(backend, spec.name, spec.family)
                     fake, meta = gen.img2img(img, "", 0.6, {"seed": sd})
                     rel = f"probe/gate2_operator/{iid}.png"
                     image_io.save_image(fake, out / rel)
+                    st = float(meta.get("strength", 0.6))
                     samples.append(Sample(
                         image_id=iid, image_path=rel, real_image_path=base.image_path,
                         is_fake=1, task_type=TaskType.whole_image_detection,
                         manipulation_level1="whole_generated", manipulation_level2="diffusion",
                         manipulation_level4=spec.name, generator_name=spec.name,
                         generator_family=spec.family, operator="img2img",
-                        strength=float(meta.get("strength", 0.6)), seed=sd,
-                        source_dataset=base.source_dataset,
+                        strength=st, init_timestep=int(round(st * _NUM_TRAIN_TIMESTEPS)),
+                        seed=sd, split=sp, source_dataset=base.source_dataset,
                     ))
                 else:
                     mask = _mask_for(mkind, h, w, rng)
@@ -118,7 +130,7 @@ def build_probe_operator(out_dir, bases: list[Sample], img2img_specs: list[Gener
                         manipulation_level1="partial_manipulated", manipulation_level2=l2,
                         manipulation_level3=l3, manipulation_level4=spec.name,
                         generator_name=spec.name, generator_family=spec.family,
-                        operator=op, mask_source="probe", seed=sd,
+                        operator=op, mask_source="probe", seed=sd, split=sp,
                         source_dataset=base.source_dataset,
                     ))
     return samples
@@ -126,11 +138,15 @@ def build_probe_operator(out_dir, bases: list[Sample], img2img_specs: list[Gener
 
 def run_probe(out_dir, *, n_base: int, strengths, operators,
               img2img_specs: list[GeneratorSpec], inpainter_specs: list[GeneratorSpec],
-              backend: str = "mock", seed: int = 0) -> dict:
+              holdout_generators=(), backend: str = "mock", seed: int = 0) -> dict:
     out = Path(out_dir); out.mkdir(parents=True, exist_ok=True)
     bases = build_d0(out, n_base, backend, seed)
-    g1 = build_probe_strength(out, bases, img2img_specs, strengths, backend, seed)
-    g2 = build_probe_operator(out, bases, img2img_specs, inpainter_specs, operators, backend, seed)
+    for b in bases:
+        b.split = "train"
+    g1 = build_probe_strength(out, bases, img2img_specs, strengths, backend, seed,
+                              holdout_generators)
+    g2 = build_probe_operator(out, bases, img2img_specs, inpainter_specs, operators,
+                              backend, seed, holdout_generators)
     manifest.write_jsonl(out / "gate1_strength.jsonl", g1)
     manifest.write_jsonl(out / "gate2_operator.jsonl", g2)
     samples = bases + g1 + g2
