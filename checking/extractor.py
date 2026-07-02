@@ -62,9 +62,13 @@ class MultiSigmaResidual(ResidualExtractor):
         return np.stack(maps).astype(np.float32)
 
 
-class DiffusersSD2Residual(ResidualExtractor):
-    """真实多 σ Tweedie 残差（冻结 SD2）。懒加载；需 diffusers + GPU。"""
-    def __init__(self, model_id: str = "stabilityai/stable-diffusion-2-base",
+class DiffusersResidual(ResidualExtractor):
+    """真实多 σ Tweedie 残差（冻结扩散先验）。懒加载；需 diffusers + GPU。
+
+    默认用 SD1.5（512, ε-prediction）——stabilityai SD2 repo 已从 HF 下架；
+    方法与具体先验无关（PAPER §2.1 的多 σ 去噪残差）。
+    """
+    def __init__(self, model_id: str = "stable-diffusion-v1-5/stable-diffusion-v1-5",
                  device: str = "cuda", timesteps=(50, 150, 300, 500, 700)):
         self.model_id, self.device = model_id, device
         self.sigmas = list(timesteps)          # 多 σ = 多 t
@@ -124,5 +128,5 @@ def get_extractor(name: str = "multisigma") -> ResidualExtractor:
     if name == "multisigma":
         return MultiSigmaResidual()
     if name == "real":
-        return DiffusersSD2Residual()
+        return DiffusersResidual()
     raise ValueError(f"未知 extractor: {name!r}（可选 multisigma / real）")

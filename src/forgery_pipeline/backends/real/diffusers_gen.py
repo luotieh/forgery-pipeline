@@ -1,12 +1,16 @@
-"""真实 diffusers 生成后端（SD2）。懒加载：__init__ 不 import diffusers/不占显存。"""
+"""真实 diffusers 生成后端。懒加载：__init__ 不 import diffusers/不占显存。
+
+注：stabilityai 的 SD2 repo 已从 HF 下架，改用可获取的 SD1.5（512 分辨率、
+ε-prediction，与残差提取器口径一致）。方法与具体先验模型无关。
+"""
 from __future__ import annotations
 import cv2
 import numpy as np
 from PIL import Image
 from forgery_pipeline.backends import base
 
-_SD2 = "stabilityai/stable-diffusion-2-base"
-_SD2_INPAINT = "stabilityai/stable-diffusion-2-inpainting"
+_SD = "stable-diffusion-v1-5/stable-diffusion-v1-5"
+_SD_INPAINT = "stable-diffusion-v1-5/stable-diffusion-inpainting"
 
 
 def _to_uint8_like(pil_img, ref: np.ndarray) -> np.ndarray:
@@ -17,9 +21,9 @@ def _to_uint8_like(pil_img, ref: np.ndarray) -> np.ndarray:
 
 
 class DiffusersImg2Img(base.Img2ImgGenerator):
-    def __init__(self, model_id: str = _SD2, device: str = "cuda", dtype: str = "fp16"):
+    def __init__(self, model_id: str = _SD, device: str = "cuda", dtype: str = "fp16"):
         self.model_id, self.device, self.dtype = model_id, device, dtype
-        self.name, self.family = "stable-diffusion-2-img2img", "diffusion"
+        self.name, self.family = "stable-diffusion-1-5-img2img", "diffusion"
         self._pipe = None
 
     def _ensure(self):
@@ -28,7 +32,8 @@ class DiffusersImg2Img(base.Img2ImgGenerator):
         import torch
         from diffusers import AutoPipelineForImage2Image
         self._pipe = AutoPipelineForImage2Image.from_pretrained(
-            self.model_id, torch_dtype=torch.float16).to(self.device)
+            self.model_id, torch_dtype=torch.float16,
+            safety_checker=None, requires_safety_checker=False).to(self.device)
         self._pipe.set_progress_bar_config(disable=True)
         self._pipe.enable_attention_slicing()
 
@@ -48,9 +53,9 @@ class DiffusersImg2Img(base.Img2ImgGenerator):
 
 
 class DiffusersInpainter(base.Inpainter):
-    def __init__(self, model_id: str = _SD2_INPAINT, device: str = "cuda", dtype: str = "fp16"):
+    def __init__(self, model_id: str = _SD_INPAINT, device: str = "cuda", dtype: str = "fp16"):
         self.model_id, self.device, self.dtype = model_id, device, dtype
-        self.name, self.family = "stable-diffusion-2-inpaint", "diffusion"
+        self.name, self.family = "stable-diffusion-1-5-inpaint", "diffusion"
         self._pipe = None
 
     def _ensure(self):
@@ -59,7 +64,8 @@ class DiffusersInpainter(base.Inpainter):
         import torch
         from diffusers import AutoPipelineForInpainting
         self._pipe = AutoPipelineForInpainting.from_pretrained(
-            self.model_id, torch_dtype=torch.float16).to(self.device)
+            self.model_id, torch_dtype=torch.float16,
+            safety_checker=None, requires_safety_checker=False).to(self.device)
         self._pipe.set_progress_bar_config(disable=True)
         self._pipe.enable_attention_slicing()
 

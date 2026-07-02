@@ -1,5 +1,5 @@
 import numpy as np
-from checking.extractor import MultiSigmaResidual, DiffusersSD2Residual, get_extractor
+from checking.extractor import MultiSigmaResidual, DiffusersResidual, get_extractor
 
 
 def test_multisigma_profile_and_map_shapes():
@@ -16,5 +16,5 @@ def test_multisigma_profile_and_map_shapes():
 def test_get_extractor_and_real_lazy():
     assert isinstance(get_extractor("multisigma"), MultiSigmaResidual)
     ext = get_extractor("real")               # 惰性：构造不加载模型
-    assert isinstance(ext, DiffusersSD2Residual)
+    assert isinstance(ext, DiffusersResidual)
     assert ext._unet is None
