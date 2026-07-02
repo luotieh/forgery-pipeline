@@ -33,12 +33,22 @@ def get_whole_generator(backend: str, name: str, family: str) -> base.WholeImage
     _unsupported(backend)
 
 
+_REAL_CACHE: dict[str, object] = {}
+
+
+def _real_cached(key: str, factory):
+    # probe 循环内每个样本都取生成器；缓存实例避免重复加载扩散管线
+    if key not in _REAL_CACHE:
+        _REAL_CACHE[key] = factory()
+    return _REAL_CACHE[key]
+
+
 def get_inpainter(backend: str, name: str, family: str) -> base.Inpainter:
     if backend == "mock":
         return mock.MockInpainter(name=name, family=family)
     if backend == "real":
         from forgery_pipeline.backends.real.diffusers_gen import DiffusersInpainter
-        return DiffusersInpainter()
+        return _real_cached("inpaint", DiffusersInpainter)
     _unsupported(backend)
 
 
@@ -61,5 +71,5 @@ def get_img2img(backend: str, name: str, family: str) -> base.Img2ImgGenerator:
         return mock.MockImg2Img(name=name, family=family)
     if backend == "real":
         from forgery_pipeline.backends.real.diffusers_gen import DiffusersImg2Img
-        return DiffusersImg2Img()
+        return _real_cached("img2img", DiffusersImg2Img)
     _unsupported(backend)

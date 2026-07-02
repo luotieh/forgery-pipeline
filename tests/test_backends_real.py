@@ -29,3 +29,9 @@ def test_registry_real_generators_lazy():
     assert isinstance(registry.get_segmenter("real"), mock.MockSegmenter)
     # 构造不触发模型加载（无 GPU/无 diffusers 也能构造）
     assert DiffusersImg2Img()._pipe is None
+
+
+def test_registry_real_generators_cached():
+    # probe 循环内反复取生成器；real 后端必须复用实例，否则每个样本重载管线
+    assert registry.get_img2img("real", "x", "y") is registry.get_img2img("real", "z", "w")
+    assert registry.get_inpainter("real", "x", "y") is registry.get_inpainter("real", "z", "w")
