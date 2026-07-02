@@ -47,8 +47,11 @@ def get_inpainter(backend: str, name: str, family: str) -> base.Inpainter:
     if backend == "mock":
         return mock.MockInpainter(name=name, family=family)
     if backend == "real":
-        from forgery_pipeline.backends.real.diffusers_gen import DiffusersInpainter
-        return _real_cached("inpaint", DiffusersInpainter)
+        from forgery_pipeline.backends.real import diffusers_gen as dg
+        model_id, fam = dg.INPAINT_MODELS.get(name, (None, family))
+        model_id = model_id or dg.DiffusersInpainter().model_id
+        return _real_cached(f"inpaint:{name}", lambda: dg.DiffusersInpainter(
+            model_id=model_id, name=name, family=fam))
     _unsupported(backend)
 
 
@@ -70,6 +73,9 @@ def get_img2img(backend: str, name: str, family: str) -> base.Img2ImgGenerator:
     if backend == "mock":
         return mock.MockImg2Img(name=name, family=family)
     if backend == "real":
-        from forgery_pipeline.backends.real.diffusers_gen import DiffusersImg2Img
-        return _real_cached("img2img", DiffusersImg2Img)
+        from forgery_pipeline.backends.real import diffusers_gen as dg
+        model_id, fam = dg.IMG2IMG_MODELS.get(name, (None, family))
+        model_id = model_id or dg.DiffusersImg2Img().model_id
+        return _real_cached(f"img2img:{name}", lambda: dg.DiffusersImg2Img(
+            model_id=model_id, name=name, family=fam))
     _unsupported(backend)

@@ -1,0 +1,9 @@
+# 真实后端生成器清单（name 必须在 diffusers_gen 的 MODEL 映射中，标签才如实）
+# img2img 仅 SD1.5：保持 gate1 强度网格单生成器、与 2026-07-02 结果可比
+# inpainters 两个异族先验：SD1.5(diffusion) + Kandinsky 2.2(kandinsky, unCLIP 架构)
+generators: []
+inpainters:
+  - {name: stable-diffusion-inpaint, family: diffusion, kind: inpaint}
+  - {name: kandinsky-inpaint,        family: kandinsky, kind: inpaint}
+img2img:
+  - {name: stable-diffusion-img2img, family: diffusion, kind: img2img}
