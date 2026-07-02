@@ -5,6 +5,24 @@ import cv2
 import numpy as np
 
 
+def _region_descriptors(agg: np.ndarray) -> np.ndarray:
+    """高残差区（agg≥p90）的几何：归一化重心 cy/cx、扩散、边界带/中心区残差比。"""
+    H, W = agg.shape
+    thr = np.quantile(agg, 0.9)
+    ys, xs = np.nonzero(agg >= thr)
+    if len(ys) == 0:
+        cy = cx = 0.5; spread = 0.0
+    else:
+        cy = float(ys.mean()) / H; cx = float(xs.mean()) / W
+        spread = float(np.sqrt(((ys / H - cy) ** 2 + (xs / W - cx) ** 2).mean()))
+    b = max(1, min(H, W) // 8)
+    border = np.concatenate([agg[:b].ravel(), agg[-b:].ravel(),
+                             agg[:, :b].ravel(), agg[:, -b:].ravel()])
+    center = agg[b:H - b, b:W - b]
+    bc = float(border.mean() / (center.mean() + 1e-8)) if center.size else 1.0
+    return np.array([cy, cx, spread, bc], np.float32)
+
+
 class ResidualExtractor(ABC):
     sigmas: list
 
@@ -14,10 +32,20 @@ class ResidualExtractor(ABC):
 
     def profile(self, image: np.ndarray) -> np.ndarray:
         rs = self.residual_stack(image)
-        return np.concatenate([rs.mean(axis=(1, 2)), rs.std(axis=(1, 2))]).astype(np.float32)
+        per_scale = np.concatenate([rs.mean(axis=(1, 2)), rs.std(axis=(1, 2))])
+        agg = rs.mean(axis=0)
+        q = np.quantile(agg, [0.1, 0.5, 0.9])
+        return np.concatenate([per_scale, q, _region_descriptors(agg)]).astype(np.float32)
 
     def residual_map(self, image: np.ndarray) -> np.ndarray:
         return self.residual_stack(image).mean(axis=0).astype(np.float32)
+
+    def detection_score(self, image: np.ndarray) -> float:
+        """残差图 top-decile 均值：对局部编辑比全局均值更灵敏。"""
+        rm = self.residual_map(image)
+        thr = float(np.quantile(rm, 0.90))
+        top = rm[rm >= thr]
+        return float(top.mean()) if top.size else float(rm.mean())
 
 
 class MultiSigmaResidual(ResidualExtractor):

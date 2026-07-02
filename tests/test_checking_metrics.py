@@ -30,3 +30,12 @@ def test_linear_and_pca_and_split():
     assert pca_2d(np.random.default_rng(0).random((8, 5))).shape == (8, 2)
     tr, te = group_split(["g1", "g1", "g2", "g3"], test_frac=0.5, seed=0)
     assert set(tr) & set(te) == set() and len(tr) + len(te) == 4
+
+
+def test_bootstrap_ci():
+    from checking.metrics import bootstrap_ci, separability_auc
+    y = [0, 0, 0, 0, 1, 1, 1, 1]
+    s = [0.1, 0.2, 0.15, 0.05, 0.9, 0.8, 0.85, 0.95]
+    lo, hi = bootstrap_ci(y, s, separability_auc, n_boot=100, seed=0)
+    assert 0.5 <= lo <= hi <= 1.0
+    assert bootstrap_ci([0, 1], [0.1, 0.9], separability_auc) == [None, None]

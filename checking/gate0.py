@@ -16,7 +16,7 @@ def run(run_dir, extractor, max_n: int = 200) -> dict:
         except Exception:
             continue
         rmap = extractor.residual_map(img)
-        det_y.append(int(s.is_fake)); det_s.append(float(rmap.mean()))
+        det_y.append(int(s.is_fake)); det_s.append(extractor.detection_score(img))
         m = data.mask_of(run_dir, s)
         if m is not None and m.shape == rmap.shape and (m > 127).any() and (m <= 127).any():
             loc.append(separability_auc((m > 127).astype(int).ravel(), rmap.ravel()))

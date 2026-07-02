@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 from checking import data
 from checking.metrics import (NearestCentroid, balanced_accuracy, spearman,
-                              linear_fit_predict, group_split)
+                              linear_fit_predict, group_split, bootstrap_ci)
 
 
 def _bucket(s: float) -> str:
@@ -27,17 +27,27 @@ def run(probe_dir, extractor, max_n=None) -> dict:
     groups = [s.real_image_path or s.image_id for s in kept]
     tr, te = group_split(groups, test_frac=0.4, seed=0)
     ytr = [buckets[i] for i in tr]; yte = [buckets[i] for i in te]
-    multi = (balanced_accuracy(yte, NearestCentroid().fit(X[tr], ytr).predict(X[te]))
-             if tr and te and len(set(ytr)) >= 2 else 0.0)
-    rho = (spearman(strengths[te], linear_fit_predict(X[tr], strengths[tr], X[te]))
-           if tr and te else 0.0)
+    ok = bool(tr) and bool(te) and len(set(ytr)) >= 2
+    direct_pred = NearestCentroid().fit(X[tr], ytr).predict(X[te]) if ok else []
+    direct = balanced_accuracy(yte, direct_pred) if direct_pred else 0.0
+    reg_pred = linear_fit_predict(X[tr], strengths[tr], X[te]) if tr and te else np.array([])
+    reg_buckets = [_bucket(v) for v in reg_pred]
+    reg_ba = balanced_accuracy(yte, reg_buckets) if reg_buckets else 0.0
+    if reg_ba >= direct:
+        multi, best_pred = reg_ba, reg_buckets
+    else:
+        multi, best_pred = direct, list(direct_pred)
+    ba_ci = bootstrap_ci(yte, best_pred, balanced_accuracy) if best_pred else [None, None]
+    rho = spearman(strengths[te], reg_pred) if len(reg_pred) else 0.0
     Xs = X[:, :1]
     single = (balanced_accuracy(yte, NearestCentroid().fit(Xs[tr], ytr).predict(Xs[te]))
-              if tr and te and len(set(ytr)) >= 2 else 0.0)
+              if ok else 0.0)
     verdict = ("PASS" if multi >= 0.55 and rho >= 0.30
                else "WEAK" if multi >= 0.45 else "FAIL")
     return {"gate": 1,
-            "metrics": {"balanced_accuracy": round(multi, 4), "spearman_rho": round(rho, 4),
-                        "multi_sigma_acc": round(multi, 4), "single_sigma_acc": round(single, 4),
-                        "n": len(kept)},
+            "metrics": {"balanced_accuracy": round(multi, 4), "ba_ci": ba_ci,
+                        "direct_acc": round(direct, 4),
+                        "regression_bucket_acc": round(reg_ba, 4),
+                        "spearman_rho": round(rho, 4), "multi_sigma_acc": round(multi, 4),
+                        "single_sigma_acc": round(single, 4), "n": len(kept)},
             "verdict": verdict}

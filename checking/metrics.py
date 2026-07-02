@@ -73,3 +73,23 @@ def group_split(keys, test_frac: float = 0.4, seed: int = 0):
     train_idx = [i for i, k in enumerate(keys) if k not in test_groups]
     test_idx = [i for i, k in enumerate(keys) if k in test_groups]
     return train_idx, test_idx
+
+
+def bootstrap_ci(a, b, metric, n_boot: int = 200, seed: int = 0, alpha: float = 0.05):
+    """对 metric(a[idx], b[idx]) 做自助法置信区间；样本<4 或无值返回 [None, None]。"""
+    a = np.asarray(a, dtype=object); b = np.asarray(b, dtype=object)
+    n = len(a)
+    if n < 4:
+        return [None, None]
+    rng = np.random.default_rng(seed)
+    vals = []
+    for _ in range(n_boot):
+        idx = rng.integers(0, n, n)
+        try:
+            vals.append(float(metric(list(a[idx]), list(b[idx]))))
+        except Exception:
+            continue
+    if not vals:
+        return [None, None]
+    lo, hi = np.quantile(vals, [alpha / 2, 1 - alpha / 2])
+    return [round(float(lo), 4), round(float(hi), 4)]
