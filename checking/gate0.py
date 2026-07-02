@@ -8,7 +8,11 @@ from checking.metrics import separability_auc
 
 def run(run_dir, extractor, max_n: int = 200) -> dict:
     run_dir = Path(run_dir)
-    samples = data.load(run_dir / "manifest.jsonl")[:max_n]
+    samples = data.load(run_dir / "manifest.jsonl")
+    if max_n and len(samples) > max_n:
+        # 等间隔取样：manifest 分段有序（pristine→gate1→gate2），头部截断会漏掉整段掩码样本
+        idx = np.linspace(0, len(samples) - 1, max_n).round().astype(int)
+        samples = [samples[i] for i in dict.fromkeys(idx.tolist())]
     det_y, det_s, loc = [], [], []
     for s in samples:
         try:
