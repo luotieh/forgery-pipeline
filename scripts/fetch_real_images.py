@@ -23,7 +23,7 @@ def fetch(out_dir="data/real_base", n=200, size=512, start_id=0) -> int:
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default="data/real_base")
+    ap.add_argument("--out", dest="out_dir", default="data/real_base")
     ap.add_argument("--n", type=int, default=200)
     ap.add_argument("--size", type=int, default=512)
     raise SystemExit(0 if fetch(**vars(ap.parse_args())) else 1)
