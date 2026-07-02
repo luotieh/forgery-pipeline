@@ -1,0 +1,8 @@
+out_dir: data/probe_real
+seed: 1234
+backend: real
+generators_config: configs/generators.yaml
+n_base: 8
+strengths: [0.1, 0.3, 0.5, 0.7, 0.9]
+operators: [img2img, inpaint, outpaint, object_replacement, background_editing]
+holdout_generators: []

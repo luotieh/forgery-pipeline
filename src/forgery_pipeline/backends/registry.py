@@ -19,6 +19,11 @@ def _unsupported(backend: str):
 def get_image_source(backend: str, seed: int = 0) -> base.ImageSource:
     if backend == "mock":
         return mock.MockImageSource(seed=seed)
+    if backend == "real":
+        import os
+        from forgery_pipeline.backends.real.local_source import LocalImageSource
+        return LocalImageSource(os.environ.get("FORGERY_REAL_IMAGE_DIR", "data/real_base"),
+                                seed=seed)
     _unsupported(backend)
 
 
@@ -31,12 +36,17 @@ def get_whole_generator(backend: str, name: str, family: str) -> base.WholeImage
 def get_inpainter(backend: str, name: str, family: str) -> base.Inpainter:
     if backend == "mock":
         return mock.MockInpainter(name=name, family=family)
+    if backend == "real":
+        from forgery_pipeline.backends.real.diffusers_gen import DiffusersInpainter
+        return DiffusersInpainter()
     _unsupported(backend)
 
 
 def get_segmenter(backend: str, seed: int = 0) -> base.Segmenter:
     if backend == "mock":
         return mock.MockSegmenter(seed=seed)
+    if backend == "real":
+        return mock.MockSegmenter(seed=seed)  # probe 用几何掩码，占位无害
     _unsupported(backend)
 
 
@@ -49,4 +59,7 @@ def get_explainer(backend: str) -> base.Explainer:
 def get_img2img(backend: str, name: str, family: str) -> base.Img2ImgGenerator:
     if backend == "mock":
         return mock.MockImg2Img(name=name, family=family)
+    if backend == "real":
+        from forgery_pipeline.backends.real.diffusers_gen import DiffusersImg2Img
+        return DiffusersImg2Img()
     _unsupported(backend)

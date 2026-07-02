@@ -63,22 +63,61 @@ class MultiSigmaResidual(ResidualExtractor):
 
 
 class DiffusersSD2Residual(ResidualExtractor):
-    """真实多 σ Tweedie 残差骨架（冻结 SD2）。需 `pip install .[real]` + GPU。"""
+    """真实多 σ Tweedie 残差（冻结 SD2）。懒加载；需 diffusers + GPU。"""
     def __init__(self, model_id: str = "stabilityai/stable-diffusion-2-base",
-                 device: str = "cuda", sigmas=(0.1, 0.2, 0.4, 0.6, 0.8)):
-        self.sigmas = list(sigmas)
-        try:
-            import torch  # noqa: F401
-            import diffusers  # noqa: F401
-        except ImportError as e:
-            raise NotImplementedError(
-                "真实 SD2 提取器未启用：请 `pip install .[real]`（torch/diffusers）并提供 GPU。") from e
-        raise NotImplementedError(
-            "参考骨架：VAE 编码 z0 → 多 t 加噪 z_t → UNet ε̂ → r_ε(t)=‖ε−ε̂‖²、"
-            "一步反演 ẑ0 → r_x(t)=‖z0−ẑ0‖²，堆叠成 residual_stack。")
+                 device: str = "cuda", timesteps=(50, 150, 300, 500, 700)):
+        self.model_id, self.device = model_id, device
+        self.sigmas = list(timesteps)          # 多 σ = 多 t
+        self._unet = None
 
-    def residual_stack(self, image):
-        raise NotImplementedError
+    def _ensure(self):
+        if self._unet is not None:
+            return
+        import torch
+        from diffusers import AutoencoderKL, UNet2DConditionModel, DDPMScheduler
+        from transformers import CLIPTextModel, CLIPTokenizer
+        m = self.model_id
+        self._vae = AutoencoderKL.from_pretrained(
+            m, subfolder="vae", torch_dtype=torch.float32).to(self.device).eval()
+        self._unet = UNet2DConditionModel.from_pretrained(
+            m, subfolder="unet", torch_dtype=torch.float16).to(self.device).eval()
+        self._abar = DDPMScheduler.from_pretrained(m, subfolder="scheduler").alphas_cumprod
+        tok = CLIPTokenizer.from_pretrained(m, subfolder="tokenizer")
+        te = CLIPTextModel.from_pretrained(
+            m, subfolder="text_encoder", torch_dtype=torch.float16).to(self.device).eval()
+        ids = tok("", padding="max_length", max_length=tok.model_max_length,
+                  return_tensors="pt").input_ids.to(self.device)
+        with torch.no_grad():
+            self._null = te(ids)[0]
+
+    def residual_stack(self, image: np.ndarray) -> np.ndarray:
+        import hashlib
+        import torch
+        self._ensure()
+        H, W = image.shape[:2]
+        img512 = cv2.resize(image, (512, 512))
+        x = (torch.from_numpy(img512).float().permute(2, 0, 1)[None] / 127.5 - 1.0
+             ).to(self.device, torch.float32)
+        seed_base = int.from_bytes(
+            hashlib.sha1(np.ascontiguousarray(img512).tobytes()).digest()[:4], "big")
+        maps = []
+        with torch.no_grad():
+            z0 = self._vae.encode(x).latent_dist.mean * self._vae.config.scaling_factor
+            for t in self.sigmas:
+                g = torch.Generator(self.device).manual_seed((seed_base + int(t)) & 0x7FFFFFFF)
+                eps = torch.randn(z0.shape, generator=g, device=self.device, dtype=torch.float32)
+                abar = self._abar[int(t)].to(self.device).float()
+                zt = abar.sqrt() * z0 + (1 - abar).sqrt() * eps
+                eps_hat = self._unet(zt.half(), int(t),
+                                     encoder_hidden_states=self._null).sample.float()
+                r_eps = ((eps - eps_hat) ** 2).mean(dim=1)[0]
+                z0_hat = (zt - (1 - abar).sqrt() * eps_hat) / abar.sqrt()
+                r_x = ((z0 - z0_hat) ** 2).mean(dim=1)[0]
+                mp = (r_eps + r_x).cpu().numpy()
+                p99 = float(np.percentile(mp, 99)) + 1e-8
+                mp = np.clip(mp / p99, 0.0, 1.0)
+                maps.append(cv2.resize(mp.astype(np.float32), (W, H)))
+        return np.stack(maps).astype(np.float32)
 
 
 def get_extractor(name: str = "multisigma") -> ResidualExtractor:

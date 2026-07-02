@@ -1,6 +1,5 @@
 import numpy as np
-import pytest
-from checking.extractor import MultiSigmaResidual, get_extractor
+from checking.extractor import MultiSigmaResidual, DiffusersSD2Residual, get_extractor
 
 
 def test_multisigma_profile_and_map_shapes():
@@ -14,7 +13,8 @@ def test_multisigma_profile_and_map_shapes():
     assert isinstance(ds, float) and ds == ds  # 有限
 
 
-def test_get_extractor_and_real_stub():
+def test_get_extractor_and_real_lazy():
     assert isinstance(get_extractor("multisigma"), MultiSigmaResidual)
-    with pytest.raises(NotImplementedError):
-        get_extractor("real")
+    ext = get_extractor("real")               # 惰性：构造不加载模型
+    assert isinstance(ext, DiffusersSD2Residual)
+    assert ext._unet is None
