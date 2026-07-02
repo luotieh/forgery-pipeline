@@ -7,8 +7,12 @@ from checking.metrics import (NearestCentroid, balanced_accuracy, spearman,
                               linear_fit_predict, group_split, bootstrap_ci)
 
 
-def _bucket(s: float) -> str:
-    return "low" if s < 0.35 else ("mid" if s < 0.65 else "high")
+def _bucket(s: float, lo: float = 0.35, hi: float = 0.65) -> str:
+    return "low" if s < lo else ("mid" if s < hi else "high")
+
+
+# 桶边界敏感性网格：BA 读数不能只依赖单一桶界
+_BOUNDARY_GRID = [(0.30, 0.60), (0.35, 0.65), (0.40, 0.70)]
 
 
 def run(probe_dir, extractor, max_n=None) -> dict:
@@ -38,6 +42,11 @@ def run(probe_dir, extractor, max_n=None) -> dict:
     else:
         multi, best_pred = direct, list(direct_pred)
     ba_ci = bootstrap_ci(yte, best_pred, balanced_accuracy) if best_pred else [None, None]
+    sens = {}
+    for lo, hi in _BOUNDARY_GRID:
+        yb = [_bucket(strengths[i], lo, hi) for i in te]
+        pb = [_bucket(v, lo, hi) for v in reg_pred]
+        sens[f"{lo:.2f}/{hi:.2f}"] = round(balanced_accuracy(yb, pb), 4) if pb else 0.0
     rho = spearman(strengths[te], reg_pred) if len(reg_pred) else 0.0
     Xs = X[:, :1]
     single = (balanced_accuracy(yte, NearestCentroid().fit(Xs[tr], ytr).predict(Xs[te]))
@@ -49,5 +58,6 @@ def run(probe_dir, extractor, max_n=None) -> dict:
                         "direct_acc": round(direct, 4),
                         "regression_bucket_acc": round(reg_ba, 4),
                         "spearman_rho": round(rho, 4), "multi_sigma_acc": round(multi, 4),
-                        "single_sigma_acc": round(single, 4), "n": len(kept)},
+                        "single_sigma_acc": round(single, 4),
+                        "bucket_sensitivity": sens, "n": len(kept)},
             "verdict": verdict}

@@ -50,6 +50,10 @@ def test_gate1(dd):
     assert 0.0 <= m["balanced_accuracy"] <= 1.0
     assert -1.0 <= m["spearman_rho"] <= 1.0
     assert "single_sigma_acc" in m
+    # 桶边界敏感性：三组边界下的 reg-bucket BA（判定不能只依赖单一桶界）
+    sens = m["bucket_sensitivity"]
+    assert set(sens) == {"0.30/0.60", "0.35/0.65", "0.40/0.70"}
+    assert all(0.0 <= v <= 1.0 for v in sens.values())
 
 
 def test_gate2(dd):
