@@ -1,0 +1,16 @@
+# prereg v2 §5 补充 probe：CFG/steps 抖动下 t0 序数恢复的稳健性（投稿前义务）。
+# 判据（已在 v2 §5 预注册）：本 probe 的 ρ 相对主 confirmatory（0.6999）跌幅 > 0.10
+# → 「固定 CFG/steps」限定升级为正文 limitation；否则留脚注。
+# 规模：50 底图 × 5 强度 × CFG{5,7.5,10} × steps{30,50} = 1500 张。
+# 底图复用主 confirmatory 的前 50 张（FORGERY_REAL_IMAGE_DIR=data/real_base_n200），
+# 控内容、只变 nuisance。
+out_dir: data/probe_real_cfgsteps
+seed: 777
+backend: real
+generators_config: configs/generators.real.yaml
+n_base: 50
+strengths: [0.1, 0.3, 0.5, 0.7, 0.9]
+operators: []
+holdout_generators: []
+cfg_grid: [5.0, 7.5, 10.0]
+steps_grid: [30, 50]

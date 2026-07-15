@@ -228,9 +228,10 @@ def _extract(probe_dir: Path, npz_path: Path):
     return X, np.asarray(y, float), groups, None
 
 
-def _report_md(r: dict, probe_dir: Path, npz_path: Path) -> str:
+def _report_md(r: dict, probe_dir: Path, npz_path: Path,
+               title: str = "gate1 验证性复测报告（2026-07-15）") -> str:
     sha = hashlib.sha1((probe_dir / "gate1_strength.jsonl").read_bytes()).hexdigest()
-    L = [f"# gate1 验证性复测报告（2026-07-15）\n",
+    L = [f"# {title}\n",
          "预注册：`docs/PREREG_gate1_v2_2026-07-15.md`（锁定版）；一次性评估。\n",
          "## DATA",
          f"- probe: `{probe_dir}`（n={r['n']}，档位 {r['levels']}），manifest sha1 `{sha[:12]}`",
@@ -264,6 +265,8 @@ def main(argv=None) -> int:
     ap.add_argument("--npz", default="data/gate1_n200_features.npz")
     ap.add_argument("--out", default="data/gate1_confirmatory.json")
     ap.add_argument("--report", default="checking/gate1_confirmatory_report_2026-07-15.md")
+    ap.add_argument("--title", default="gate1 验证性复测报告（2026-07-15）",
+                    help="报告标题（补充 probe 时用于区分，不影响评估）")
     a = ap.parse_args(argv)
     report = Path(a.report)
     if report.exists():
@@ -273,7 +276,7 @@ def main(argv=None) -> int:
     X, y, groups, _ = _extract(probe, Path(a.npz))
     r = evaluate(X, y, groups)
     Path(a.out).write_text(json.dumps(r, ensure_ascii=False, indent=2), encoding="utf-8")
-    report.write_text(_report_md(r, probe, Path(a.npz)), encoding="utf-8")
+    report.write_text(_report_md(r, probe, Path(a.npz), title=a.title), encoding="utf-8")
     print("\n===== VERDICT（§4 机械导出） =====")
     for line in r["verdict_lines"]:
         print(" -", line)
