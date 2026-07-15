@@ -16,8 +16,16 @@ PROBE_DIR="data/probe_real"
 REPORT="data/checking_report_real.json"
 CROSS_REPORT="data/gate0_cross_generator.json"
 
-echo "==> [0/5] 安装依赖（real extra）"
-pip install -e ".[real]" >/dev/null
+echo "==> [0/5] 安装依赖（SKIP_INSTALL=1 可跳过）"
+# 注意：镜像若为 torch 2.3（如 AutoDL PyTorch 2.3 镜像），diffusers/transformers 最新版需 torch≥2.4/2.5，
+# 会与 torch 2.3 冲突（flex_attention 缺失 / transformers 禁用 PyTorch）。故锁定兼容组合，不动预装 torch。
+if [ "${SKIP_INSTALL:-0}" != "1" ]; then
+  pip install -e . >/dev/null
+  python - <<'PY' || pip install "diffusers==0.30.0" "transformers==4.44.2" "huggingface_hub==0.24.6" "tokenizers==0.19.1" accelerate safetensors >/dev/null
+import torch, sys
+sys.exit(0 if torch.__version__.split("+")[0] >= "2.4" else 1)  # torch≥2.4 才敢用最新 diffusers
+PY
+fi
 
 echo "==> [1/5] 下载真实底图（picsum，n=${N_BASE}）"
 python scripts/fetch_real_images.py --out data/real_base --n "${N_BASE}"

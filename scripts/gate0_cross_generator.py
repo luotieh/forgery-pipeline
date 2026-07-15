@@ -10,7 +10,9 @@
 from __future__ import annotations
 import argparse
 import json
+import sys
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # 仓库根入 sys.path → 可 import checking
 import numpy as np
 from checking import data
 from checking.extractor import get_extractor
