@@ -63,14 +63,9 @@
 **探索性观测（n=50 probe，2026-07-15，real extractor）——不得据此宣布 PASS**：
 - amp-only：ρ=0.377，三桶 BA=0.483；+direction：**ρ=0.503**，三桶 BA=0.492（方向特征增益 ρ **+0.127**、BA +0.008）。
 - 呈典型「ρ 显著、三桶 BA 不过」分裂 → 信号单调、均匀三桶画错的假说。
-- 2 桶 median 切点探索性运行点：见 `data/report_*_2bucket`（gate1 `metrics.two_bucket_median`），**标注为降级分支运行点、探索性**。
+- 2 桶 median 切点探索性运行点：见 `data/report_*_2bucket`（gate1 `metrics.two_bucket_median`），**标注为降级分支运行点、探索性**（其 CI 为逐行 bootstrap，未按底图聚类，偏窄——v2 预注册已改为 cluster bootstrap；median 切点 0.5 与 v2 声明式切点 0.4 在离散档位下给出**同一划分** {0.1,0.3} vs {0.5,0.7,0.9}）。
 
-**预注册验证性判据（仅在 n_base≥200 强度网格上 confirmatory 复测后生效；n=50 结果一律探索性）**：
-- **主判据**：OOF/回归 Spearman ρ ≥ 0.50 且 bootstrap 95% CI 下界 > 0.30。
-- **辅判据（2 桶 median，随机=0.5）**：balanced accuracy ≥ 0.65 且 CI 下界 > 0.55。
-- **多σ 主张（C4）**：Δρ(多σ−单σ) 的配对 bootstrap 95% CI 下界 > 0 才可在论文称「多σ 对 t0 有增量」。
-- **落点解释**：主判据过 → t0 逆估计上行兑现（细粒度回归/粗分级二选一按辅判据）；ρ∈[0.30,0.50) 或仅辅判据过 → t0 降级为**粗粒度强度分级**（诚实降级分支）；ρ<0.30 → 撤下 t0 主张，G-A 走兜底（定位+算子族识别）。
-- 完整回归口径（isotonic 校准 + 混淆饱和诊断）见 PATCH 6，随 n≥200 复测一并出报告。
+**预注册（权威版）**：t0 验证性判据与协议以 **`docs/PREREG_gate1_v2_2026-07-15.md`（已锁定）** 为唯一权威，取代本节先前草案。要点：主判据 ρ≥0.50（cluster-bootstrap 95% CI 下界>0.30）；辅判据切点 **0.4** 的 2 桶 BA≥**0.66**（CI 下界>0.55），BA≥0.72 加档「信息量等效」声明；MAE≤0.15 决定「逆估计」措辞权；C4 挂 Δρ 配对 cluster bootstrap CI 下界>0；**P4=否** → 全部结论自动限定「固定 CFG/steps 条件下」，投稿前须补 CFG/steps 抖动 probe（n=50 × 网格 × CFG{5,7.5,10} × steps{30,50}）。协议：Ridge(α=1) OOF（5 折×20 重复 repeated **group** K-fold，按底图分组）+ 折内嵌套 isotonic + **按底图 cluster bootstrap**（B≥2000）；三配置共享折划分与 bootstrap 索引；一次性评估。执行脚本 `checking/gate1_confirmatory.py`，verdict 按预注册 §4 机械导出。
 
 **Phase A 产物**：决策门 G-A 的结论 + 冻结的特征提取配置（`profile()` 最终形态）+ 闸门复测报告 + n≥200 confirmatory gate1。**算力**：几个 GPU 小时（多为已存图离线复算 + 一次 Kandinsky 生成 + 一次 n≥200 强度网格）。
 
