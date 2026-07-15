@@ -54,6 +54,9 @@ def test_gate1(dd):
     sens = m["bucket_sensitivity"]
     assert set(sens) == {"0.30/0.60", "0.35/0.65", "0.40/0.70"}
     assert all(0.0 <= v <= 1.0 for v in sens.values())
+    # 2 桶 median 探索性运行点（附加，不参与 verdict）
+    tb = m["two_bucket_median"]
+    assert 0.0 <= tb["ba"] <= 1.0 and "cut" in tb and "note" in tb
 
 
 def test_gate2(dd):

@@ -11,6 +11,11 @@ def _bucket(s: float, lo: float = 0.35, hi: float = 0.65) -> str:
     return "low" if s < lo else ("mid" if s < hi else "high")
 
 
+def _bucket2(s: float, cut: float) -> str:
+    """2 桶：以 median 切点二分强度（探索性降级运行点，非官方 verdict）。"""
+    return "high" if s >= cut else "low"
+
+
 # 桶边界敏感性网格：BA 读数不能只依赖单一桶界
 _BOUNDARY_GRID = [(0.30, 0.60), (0.35, 0.65), (0.40, 0.70)]
 
@@ -47,6 +52,12 @@ def run(probe_dir, extractor, max_n=None) -> dict:
         yb = [_bucket(strengths[i], lo, hi) for i in te]
         pb = [_bucket(v, lo, hi) for v in reg_pred]
         sens[f"{lo:.2f}/{hi:.2f}"] = round(balanced_accuracy(yb, pb), 4) if pb else 0.0
+    # 2 桶 median 切点（探索性降级运行点，PATCH 6 粗桶方向的最简版；不参与官方 verdict）
+    cut2 = float(np.median(strengths))
+    yte2 = [_bucket2(strengths[i], cut2) for i in te]
+    pred2 = [_bucket2(v, cut2) for v in reg_pred]
+    two_ba = balanced_accuracy(yte2, pred2) if pred2 else 0.0
+    two_ci = bootstrap_ci(yte2, pred2, balanced_accuracy) if pred2 else [None, None]
     rho = spearman(strengths[te], reg_pred) if len(reg_pred) else 0.0
     Xs = X[:, :1]
     single = (balanced_accuracy(yte, NearestCentroid().fit(Xs[tr], ytr).predict(Xs[te]))
@@ -59,5 +70,10 @@ def run(probe_dir, extractor, max_n=None) -> dict:
                         "regression_bucket_acc": round(reg_ba, 4),
                         "spearman_rho": round(rho, 4), "multi_sigma_acc": round(multi, 4),
                         "single_sigma_acc": round(single, 4),
-                        "bucket_sensitivity": sens, "n": len(kept)},
+                        "bucket_sensitivity": sens,
+                        "two_bucket_median": {
+                            "ba": round(two_ba, 4), "ba_ci": two_ci, "cut": round(cut2, 4),
+                            "note": "探索性降级运行点(median 2-bucket, 随机=0.5)；非官方 verdict，"
+                                    "判据待 n>=200 强度网格验证性复测"},
+                        "n": len(kept)},
             "verdict": verdict}
