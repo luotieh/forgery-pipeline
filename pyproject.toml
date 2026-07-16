@@ -20,7 +20,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest"]
-real = ["torch", "diffusers", "transformers"]
+real = ["torch", "diffusers", "transformers", "accelerate", "safetensors"]
 sam = ["segment-anything"]
 clip = ["open-clip-torch"]
 mllm = ["openai", "anthropic"]

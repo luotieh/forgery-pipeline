@@ -6,8 +6,10 @@ from pathlib import Path
 from checking.extractor import get_extractor
 from checking import gate0, gate1, gate2, gate3, gate4_eval
 
-_CAVEAT = ("extractor=multisigma 是 CPU 代理信号：在 mock 数据上的 VERDICT 仅验证分析代码通路，"
-           "非科学结论（甚至可能假阳性）。真实判定需 extractor=real（SD2）+ 真实扩散生成数据 + GPU。")
+_CAVEAT_PROXY = ("extractor=multisigma 是 CPU 代理信号：在 mock 数据上的 VERDICT 仅验证分析代码通路，"
+                 "非科学结论（甚至可能假阳性）。真实判定需 extractor=real（扩散先验）+ 真实扩散生成数据 + GPU。")
+_CAVEAT_REAL = ("extractor=real：冻结扩散先验（SD1.5）的多σ Tweedie 残差，真实信号下的初步判定；"
+                "受限于单一先验模型与小样本规模，结论需扩样本 + 多先验模型复核。")
 
 
 def main(argv=None) -> int:
@@ -18,6 +20,7 @@ def main(argv=None) -> int:
     ap.add_argument("--max", type=int, default=None)
     ap.add_argument("--out", default="data/checking_report.json")
     args = ap.parse_args(argv)
+    caveat = _CAVEAT_REAL if args.extractor == "real" else _CAVEAT_PROXY
     ext = get_extractor(args.extractor)
     plot = str(Path(args.out).with_name("gate2_pca.png"))
     gates = {
@@ -29,8 +32,8 @@ def main(argv=None) -> int:
     }
     for k, r in gates.items():
         print(f"[{k}] VERDICT={r['verdict']}  {json.dumps(r['metrics'], ensure_ascii=False)}")
-    print("CAVEAT:", _CAVEAT)
-    report = {"extractor": args.extractor, "caveat": _CAVEAT, "gates": gates}
+    print("CAVEAT:", caveat)
+    report = {"extractor": args.extractor, "caveat": caveat, "gates": gates}
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     Path(args.out).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print("report ->", args.out)

@@ -1,0 +1,11 @@
+# n>=200 强度网格：gate1 t0 验证性复测（PATCH 6 / 2桶预注册判据的 confirmatory 集）。
+# operators: [] → 只出 gate1 强度网格（img2img×5 强度），跳过昂贵的 gate2 算子×族网格，
+# 因为本轮只验证 t0 强度信号。gate2/3 的 n>=200 复测另起（随 Phase B 主生成）。
+out_dir: data/probe_real_n200
+seed: 1234
+backend: real
+generators_config: configs/generators.real.yaml
+n_base: 200
+strengths: [0.1, 0.3, 0.5, 0.7, 0.9]
+operators: []
+holdout_generators: [kandinsky-inpaint]

@@ -59,6 +59,7 @@ class Sample(BaseModel):
     strength: Optional[float] = None        # img2img/SDEdit 去噪强度 ∈ [0,1]，≈ 起始噪声级 t0/T
     init_timestep: Optional[int] = None     # SDEdit 起始 timestep（可选，便于直接读 t0）
     operator: Optional[str] = None          # 显式编辑算子（对齐闸门口径），取值见 labels.EDIT_OPERATORS
+    op_params: Optional[str] = None         # 算子参数容器（JSON string，如 cfg_scale/steps；PATCH 8.2 约定）
     postprocess_of: Optional[str] = None    # 退化样本回链原始 fake 的 image_id；原图为 None
 
     @field_validator("is_fake")

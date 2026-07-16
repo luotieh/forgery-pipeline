@@ -1,0 +1,5177 @@
+{
+  "version": "2.13",
+  "children": [
+    {
+      "type": "frame",
+      "id": "Q98DqN",
+      "x": 0,
+      "y": 0,
+      "name": "Slide 1 - Title",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "B05oVK",
+          "name": "Tag Row",
+          "gap": 12,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "YooIr",
+              "name": "Tag BG",
+              "fill": "#111111",
+              "padding": [
+                6,
+                16
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Z6jbAz",
+                  "name": "Tag Label",
+                  "fill": "#FFFFFF",
+                  "content": "forgery-pipeline",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "a362np",
+          "name": "Title Block",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            40,
+            0,
+            0,
+            0
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "xFmOg",
+              "name": "Title Line 1",
+              "fill": "#111111",
+              "content": "伪造检测数据管线",
+              "fontFamily": "Inter",
+              "fontSize": 56,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "BUuy1",
+              "name": "Title Line 2",
+              "fill": "#111111",
+              "content": "真实扩散信号闸门实验",
+              "fontFamily": "Inter",
+              "fontSize": 56,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "xhWKF",
+          "name": "Sub Block",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            32,
+            0,
+            0,
+            0
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "zVmJb",
+              "name": "Subtitle",
+              "fill": "#666666",
+              "content": "Real Diffusion Signal Gate Experiment",
+              "fontFamily": "Inter",
+              "fontSize": 24,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "vQrGJ",
+              "name": "Meta",
+              "fill": "#999999",
+              "content": "组会汇报 · 2026-07-02",
+              "fontFamily": "IBM Plex Mono",
+              "fontSize": 18,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Ql3ll",
+          "name": "Bottom Line",
+          "padding": [
+            60,
+            0,
+            0,
+            0
+          ],
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "YVWtK",
+              "name": "Accent Line",
+              "fill": "#111111",
+              "width": 120,
+              "height": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "AKm44",
+      "x": 1960,
+      "y": 0,
+      "name": "Slide 2 - Verdict",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "gap": 40,
+      "padding": [
+        80,
+        100,
+        60,
+        100
+      ],
+      "children": [
+        {
+          "type": "text",
+          "id": "nxw7r",
+          "name": "S2 Title",
+          "fill": "#111111",
+          "content": "一页结论:四道闸门判定",
+          "fontFamily": "Inter",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "P5sSDt",
+          "name": "Badges Row",
+          "width": "fill_container",
+          "gap": 20,
+          "children": [
+            {
+              "type": "frame",
+              "id": "LYksJ",
+              "name": "Gate gate0",
+              "width": "fill_container",
+              "fill": "#F5F5F5",
+              "stroke": "#E0E0E0",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 16,
+              "padding": [
+                28,
+                24
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "d6EOF",
+                  "name": "gate0 Header",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "AInAD",
+                      "name": "gate0 Name",
+                      "fill": "#999999",
+                      "content": "GATE0",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "DACTM",
+                      "name": "gate0 Badge",
+                      "fill": "#DCFCE7",
+                      "stroke": "#16A34A",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "iSPjb",
+                          "name": "gate0 Status",
+                          "fill": "#16A34A",
+                          "content": "PASS",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "l201o",
+                  "name": "gate0 Label",
+                  "fill": "#111111",
+                  "content": "残差可分",
+                  "fontFamily": "Inter",
+                  "fontSize": 24,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "l4Cc7i",
+                  "name": "gate0 Metrics",
+                  "fill": "#666666",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "检测 AUC 0.688 · 定位 0.643",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 15,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "nqWOc",
+              "name": "Gate gate1",
+              "width": "fill_container",
+              "fill": "#F5F5F5",
+              "stroke": "#E0E0E0",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 16,
+              "padding": [
+                28,
+                24
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "dQY3g",
+                  "name": "gate1 Header",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "PPI7j",
+                      "name": "gate1 Name",
+                      "fill": "#999999",
+                      "content": "GATE1",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "bYiy0",
+                      "name": "gate1 Badge",
+                      "fill": "#FEF3C7",
+                      "stroke": "#D97706",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "pc6WU",
+                          "name": "gate1 Status",
+                          "fill": "#D97706",
+                          "content": "WEAK",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "Q4PlD",
+                  "name": "gate1 Label",
+                  "fill": "#111111",
+                  "content": "t₀ 可恢复",
+                  "fontFamily": "Inter",
+                  "fontSize": 24,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "WzD1o",
+                  "name": "gate1 Metrics",
+                  "fill": "#666666",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "BA 0.475 · ρ 0.476",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 15,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "pYYPZ",
+              "name": "Gate gate2",
+              "width": "fill_container",
+              "fill": "#F5F5F5",
+              "stroke": "#E0E0E0",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 16,
+              "padding": [
+                28,
+                24
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "wfsHR",
+                  "name": "gate2 Header",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ry7wu",
+                      "name": "gate2 Name",
+                      "fill": "#999999",
+                      "content": "GATE2",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "L7NFth",
+                      "name": "gate2 Badge",
+                      "fill": "#FEF3C7",
+                      "stroke": "#D97706",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "oKwgo",
+                          "name": "gate2 Status",
+                          "fill": "#D97706",
+                          "content": "WEAK",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "i4wjP8",
+                  "name": "gate2 Label",
+                  "fill": "#111111",
+                  "content": "算子可分",
+                  "fontFamily": "Inter",
+                  "fontSize": 24,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "Tweqp",
+                  "name": "gate2 Metrics",
+                  "fill": "#666666",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "0.372 vs 随机 0.2",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 15,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "I9THa",
+              "name": "Gate gate3",
+              "width": "fill_container",
+              "fill": "#F5F5F5",
+              "stroke": "#E0E0E0",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 16,
+              "padding": [
+                28,
+                24
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "w9WDu",
+                  "name": "gate3 Header",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "qdMjf",
+                      "name": "gate3 Name",
+                      "fill": "#999999",
+                      "content": "GATE3",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "TTHLO",
+                      "name": "gate3 Badge",
+                      "fill": "#FFEDD5",
+                      "stroke": "#EA580C",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "H61Dmv",
+                          "name": "gate3 Status",
+                          "fill": "#EA580C",
+                          "content": "PARTIAL",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "tyG8m",
+                  "name": "gate3 Label",
+                  "fill": "#111111",
+                  "content": "多σ增量",
+                  "fontFamily": "Inter",
+                  "fontSize": 24,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "D5zwTh",
+                  "name": "gate3 Metrics",
+                  "fill": "#666666",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "+0.025",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 15,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "c67tK",
+          "name": "Takeaway Block",
+          "width": "fill_container",
+          "stroke": "#E0E0E0",
+          "strokeWidth": 1,
+          "strokeAlignment": "inner",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            24,
+            32
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "M3ObY",
+              "name": "Takeaway Title",
+              "fill": "#111111",
+              "content": "关键判断",
+              "fontFamily": "Inter",
+              "fontSize": 20,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "aZD73",
+              "name": "Item",
+              "width": "fill_container",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "octgY",
+                  "name": "Bullet",
+                  "fill": "#111111",
+                  "content": "›",
+                  "fontFamily": "Inter",
+                  "fontSize": 20,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "VZKMc",
+                  "name": "Item Text",
+                  "fill": "#444444",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "承重主线「残差可检测 / 可定位」在真实扩散信号下成立",
+                  "fontFamily": "Inter",
+                  "fontSize": 20,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "LLeVR",
+              "name": "Item",
+              "width": "fill_container",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "a2pvaj",
+                  "name": "Bullet",
+                  "fill": "#111111",
+                  "content": "›",
+                  "fontFamily": "Inter",
+                  "fontSize": 20,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "PGqpU",
+                  "name": "Item Text",
+                  "fill": "#444444",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "t₀ 精细回归被 mock 高估 (+0.28)，需降级为分桶方案",
+                  "fontFamily": "Inter",
+                  "fontSize": 20,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "B06g5",
+              "name": "Item",
+              "width": "fill_container",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "pwzFK",
+                  "name": "Bullet",
+                  "fill": "#111111",
+                  "content": "›",
+                  "fontFamily": "Inter",
+                  "fontSize": 20,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "smCcf",
+                  "name": "Item Text",
+                  "fill": "#444444",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "mock 验证可保代码通路正确，不可估计效应量",
+                  "fontFamily": "Inter",
+                  "fontSize": 20,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "k4tBpg",
+      "x": 3920,
+      "y": 0,
+      "name": "Slide 3 - Background",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "gap": 48,
+      "padding": [
+        80,
+        100,
+        60,
+        100
+      ],
+      "children": [
+        {
+          "type": "text",
+          "id": "qs2Nn",
+          "name": "S3 Title",
+          "fill": "#111111",
+          "content": "背景:方法与闸门体系",
+          "fontFamily": "Inter",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "Ygvi9",
+          "name": "S3 Columns",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 48,
+          "children": [
+            {
+              "type": "frame",
+              "id": "d63jGE",
+              "name": "Method Col",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "friKe",
+                  "name": "Method Tag",
+                  "fill": "#111111",
+                  "padding": [
+                    6,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "GwOEP",
+                      "name": "Method Tag Text",
+                      "fill": "#FFFFFF",
+                      "content": "METHOD",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "ZWcQH",
+                  "name": "Method Title",
+                  "fill": "#111111",
+                  "content": "冻结扩散先验的\n多σ Tweedie 去噪残差",
+                  "fontFamily": "Inter",
+                  "fontSize": 28,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "frame",
+                  "id": "CFqVy",
+                  "name": "Method Item",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "ycdY9",
+                      "name": "Dot",
+                      "fill": "#111111",
+                      "width": 6,
+                      "height": 6
+                    },
+                    {
+                      "type": "text",
+                      "id": "XWKPz",
+                      "name": "Method Text",
+                      "fill": "#444444",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "冻结预训练 Stable Diffusion 作为信号提取器",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "y3T6t5",
+                  "name": "Method Item",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "NpD1L",
+                      "name": "Dot",
+                      "fill": "#111111",
+                      "width": 6,
+                      "height": 6
+                    },
+                    {
+                      "type": "text",
+                      "id": "zaAhV",
+                      "name": "Method Text",
+                      "fill": "#444444",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "多强度 (σ) Tweedie 去噪 → 残差信号",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "GJERd",
+                  "name": "Method Item",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "Pf5oh",
+                      "name": "Dot",
+                      "fill": "#111111",
+                      "width": 6,
+                      "height": 6
+                    },
+                    {
+                      "type": "text",
+                      "id": "CNhlc",
+                      "name": "Method Text",
+                      "fill": "#444444",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "下游任务:伪造检测 / 定位 / 强度估计",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "V5HWLV",
+                  "name": "Method Item",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "NHMwB",
+                      "name": "Dot",
+                      "fill": "#111111",
+                      "width": 6,
+                      "height": 6
+                    },
+                    {
+                      "type": "text",
+                      "id": "C6hhB",
+                      "name": "Method Text",
+                      "fill": "#444444",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "核心假设:伪造区域残差统计显著可分",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "ZbZQy",
+              "name": "Divider",
+              "fill": "#E0E0E0",
+              "width": 1,
+              "height": "fill_container"
+            },
+            {
+              "type": "frame",
+              "id": "wa4ZV",
+              "name": "Gate Col",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "TMcu9",
+                  "name": "Gate Tag",
+                  "fill": "#F5F5F5",
+                  "stroke": "#E0E0E0",
+                  "strokeWidth": 1,
+                  "padding": [
+                    6,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "o4B515",
+                      "name": "Gate Tag Text",
+                      "fill": "#666666",
+                      "content": "GATE SYSTEM",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "urem5",
+                  "name": "Gate Title",
+                  "fill": "#111111",
+                  "content": "5 道 Go/No-Go 闸门",
+                  "fontFamily": "Inter",
+                  "fontSize": 28,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "frame",
+                  "id": "BLWfA",
+                  "name": "Gate Row gate0",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "ep715",
+                      "name": "gate0 chip",
+                      "fill": "#F5F5F5",
+                      "stroke": "#E0E0E0",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "cr1RU",
+                          "name": "gate0 chip text",
+                          "fill": "#666666",
+                          "content": "gate0",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "Prv4w",
+                      "name": "gate0 desc",
+                      "fill": "#444444",
+                      "content": "残差可分性 (检测 + 定位)",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "bcC7J",
+                  "name": "Gate Row gate1",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "oXDZ1",
+                      "name": "gate1 chip",
+                      "fill": "#F5F5F5",
+                      "stroke": "#E0E0E0",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "YgN41",
+                          "name": "gate1 chip text",
+                          "fill": "#666666",
+                          "content": "gate1",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "WZ0LD",
+                      "name": "gate1 desc",
+                      "fill": "#444444",
+                      "content": "t₀ 可恢复性 (强度回归)",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "kKYjx",
+                  "name": "Gate Row gate2",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "b9eqw",
+                      "name": "gate2 chip",
+                      "fill": "#F5F5F5",
+                      "stroke": "#E0E0E0",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "YYVyY",
+                          "name": "gate2 chip text",
+                          "fill": "#666666",
+                          "content": "gate2",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "Hn95D",
+                      "name": "gate2 desc",
+                      "fill": "#444444",
+                      "content": "算子可分性 (生成器指纹)",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "NOqJ4",
+                  "name": "Gate Row gate3",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "koLsN",
+                      "name": "gate3 chip",
+                      "fill": "#F5F5F5",
+                      "stroke": "#E0E0E0",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Ejcua",
+                          "name": "gate3 chip text",
+                          "fill": "#666666",
+                          "content": "gate3",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "QdRFy",
+                      "name": "gate3 desc",
+                      "fill": "#444444",
+                      "content": "多σ 增量 (信号增益)",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "nzWpD",
+                  "name": "Gate Row gate4",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "pmpWx",
+                      "name": "gate4 chip",
+                      "fill": "#F5F5F5",
+                      "stroke": "#E0E0E0",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "nXQSI",
+                          "name": "gate4 chip text",
+                          "fill": "#666666",
+                          "content": "gate4",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "z1ORLd",
+                      "name": "gate4 desc",
+                      "fill": "#444444",
+                      "content": "端到端管线泛化",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "NxO7K",
+                  "name": "Note",
+                  "width": "fill_container",
+                  "fill": "#F5F5F5",
+                  "gap": 8,
+                  "padding": 16,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "FZOLe",
+                      "name": "Note Icon",
+                      "fill": "#999999",
+                      "content": "⚠",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "yvIJw",
+                      "name": "Note Text",
+                      "fill": "#666666",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "此前 VERDICT 全部基于 mock 数据 + CPU 代理\n仅验证代码通路,未验证假设",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "IYoic",
+      "x": 5880,
+      "y": 0,
+      "name": "Slide 4 - Overview",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "gap": 48,
+      "padding": [
+        80,
+        100,
+        60,
+        100
+      ],
+      "children": [
+        {
+          "type": "text",
+          "id": "kZ74X",
+          "name": "S4 Title",
+          "fill": "#111111",
+          "content": "今日工作总览",
+          "fontFamily": "Inter",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "d9Cpm3",
+          "name": "Timeline",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 32,
+          "children": [
+            {
+              "type": "frame",
+              "id": "ioZEB",
+              "name": "Round 1",
+              "width": "fill_container",
+              "fill": "#F5F5F5",
+              "stroke": "#E0E0E0",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 20,
+              "padding": 32,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Q7oSGW",
+                  "name": "R1 Header",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "ncxek",
+                      "name": "R1 Badge",
+                      "fill": "#111111",
+                      "padding": [
+                        6,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "UQ0Cw",
+                          "name": "R1 Badge Text",
+                          "fill": "#FFFFFF",
+                          "content": "上午",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "rrIta",
+                      "name": "R1 Time",
+                      "fill": "#999999",
+                      "content": "ROUND 1",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 15,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "ZleY0",
+                  "name": "R1 Title",
+                  "fill": "#111111",
+                  "content": "P0 分析代码优化\n+ Mock 复测",
+                  "fontFamily": "Inter",
+                  "fontSize": 26,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "frame",
+                  "id": "aJWz7",
+                  "name": "R1 Item",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "Je5gF",
+                      "name": "R1 Dot",
+                      "fill": "#111111",
+                      "width": 6,
+                      "height": 6
+                    },
+                    {
+                      "type": "text",
+                      "id": "T29ED",
+                      "name": "R1 Text",
+                      "fill": "#444444",
+                      "content": "区域 / 分位特征工程",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "sg2gA",
+                  "name": "R1 Item",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "RZ4yB",
+                      "name": "R1 Dot",
+                      "fill": "#111111",
+                      "width": 6,
+                      "height": 6
+                    },
+                    {
+                      "type": "text",
+                      "id": "v82QHh",
+                      "name": "R1 Text",
+                      "fill": "#444444",
+                      "content": "回归 → 分桶 (降级方案)",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ictn7",
+                  "name": "R1 Item",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "cV8Wm",
+                      "name": "R1 Dot",
+                      "fill": "#111111",
+                      "width": 6,
+                      "height": 6
+                    },
+                    {
+                      "type": "text",
+                      "id": "BSPj8",
+                      "name": "R1 Text",
+                      "fill": "#444444",
+                      "content": "评测口径修复",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "K5KSJ",
+                  "name": "R1 Item",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "OZA4z",
+                      "name": "R1 Dot",
+                      "fill": "#111111",
+                      "width": 6,
+                      "height": 6
+                    },
+                    {
+                      "type": "text",
+                      "id": "PTXr0",
+                      "name": "R1 Text",
+                      "fill": "#444444",
+                      "content": "Bootstrap CI 置信区间",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "GPQKY",
+                  "name": "R1 Goal",
+                  "fill": "#999999",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "目标:验证分析代码改进 → mock 指标变化",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 15,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "HPuJ8",
+              "name": "Arrow",
+              "width": 48,
+              "layout": "vertical",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "hHqRw",
+                  "name": "Arrow Icon",
+                  "fill": "#999999",
+                  "content": "→",
+                  "fontFamily": "Inter",
+                  "fontSize": 36,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "LepG8",
+              "name": "Round 2",
+              "width": "fill_container",
+              "fill": "#F5F5F5",
+              "stroke": "#E0E0E0",
+              "strokeWidth": 1,
+              "strokeAlignment": "inner",
+              "layout": "vertical",
+              "gap": 20,
+              "padding": 32,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "yxDY6",
+                  "name": "R2 Header",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "RBEgl",
+                      "name": "R2 Badge",
+                      "fill": "#111111",
+                      "padding": [
+                        6,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "nVgnz",
+                          "name": "R2 Badge Text",
+                          "fill": "#FFFFFF",
+                          "content": "下午→晚间",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "phUsF",
+                      "name": "R2 Time",
+                      "fill": "#999999",
+                      "content": "ROUND 2",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 15,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "mA1vi",
+                  "name": "R2 Title",
+                  "fill": "#111111",
+                  "content": "真实扩散闸门\nSD1.5 · RTX 4060",
+                  "fontFamily": "Inter",
+                  "fontSize": 26,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "frame",
+                  "id": "C6GwPa",
+                  "name": "R2 Item",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "K3wdwX",
+                      "name": "R2 Dot",
+                      "fill": "#111111",
+                      "width": 6,
+                      "height": 6
+                    },
+                    {
+                      "type": "text",
+                      "id": "wVN8z",
+                      "name": "R2 Text",
+                      "fill": "#444444",
+                      "content": "SD1.5 真实后端 (img2img + inpaint)",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "hjKa9",
+                  "name": "R2 Item",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "yIl22",
+                      "name": "R2 Dot",
+                      "fill": "#111111",
+                      "width": 6,
+                      "height": 6
+                    },
+                    {
+                      "type": "text",
+                      "id": "Rnirf",
+                      "name": "R2 Text",
+                      "fill": "#444444",
+                      "content": "真实底图 (picsum 64 张 512²)",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "zt6he",
+                  "name": "R2 Item",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "HFtw3",
+                      "name": "R2 Dot",
+                      "fill": "#111111",
+                      "width": 6,
+                      "height": 6
+                    },
+                    {
+                      "type": "text",
+                      "id": "jSw2j",
+                      "name": "R2 Text",
+                      "fill": "#444444",
+                      "content": "n_base=4 冒烟 → n_base=50 放量",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "tXedr",
+                  "name": "R2 Item",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "FByD1",
+                      "name": "R2 Dot",
+                      "fill": "#111111",
+                      "width": 6,
+                      "height": 6
+                    },
+                    {
+                      "type": "text",
+                      "id": "V324k1",
+                      "name": "R2 Text",
+                      "fill": "#444444",
+                      "content": "生成 80 min + 分析 30 min",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "mbxfm",
+                  "name": "R2 Goal",
+                  "fill": "#999999",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "目标:真实信号下验证闸门假设",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 15,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "G3ByO",
+      "x": 7840,
+      "y": 0,
+      "name": "Slide 5 - Round1 Results",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "gap": 36,
+      "padding": [
+        80,
+        100,
+        60,
+        100
+      ],
+      "children": [
+        {
+          "type": "text",
+          "id": "QoFER",
+          "name": "S5 Title",
+          "fill": "#111111",
+          "content": "第一轮:Mock 复测结果",
+          "fontFamily": "Inter",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "text",
+          "id": "xYQWW",
+          "name": "S5 Subtitle",
+          "fill": "#999999",
+          "content": "同数据 · 仅换分析代码",
+          "fontFamily": "Inter",
+          "fontSize": 22,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "F4xyLQ",
+          "name": "Table",
+          "width": "fill_container",
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "nJHCc",
+              "name": "Header Row",
+              "width": "fill_container",
+              "fill": "#F5F5F5",
+              "stroke": "#E0E0E0",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "padding": [
+                16,
+                20
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "X15UK",
+                  "name": "H0",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "k3eXoh",
+                      "name": "HT0",
+                      "fill": "#666666",
+                      "content": "Gate",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "axK0k",
+                  "name": "H1",
+                  "width": 180,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "N2Rqe6",
+                      "name": "HT1",
+                      "fill": "#666666",
+                      "content": "旧值",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "nXRum",
+                  "name": "H2",
+                  "width": 180,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "jaPUa",
+                      "name": "HT2",
+                      "fill": "#666666",
+                      "content": "新值",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "aWLbk",
+                  "name": "H3",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "bhUzE",
+                      "name": "HT3",
+                      "fill": "#666666",
+                      "content": "变化",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "v4BWf",
+                  "name": "H4",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "oAnat",
+                      "name": "HT4",
+                      "fill": "#666666",
+                      "content": "判定",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "tBTKW",
+              "name": "Row gate1",
+              "width": "fill_container",
+              "stroke": "#E0E0E0",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "padding": [
+                16,
+                20
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ws6xt",
+                  "name": "C0 gate1",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "r5QFXh",
+                      "name": "CT0",
+                      "fill": "#111111",
+                      "content": "gate1",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "g1OAkx",
+                  "name": "C1 gate1",
+                  "width": 180,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "MYKW1",
+                      "name": "CT1",
+                      "fill": "#999999",
+                      "content": "0.472",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "g5aJG",
+                  "name": "C2 gate1",
+                  "width": 180,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "U5lN6",
+                      "name": "CT2",
+                      "fill": "#111111",
+                      "content": "0.757",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "M4OWjk",
+                  "name": "C3 gate1",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "YObUc",
+                      "name": "CT3",
+                      "fill": "#444444",
+                      "content": "回归→分桶",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "apXcm",
+                  "name": "C4 gate1",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "zRMYo",
+                      "name": "Badge",
+                      "fill": "#DCFCE7",
+                      "stroke": "#16A34A",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "zZABm",
+                          "name": "Badge Text",
+                          "fill": "#16A34A",
+                          "content": "PASS",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "eEPif",
+              "name": "Row gate2",
+              "width": "fill_container",
+              "stroke": "#E0E0E0",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "padding": [
+                16,
+                20
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "QM5qK",
+                  "name": "C0 gate2",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "xFD8J",
+                      "name": "CT0",
+                      "fill": "#111111",
+                      "content": "gate2",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "dWAF9",
+                  "name": "C1 gate2",
+                  "width": 180,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "dosHb",
+                      "name": "CT1",
+                      "fill": "#999999",
+                      "content": "0.330",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "YMprw",
+                  "name": "C2 gate2",
+                  "width": 180,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "g7Ojr4",
+                      "name": "CT2",
+                      "fill": "#111111",
+                      "content": "0.454",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "cbseo",
+                  "name": "C3 gate2",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "CkM5k",
+                      "name": "CT3",
+                      "fill": "#444444",
+                      "content": "Δ +0.124",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "RlrlP",
+                  "name": "C4 gate2",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "gCNF9",
+                      "name": "Badge",
+                      "fill": "#FEF3C7",
+                      "stroke": "#D97706",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "pZUwb",
+                          "name": "Badge Text",
+                          "fill": "#D97706",
+                          "content": "WEAK",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "aLqUm",
+              "name": "Row gate3",
+              "width": "fill_container",
+              "stroke": "#E0E0E0",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "padding": [
+                16,
+                20
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "kCA0M",
+                  "name": "C0 gate3",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ioXqv",
+                      "name": "CT0",
+                      "fill": "#111111",
+                      "content": "gate3",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "h6UY8",
+                  "name": "C1 gate3",
+                  "width": 180,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "E9Qs40",
+                      "name": "CT1",
+                      "fill": "#999999",
+                      "content": "+0.132",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "I8eQYW",
+                  "name": "C2 gate3",
+                  "width": 180,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "YfXjM",
+                      "name": "CT2",
+                      "fill": "#111111",
+                      "content": "+0.417",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "gKKnu",
+                  "name": "C3 gate3",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "h0VShk",
+                      "name": "CT3",
+                      "fill": "#444444",
+                      "content": "Δ +0.285",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "i6Icx9",
+                  "name": "C4 gate3",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "jrDRq",
+                      "name": "Badge",
+                      "fill": "#DCFCE7",
+                      "stroke": "#16A34A",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "SL6Nm",
+                          "name": "Badge Text",
+                          "fill": "#16A34A",
+                          "content": "PASS",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "cv8RE",
+              "name": "Row gate4",
+              "width": "fill_container",
+              "stroke": "#E0E0E0",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "padding": [
+                16,
+                20
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "auPQT",
+                  "name": "C0 gate4",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "XoK8J",
+                      "name": "CT0",
+                      "fill": "#111111",
+                      "content": "gate4",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "zZX0Z",
+                  "name": "C1 gate4",
+                  "width": 180,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ZJZrA",
+                      "name": "CT1",
+                      "fill": "#999999",
+                      "content": "无定义",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "m4mWL",
+                  "name": "C2 gate4",
+                  "width": 180,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "zagw0",
+                      "name": "CT2",
+                      "fill": "#111111",
+                      "content": "0.537",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "x3appM",
+                  "name": "C3 gate4",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "CDfdi",
+                      "name": "CT3",
+                      "fill": "#444444",
+                      "content": "新增 CI",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "f0uPXX",
+                  "name": "C4 gate4",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "d1VI2",
+                      "name": "Badge",
+                      "fill": "#F5F5F5",
+                      "stroke": "#999999",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "OQYgJ",
+                          "name": "Badge Text",
+                          "fill": "#999999",
+                          "content": "EVAL",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "YT7n1",
+          "name": "Lesson",
+          "width": "fill_container",
+          "fill": "#FFFBEB",
+          "stroke": "#D97706",
+          "strokeWidth": 1,
+          "strokeAlignment": "inner",
+          "gap": 12,
+          "padding": [
+            20,
+            24
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "tJMez",
+              "name": "Lesson Icon",
+              "fill": "#D97706",
+              "content": "!",
+              "fontFamily": "Inter",
+              "fontSize": 22,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "g0d1I",
+              "name": "Lesson Text",
+              "fill": "#444444",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "教训:mock 的 PASS 只说明代码口径对,不说明假设成立",
+              "fontFamily": "Inter",
+              "fontSize": 20,
+              "fontWeight": "500"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "cywD3",
+      "x": 9800,
+      "y": 0,
+      "name": "Slide 6 - Setup",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "gap": 40,
+      "padding": [
+        80,
+        100,
+        60,
+        100
+      ],
+      "children": [
+        {
+          "type": "text",
+          "id": "NTTj5",
+          "name": "S6 Title",
+          "fill": "#111111",
+          "content": "第二轮:真实扩散实验设置",
+          "fontFamily": "Inter",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "ZajZX",
+          "name": "Setup Grid",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 24,
+          "children": [
+            {
+              "type": "frame",
+              "id": "gNJ08",
+              "name": "HARDWARE Card",
+              "width": "fill_container",
+              "fill": "#F5F5F5",
+              "stroke": "#E0E0E0",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 20,
+              "padding": [
+                28,
+                24
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "zmHOI",
+                  "name": "HARDWARE Tag",
+                  "fill": "#999999",
+                  "content": "HARDWARE",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "vRpwl",
+                  "name": "HARDWARE Title",
+                  "fill": "#111111",
+                  "content": "硬件",
+                  "fontFamily": "Inter",
+                  "fontSize": 28,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "rectangle",
+                  "id": "wgiQc",
+                  "name": "HARDWARE Sep",
+                  "fill": "#E0E0E0",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "byCR3",
+                  "name": "HARDWARE Row",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "ZtiRv",
+                      "name": "Dot",
+                      "fill": "$accent",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "text",
+                      "id": "geTgj",
+                      "name": "Text",
+                      "fill": "$fg-secondary",
+                      "content": "RTX 4060 8GB",
+                      "fontFamily": "Inter",
+                      "fontSize": 19,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "A76uu",
+                  "name": "HARDWARE Row",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "tIMHk",
+                      "name": "Dot",
+                      "fill": "$accent",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "text",
+                      "id": "g2Go8",
+                      "name": "Text",
+                      "fill": "$fg-secondary",
+                      "content": "WSL2 (Linux)",
+                      "fontFamily": "Inter",
+                      "fontSize": 19,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "M4teu9",
+                  "name": "HARDWARE Row",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "o8mXj",
+                      "name": "Dot",
+                      "fill": "$accent",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "text",
+                      "id": "ISHym",
+                      "name": "Text",
+                      "fill": "$fg-secondary",
+                      "content": "CUDA fp16",
+                      "fontFamily": "Inter",
+                      "fontSize": 19,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "fHD4Q",
+              "name": "MODEL Card",
+              "width": "fill_container",
+              "fill": "#F5F5F5",
+              "stroke": "#E0E0E0",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 20,
+              "padding": [
+                28,
+                24
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "kAdRq",
+                  "name": "MODEL Tag",
+                  "fill": "#999999",
+                  "content": "MODEL",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "cTEj2",
+                  "name": "MODEL Title",
+                  "fill": "#111111",
+                  "content": "模型",
+                  "fontFamily": "Inter",
+                  "fontSize": 28,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "rectangle",
+                  "id": "w3IIxx",
+                  "name": "MODEL Sep",
+                  "fill": "#E0E0E0",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "d6CGd",
+                  "name": "MODEL Row",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "HaLvC",
+                      "name": "Dot",
+                      "fill": "$accent",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "text",
+                      "id": "v4ub7",
+                      "name": "Text",
+                      "fill": "$fg-secondary",
+                      "content": "Stable Diffusion 1.5",
+                      "fontFamily": "Inter",
+                      "fontSize": 19,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "hiEiw",
+                  "name": "MODEL Row",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "N7fEtP",
+                      "name": "Dot",
+                      "fill": "$accent",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "text",
+                      "id": "jQpLe",
+                      "name": "Text",
+                      "fill": "$fg-secondary",
+                      "content": "img2img + inpainting",
+                      "fontFamily": "Inter",
+                      "fontSize": 19,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "FkCer",
+                  "name": "MODEL Row",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "mO1Cv",
+                      "name": "Dot",
+                      "fill": "$accent",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "text",
+                      "id": "RQrul",
+                      "name": "Text",
+                      "fill": "$fg-secondary",
+                      "content": "SD2 已从 HF 下架",
+                      "fontFamily": "Inter",
+                      "fontSize": 19,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "n3q1p",
+              "name": "PARAMS Card",
+              "width": "fill_container",
+              "fill": "#F5F5F5",
+              "stroke": "#E0E0E0",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 20,
+              "padding": [
+                28,
+                24
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "CORAw",
+                  "name": "PARAMS Tag",
+                  "fill": "#999999",
+                  "content": "PARAMS",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "fV7mL",
+                  "name": "PARAMS Title",
+                  "fill": "#111111",
+                  "content": "参数",
+                  "fontFamily": "Inter",
+                  "fontSize": 28,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "rectangle",
+                  "id": "iClyk",
+                  "name": "PARAMS Sep",
+                  "fill": "#E0E0E0",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "V5c5ns",
+                  "name": "PARAMS Row",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "j5LiH",
+                      "name": "Dot",
+                      "fill": "$accent",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "text",
+                      "id": "yRxBc",
+                      "name": "Text",
+                      "fill": "$fg-secondary",
+                      "content": "t ∈ {50,150,300,500,700}",
+                      "fontFamily": "Inter",
+                      "fontSize": 19,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "OMkkL",
+                  "name": "PARAMS Row",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "CThup",
+                      "name": "Dot",
+                      "fill": "$accent",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "text",
+                      "id": "ZYok5",
+                      "name": "Text",
+                      "fill": "$fg-secondary",
+                      "content": "strength = t / 1000",
+                      "fontFamily": "Inter",
+                      "fontSize": 19,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "DIe5u",
+                  "name": "PARAMS Row",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "farSA",
+                      "name": "Dot",
+                      "fill": "$accent",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "text",
+                      "id": "wo7eO",
+                      "name": "Text",
+                      "fill": "$fg-secondary",
+                      "content": "n_base = 50",
+                      "fontFamily": "Inter",
+                      "fontSize": 19,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "JefwG",
+              "name": "DATA Card",
+              "width": "fill_container",
+              "fill": "#F5F5F5",
+              "stroke": "#E0E0E0",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 20,
+              "padding": [
+                28,
+                24
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "tzQI6",
+                  "name": "DATA Tag",
+                  "fill": "#999999",
+                  "content": "DATA",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "TPOwl",
+                  "name": "DATA Title",
+                  "fill": "#111111",
+                  "content": "数据",
+                  "fontFamily": "Inter",
+                  "fontSize": 28,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "rectangle",
+                  "id": "VH9at",
+                  "name": "DATA Sep",
+                  "fill": "#E0E0E0",
+                  "width": "fill_container",
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "A23EFJ",
+                  "name": "DATA Row",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "yXlWU",
+                      "name": "Dot",
+                      "fill": "$accent",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "text",
+                      "id": "CoTJY",
+                      "name": "Text",
+                      "fill": "$fg-secondary",
+                      "content": "picsum 真实底图 64 张",
+                      "fontFamily": "Inter",
+                      "fontSize": 19,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "kHpIy",
+                  "name": "DATA Row",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "Cny27",
+                      "name": "Dot",
+                      "fill": "$accent",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "text",
+                      "id": "kqLQW",
+                      "name": "Text",
+                      "fill": "$fg-secondary",
+                      "content": "512 × 512 分辨率",
+                      "fontFamily": "Inter",
+                      "fontSize": 19,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "x4Fha",
+                  "name": "DATA Row",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "zXmvD",
+                      "name": "Dot",
+                      "fill": "$accent",
+                      "width": 5,
+                      "height": 5
+                    },
+                    {
+                      "type": "text",
+                      "id": "MxLF8",
+                      "name": "Text",
+                      "fill": "$fg-secondary",
+                      "content": "→ 1200 样本",
+                      "fontFamily": "Inter",
+                      "fontSize": 19,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "aW47c",
+          "name": "Bottom Stats",
+          "width": "fill_container",
+          "children": [
+            {
+              "type": "frame",
+              "id": "bQwMB",
+              "name": "生成耗时 Stat",
+              "width": "fill_container",
+              "fill": "#F5F5F5",
+              "stroke": "#E0E0E0",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 6,
+              "padding": [
+                20,
+                24
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Rlv4M",
+                  "name": "生成耗时 Label",
+                  "fill": "#999999",
+                  "content": "生成耗时",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "Yg5NP",
+                  "name": "生成耗时 Value",
+                  "fill": "#111111",
+                  "content": "80 min",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 32,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "i2dzs",
+              "name": "分析耗时 Stat",
+              "width": "fill_container",
+              "fill": "#F5F5F5",
+              "stroke": "#E0E0E0",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 6,
+              "padding": [
+                20,
+                24
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "F9G6n",
+                  "name": "分析耗时 Label",
+                  "fill": "#999999",
+                  "content": "分析耗时",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "i399F",
+                  "name": "分析耗时 Value",
+                  "fill": "#111111",
+                  "content": "30 min",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 32,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "GYc43",
+              "name": "总样本 Stat",
+              "width": "fill_container",
+              "fill": "#F5F5F5",
+              "stroke": "#E0E0E0",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 6,
+              "padding": [
+                20,
+                24
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ZI6rt",
+                  "name": "总样本 Label",
+                  "fill": "#999999",
+                  "content": "总样本",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "jjO3s",
+                  "name": "总样本 Value",
+                  "fill": "#111111",
+                  "content": "1,200",
+                  "fontFamily": "IBM Plex Mono",
+                  "fontSize": 32,
+                  "fontWeight": "700"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "ZuiMb",
+      "x": 11760,
+      "y": 0,
+      "name": "Slide 7 - Core Results",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "gap": 32,
+      "padding": [
+        80,
+        100,
+        60,
+        100
+      ],
+      "children": [
+        {
+          "type": "text",
+          "id": "CHjrZ",
+          "name": "S7 Title",
+          "fill": "#111111",
+          "content": "核心结果:真实 vs Mock 代理",
+          "fontFamily": "Inter",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "kB8Gh",
+          "name": "S7 Table",
+          "width": "fill_container",
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "RZhiY",
+              "name": "S7 Hdr",
+              "width": "fill_container",
+              "fill": "#F5F5F5",
+              "stroke": "#E0E0E0",
+              "strokeWidth": {
+                "bottom": 2
+              },
+              "padding": [
+                16,
+                24
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "mbbF5",
+                  "name": "SH0",
+                  "width": 160,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "R1rONf",
+                      "name": "SHT0",
+                      "fill": "#666666",
+                      "content": "Gate",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 15,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "vk3cx",
+                  "name": "SH1",
+                  "width": 240,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Le1V1",
+                      "name": "SHT1",
+                      "fill": "#666666",
+                      "content": "真实 (Real)",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 15,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "PppWx",
+                  "name": "SH2",
+                  "width": 240,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "yPMPG",
+                      "name": "SHT2",
+                      "fill": "#666666",
+                      "content": "Mock 代理",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 15,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "E4R4o",
+                  "name": "SH3",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "u5ni77",
+                      "name": "SHT3",
+                      "fill": "#666666",
+                      "content": "差距 (Δ)",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 15,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "b4CTaz",
+                  "name": "SH4",
+                  "width": 180,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "mHG9L",
+                      "name": "SHT4",
+                      "fill": "#666666",
+                      "content": "判定",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 15,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "pSTFt",
+              "name": "R gate0",
+              "width": "fill_container",
+              "fill": "#F0FDF4",
+              "stroke": "#E0E0E0",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "padding": [
+                18,
+                24
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "WDlKj",
+                  "name": "RC0",
+                  "width": 160,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "B8JQh",
+                      "name": "RCT0",
+                      "fill": "#111111",
+                      "content": "gate0",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "yeXEw",
+                  "name": "RC1",
+                  "width": 240,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "FZphX",
+                      "name": "RCT1",
+                      "fill": "#111111",
+                      "content": "0.688 / 0.643",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "o62tb",
+                  "name": "RC2",
+                  "width": 240,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "k7YWwb",
+                      "name": "RCT2",
+                      "fill": "#999999",
+                      "content": "0.631 / 0.758",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "pu7hG",
+                  "name": "RC3",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "CpaIl",
+                      "name": "RCT3",
+                      "fill": "#444444",
+                      "content": "方向一致",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "tLp6p",
+                  "name": "RC4",
+                  "width": 180,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "EtLkg",
+                      "name": "VBadge",
+                      "fill": "#DCFCE7",
+                      "stroke": "#16A34A",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "H4S58F",
+                          "name": "VText",
+                          "fill": "#16A34A",
+                          "content": "PASS",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "w2Zte",
+              "name": "R gate1",
+              "width": "fill_container",
+              "stroke": "#E0E0E0",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "padding": [
+                18,
+                24
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "gXpFA",
+                  "name": "RC0",
+                  "width": 160,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ZBrbP",
+                      "name": "RCT0",
+                      "fill": "#111111",
+                      "content": "gate1",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Q1mIjf",
+                  "name": "RC1",
+                  "width": 240,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "RwORl",
+                      "name": "RCT1",
+                      "fill": "#111111",
+                      "content": "0.475 / ρ 0.476",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ApHVX",
+                  "name": "RC2",
+                  "width": 240,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "V6K1Mu",
+                      "name": "RCT2",
+                      "fill": "#999999",
+                      "content": "0.757 / ρ 0.881",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "QAw3U",
+                  "name": "RC3",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "jkSxb",
+                      "name": "RCT3",
+                      "fill": "#D97706",
+                      "content": "mock +0.28",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "x9hht",
+                  "name": "RC4",
+                  "width": 180,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "PLZpg",
+                      "name": "VBadge",
+                      "fill": "#FEF3C7",
+                      "stroke": "#D97706",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "QkMKB",
+                          "name": "VText",
+                          "fill": "#D97706",
+                          "content": "WEAK",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "M43Gf",
+              "name": "R gate2",
+              "width": "fill_container",
+              "stroke": "#E0E0E0",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "padding": [
+                18,
+                24
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "sVRKK",
+                  "name": "RC0",
+                  "width": 160,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "uLKrO",
+                      "name": "RCT0",
+                      "fill": "#111111",
+                      "content": "gate2",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "o9zZzj",
+                  "name": "RC1",
+                  "width": 240,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "f2P6dV",
+                      "name": "RCT1",
+                      "fill": "#111111",
+                      "content": "0.372",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "DV6XY",
+                  "name": "RC2",
+                  "width": 240,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "s47VLT",
+                      "name": "RCT2",
+                      "fill": "#999999",
+                      "content": "0.454",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "N3nLY1",
+                  "name": "RC3",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "pnZr7",
+                      "name": "RCT3",
+                      "fill": "#444444",
+                      "content": "校准尚可",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "rMntN",
+                  "name": "RC4",
+                  "width": 180,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "mHOHz",
+                      "name": "VBadge",
+                      "fill": "#FEF3C7",
+                      "stroke": "#D97706",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "PRpbX",
+                          "name": "VText",
+                          "fill": "#D97706",
+                          "content": "WEAK",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "dTBTn",
+              "name": "R gate3",
+              "width": "fill_container",
+              "stroke": "#E0E0E0",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "padding": [
+                18,
+                24
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "x3HA5",
+                  "name": "RC0",
+                  "width": 160,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "S2U1G",
+                      "name": "RCT0",
+                      "fill": "#111111",
+                      "content": "gate3",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "N19Qiz",
+                  "name": "RC1",
+                  "width": 240,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "U0upWS",
+                      "name": "RCT1",
+                      "fill": "#111111",
+                      "content": "+0.025",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "OVpcM",
+                  "name": "RC2",
+                  "width": 240,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "J6had",
+                      "name": "RCT2",
+                      "fill": "#999999",
+                      "content": "+0.417",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "i0bNz7",
+                  "name": "RC3",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "D6KrdG",
+                      "name": "RCT3",
+                      "fill": "#D97706",
+                      "content": "mock +0.39",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "UAiJg",
+                  "name": "RC4",
+                  "width": 180,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "B8ORWw",
+                      "name": "VBadge",
+                      "fill": "#FFEDD5",
+                      "stroke": "#EA580C",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "QdwdM",
+                          "name": "VText",
+                          "fill": "#EA580C",
+                          "content": "PARTIAL",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "JbEls",
+              "name": "R gate4",
+              "width": "fill_container",
+              "stroke": "#E0E0E0",
+              "strokeWidth": {
+                "bottom": 1
+              },
+              "padding": [
+                18,
+                24
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "mFyIC",
+                  "name": "RC0",
+                  "width": 160,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "gvc4h",
+                      "name": "RCT0",
+                      "fill": "#111111",
+                      "content": "gate4",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "lV9oq",
+                  "name": "RC1",
+                  "width": 240,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "qH9wK",
+                      "name": "RCT1",
+                      "fill": "#111111",
+                      "content": "—",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "e8biYi",
+                  "name": "RC2",
+                  "width": 240,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "wM9q4",
+                      "name": "RCT2",
+                      "fill": "#999999",
+                      "content": "—",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "PKhPC",
+                  "name": "RC3",
+                  "width": 200,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "palOW",
+                      "name": "RCT3",
+                      "fill": "#999999",
+                      "content": "—",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "I1Y8T9",
+                  "name": "RC4",
+                  "width": 180,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "eh5h2",
+                      "name": "VBadge",
+                      "fill": "#F5F5F5",
+                      "stroke": "#999999",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        12
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "vURUM",
+                          "name": "VText",
+                          "fill": "#999999",
+                          "content": "EVAL",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "d9aRi",
+          "name": "S7 Insight",
+          "width": "fill_container",
+          "fill": "#F5F5F5",
+          "stroke": "#E0E0E0",
+          "strokeWidth": 1,
+          "strokeAlignment": "inner",
+          "gap": 16,
+          "padding": [
+            20,
+            28
+          ],
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "T3WWY",
+              "name": "Accent Bar",
+              "fill": "#111111",
+              "width": 4,
+              "height": 48
+            },
+            {
+              "type": "frame",
+              "id": "y3mLE",
+              "name": "Insight Content",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "pIQVn",
+                  "name": "Insight Title",
+                  "fill": "#111111",
+                  "content": "核心发现",
+                  "fontFamily": "Inter",
+                  "fontSize": 18,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "DsRhl",
+                  "name": "Insight Body",
+                  "fill": "#444444",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "gate0 承重主线方向一致 → 真实残差信号可用;gate1/3 被 mock 严重高估,代理信号不可信",
+                  "fontFamily": "Inter",
+                  "fontSize": 20,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "UQB0m",
+      "x": 13720,
+      "y": 0,
+      "name": "Slide 8 - Interpretation",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "gap": 36,
+      "padding": [
+        80,
+        100,
+        60,
+        100
+      ],
+      "children": [
+        {
+          "type": "text",
+          "id": "cOWiH",
+          "name": "S8 Title",
+          "fill": "#111111",
+          "content": "诚实解读",
+          "fontFamily": "Inter",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "L0bWYk",
+          "name": "Point ①",
+          "width": "fill_container",
+          "fill": "#FFFFFF",
+          "stroke": "#E0E0E0",
+          "strokeWidth": 1,
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "L7WvCG",
+              "name": "Side ①",
+              "fill": "#16A34A",
+              "width": 4,
+              "height": 90
+            },
+            {
+              "type": "frame",
+              "id": "sncTt",
+              "name": "Content ①",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                20,
+                28
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "WhyqT",
+                  "name": "Hdr ①",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Piqkf",
+                      "name": "Num ①",
+                      "fill": "#16A34A",
+                      "content": "①",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 20,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Zc8LR",
+                      "name": "Title ①",
+                      "fill": "#111111",
+                      "content": "gate0 过线但不豪华",
+                      "fontFamily": "Inter",
+                      "fontSize": 22,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "IgbD5",
+                  "name": "Body ①",
+                  "fill": "#444444",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "检测 AUC < 0.7,且是 SD1.5 检 SD1.5 自家先验——最有利条件下的下界",
+                  "lineHeight": 1.4,
+                  "fontFamily": "Inter",
+                  "fontSize": 19,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "iGAwv",
+          "name": "Point ②",
+          "width": "fill_container",
+          "fill": "#FFFFFF",
+          "stroke": "#E0E0E0",
+          "strokeWidth": 1,
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "I5sckZ",
+              "name": "Side ②",
+              "fill": "#D97706",
+              "width": 4,
+              "height": 90
+            },
+            {
+              "type": "frame",
+              "id": "QsBzE",
+              "name": "Content ②",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                20,
+                28
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Ub7LQ",
+                  "name": "Hdr ②",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "F5EZ7G",
+                      "name": "Num ②",
+                      "fill": "#D97706",
+                      "content": "②",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 20,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "sBrtk",
+                      "name": "Title ②",
+                      "fill": "#111111",
+                      "content": "gate1 被 mock 高估",
+                      "fontFamily": "Inter",
+                      "fontSize": 22,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "zW94C",
+                  "name": "Body ②",
+                  "fill": "#444444",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "mock 把 strength 线性写进像素,真实 SDEdit 在低/高强度区间饱和,精细回归不可行",
+                  "lineHeight": 1.4,
+                  "fontFamily": "Inter",
+                  "fontSize": 19,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "jkvkZ",
+          "name": "Point ③",
+          "width": "fill_container",
+          "fill": "#FFFFFF",
+          "stroke": "#E0E0E0",
+          "strokeWidth": 1,
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "LVf6C",
+              "name": "Side ③",
+              "fill": "#D97706",
+              "width": 4,
+              "height": 90
+            },
+            {
+              "type": "frame",
+              "id": "wLnOu",
+              "name": "Content ③",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                20,
+                28
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "uLINP",
+                  "name": "Hdr ③",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "tKBK6",
+                      "name": "Num ③",
+                      "fill": "#D97706",
+                      "content": "③",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 20,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "HTFv8",
+                      "name": "Title ③",
+                      "fill": "#111111",
+                      "content": "gate2 same ≈ cross 无信息量",
+                      "fontFamily": "Inter",
+                      "fontSize": 22,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "JSO4N",
+                  "name": "Body ③",
+                  "fill": "#444444",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "单模型设置下 same vs cross 本质相同,需第二个生成器才有判别意义",
+                  "lineHeight": 1.4,
+                  "fontFamily": "Inter",
+                  "fontSize": 19,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Zuwdb",
+          "name": "Point ④",
+          "width": "fill_container",
+          "fill": "#FFFFFF",
+          "stroke": "#E0E0E0",
+          "strokeWidth": 1,
+          "children": [
+            {
+              "type": "rectangle",
+              "id": "F5kDC",
+              "name": "Side ④",
+              "fill": "#EA580C",
+              "width": 4,
+              "height": 90
+            },
+            {
+              "type": "frame",
+              "id": "ASwlL",
+              "name": "Content ④",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                20,
+                28
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "eKbg8",
+                  "name": "Hdr ④",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "tNLMy",
+                      "name": "Num ④",
+                      "fill": "#EA580C",
+                      "content": "④",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 20,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "vXD66",
+                      "name": "Title ④",
+                      "fill": "#111111",
+                      "content": "gate3 跨生成器结构性不可测",
+                      "fontFamily": "Inter",
+                      "fontSize": 22,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "TDube",
+                  "name": "Body ④",
+                  "fill": "#444444",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "无 holdout 生成器 → 跨生成器增量无法评估;+0.025 不可解读",
+                  "lineHeight": 1.4,
+                  "fontFamily": "Inter",
+                  "fontSize": 19,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "rreO0",
+      "x": 15680,
+      "y": 0,
+      "name": "Slide 9 - Bug Fixes",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "gap": 40,
+      "padding": [
+        80,
+        100,
+        60,
+        100
+      ],
+      "children": [
+        {
+          "type": "text",
+          "id": "d3bi7",
+          "name": "S9 Title",
+          "fill": "#111111",
+          "content": "过程中修复的 3 个 Bug",
+          "fontFamily": "Inter",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "F7ZZzB",
+          "name": "Bug BUG-1",
+          "width": "fill_container",
+          "fill": "#F5F5F5",
+          "stroke": "#E0E0E0",
+          "strokeWidth": 1,
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            24,
+            28
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "zOoG4",
+              "name": "BUG-1 Hdr",
+              "width": "fill_container",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "L0Ynp",
+                  "name": "BUG-1 Tag",
+                  "fill": "#FEE2E2",
+                  "stroke": "#DC2626",
+                  "strokeWidth": 1,
+                  "padding": [
+                    4,
+                    10
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "rdjXN",
+                      "name": "BUG-1 Tag Text",
+                      "fill": "#DC2626",
+                      "content": "BUG-1",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 13,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "zxsTL",
+                  "name": "BUG-1 Title",
+                  "fill": "#111111",
+                  "content": "Registry 不缓存 real 实例",
+                  "fontFamily": "Inter",
+                  "fontSize": 22,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "r1zTC",
+              "name": "BUG-1 Body",
+              "width": "fill_container",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "OjcB3",
+                  "name": "BUG-1 Prob",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "RmoPI",
+                      "name": "BUG-1 PL",
+                      "fill": "#999999",
+                      "content": "PROBLEM",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "jomK3",
+                      "name": "BUG-1 PT",
+                      "fill": "#444444",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "probe 每个样本重载扩散管线 → 上次实验中断的根因",
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "s8JLDT",
+                  "name": "BUG-1 Fix",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Zuvxs",
+                      "name": "BUG-1 FL",
+                      "fill": "#999999",
+                      "content": "FIX",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "wdqQr",
+                      "name": "BUG-1 FT",
+                      "fill": "#16A34A",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "registry 缓存 img2img / inpaint 实例,92 样本不再逐样本重载",
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "BNrCf",
+                  "name": "BUG-1 Imp",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "vynnD",
+                      "name": "BUG-1 IL",
+                      "fill": "#999999",
+                      "content": "IMPACT",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "urWXi",
+                      "name": "BUG-1 IT",
+                      "fill": "#444444",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "生成耗时 ~80 min (此前中断)",
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "oGz1c",
+          "name": "Bug BUG-2",
+          "width": "fill_container",
+          "fill": "#F5F5F5",
+          "stroke": "#E0E0E0",
+          "strokeWidth": 1,
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            24,
+            28
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "CLZT8",
+              "name": "BUG-2 Hdr",
+              "width": "fill_container",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "A2En6t",
+                  "name": "BUG-2 Tag",
+                  "fill": "#FEE2E2",
+                  "stroke": "#DC2626",
+                  "strokeWidth": 1,
+                  "padding": [
+                    4,
+                    10
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "qmoZN",
+                      "name": "BUG-2 Tag Text",
+                      "fill": "#DC2626",
+                      "content": "BUG-2",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 13,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "t2wiEP",
+                  "name": "BUG-2 Title",
+                  "fill": "#111111",
+                  "content": "gate0 头部截断取样",
+                  "fontFamily": "Inter",
+                  "fontSize": 22,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "s0qdc9",
+              "name": "BUG-2 Body",
+              "width": "fill_container",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Nipxv",
+                  "name": "BUG-2 Prob",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "pQaLN",
+                      "name": "BUG-2 PL",
+                      "fill": "#999999",
+                      "content": "PROBLEM",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "h3lUYc",
+                      "name": "BUG-2 PT",
+                      "fill": "#444444",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "max_n 等间隔取样在放量后漏掉全部掩码样本",
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "NuMdR",
+                  "name": "BUG-2 Fix",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "xx5Sr",
+                      "name": "BUG-2 FL",
+                      "fill": "#999999",
+                      "content": "FIX",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "N5XOS5",
+                      "name": "BUG-2 FT",
+                      "fill": "#16A34A",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "头部截断改为包含掩码样本的均匀取样",
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "qmMzS",
+                  "name": "BUG-2 Imp",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "R2f84",
+                      "name": "BUG-2 IL",
+                      "fill": "#999999",
+                      "content": "IMPACT",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "IRAJn",
+                      "name": "BUG-2 IT",
+                      "fill": "#444444",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "localization 假 FAIL → 真实 0.643",
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Ebbue",
+          "name": "Bug BUG-3",
+          "width": "fill_container",
+          "fill": "#F5F5F5",
+          "stroke": "#E0E0E0",
+          "strokeWidth": 1,
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            24,
+            28
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "c5sHhq",
+              "name": "BUG-3 Hdr",
+              "width": "fill_container",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ahdQc",
+                  "name": "BUG-3 Tag",
+                  "fill": "#FEE2E2",
+                  "stroke": "#DC2626",
+                  "strokeWidth": 1,
+                  "padding": [
+                    4,
+                    10
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "KsT7X",
+                      "name": "BUG-3 Tag Text",
+                      "fill": "#DC2626",
+                      "content": "BUG-3",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 13,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "H2OZhi",
+                  "name": "BUG-3 Title",
+                  "fill": "#111111",
+                  "content": "CAVEAT 文案不分 extractor",
+                  "fontFamily": "Inter",
+                  "fontSize": 22,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "cps5X",
+              "name": "BUG-3 Body",
+              "width": "fill_container",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Dl8is",
+                  "name": "BUG-3 Prob",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "rWySF",
+                      "name": "BUG-3 PL",
+                      "fill": "#999999",
+                      "content": "PROBLEM",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "xK0o1",
+                      "name": "BUG-3 PT",
+                      "fill": "#444444",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "real extractor 被套用 multisigma 代理声明",
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ya5ml",
+                  "name": "BUG-3 Fix",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "egPdt",
+                      "name": "BUG-3 FL",
+                      "fill": "#999999",
+                      "content": "FIX",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "lUo6x",
+                      "name": "BUG-3 FT",
+                      "fill": "#16A34A",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "CAVEAT 按 extractor 类型区分,real 不再套用代理文案",
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Y2a91e",
+                  "name": "BUG-3 Imp",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "JgpEU",
+                      "name": "BUG-3 IL",
+                      "fill": "#999999",
+                      "content": "IMPACT",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "yS1xb",
+                      "name": "BUG-3 IT",
+                      "fill": "#444444",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "报告准确性提升",
+                      "fontFamily": "Inter",
+                      "fontSize": 17,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "S9tvyu",
+      "x": 17640,
+      "y": 0,
+      "name": "Slide 10 - Conclusion",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "gap": 36,
+      "padding": [
+        80,
+        100,
+        60,
+        100
+      ],
+      "children": [
+        {
+          "type": "text",
+          "id": "CLdyf",
+          "name": "S10 Title",
+          "fill": "#111111",
+          "content": "结论与下一步",
+          "fontFamily": "Inter",
+          "fontSize": 44,
+          "fontWeight": "700"
+        },
+        {
+          "type": "frame",
+          "id": "pmS4b",
+          "name": "S10 Cols",
+          "width": "fill_container",
+          "height": "fill_container",
+          "gap": 32,
+          "children": [
+            {
+              "type": "frame",
+              "id": "lPAPD",
+              "name": "Conclusions",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "OD43N",
+                  "name": "Conc Tag",
+                  "fill": "#111111",
+                  "padding": [
+                    6,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "rtdKC",
+                      "name": "Conc Tag Text",
+                      "fill": "#FFFFFF",
+                      "content": "CONCLUSIONS",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "D7u8iT",
+                  "name": "Conc Item",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "qtPbO",
+                      "name": "Check",
+                      "fill": "#16A34A",
+                      "content": "✓",
+                      "fontFamily": "Inter",
+                      "fontSize": 22,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "y8d4V",
+                      "name": "Conc Text",
+                      "fill": "#111111",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "残差可检测 / 可定位主线安全 (gate0 PASS)",
+                      "fontFamily": "Inter",
+                      "fontSize": 21,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "zVSlq",
+                  "name": "Conc Item",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "MTA5H",
+                      "name": "Check",
+                      "fill": "#16A34A",
+                      "content": "✓",
+                      "fontFamily": "Inter",
+                      "fontSize": 22,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "R0U9PM",
+                      "name": "Conc Text",
+                      "fill": "#111111",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "t₀ 精细回归降级 → 分桶方案",
+                      "fontFamily": "Inter",
+                      "fontSize": 21,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "WxukJ",
+                  "name": "Conc Item",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "TKWcP",
+                      "name": "Check",
+                      "fill": "#16A34A",
+                      "content": "✓",
+                      "fontFamily": "Inter",
+                      "fontSize": 22,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "xv1dh",
+                      "name": "Conc Text",
+                      "fill": "#111111",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "mock 可验代码正确性,不可估效应量",
+                      "fontFamily": "Inter",
+                      "fontSize": 21,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "V4GcPM",
+                  "name": "Limitations",
+                  "width": "fill_container",
+                  "fill": "#FEF2F2",
+                  "stroke": "#FECACA",
+                  "strokeWidth": 1,
+                  "strokeAlignment": "inner",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "kRNy6",
+                      "name": "Lim Title",
+                      "fill": "#DC2626",
+                      "content": "局限",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "xsFQu",
+                      "name": "Lim Row",
+                      "width": "fill_container",
+                      "gap": 10,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "rectangle",
+                          "id": "L34Th",
+                          "name": "Lim Dot",
+                          "fill": "#DC2626",
+                          "width": 5,
+                          "height": 5
+                        },
+                        {
+                          "type": "text",
+                          "id": "JKtOu",
+                          "name": "Lim Text",
+                          "fill": "#444444",
+                          "content": "单一先验 (SD1.5)",
+                          "fontFamily": "Inter",
+                          "fontSize": 17,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "iC3ol",
+                      "name": "Lim Row",
+                      "width": "fill_container",
+                      "gap": 10,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "rectangle",
+                          "id": "nS6oI",
+                          "name": "Lim Dot",
+                          "fill": "#DC2626",
+                          "width": 5,
+                          "height": 5
+                        },
+                        {
+                          "type": "text",
+                          "id": "cORXZ",
+                          "name": "Lim Text",
+                          "fill": "#444444",
+                          "content": "n_base = 50 (样本偏少)",
+                          "fontFamily": "Inter",
+                          "fontSize": 17,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ZcbBo",
+                      "name": "Lim Row",
+                      "width": "fill_container",
+                      "gap": 10,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "rectangle",
+                          "id": "ZnVO4",
+                          "name": "Lim Dot",
+                          "fill": "#DC2626",
+                          "width": 5,
+                          "height": 5
+                        },
+                        {
+                          "type": "text",
+                          "id": "q4kwM",
+                          "name": "Lim Text",
+                          "fill": "#444444",
+                          "content": "场景窄 (picsum 自然图)",
+                          "fontFamily": "Inter",
+                          "fontSize": 17,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "tbhlM",
+              "name": "S10 Div",
+              "fill": "#E0E0E0",
+              "width": 1,
+              "height": "fill_container"
+            },
+            {
+              "type": "frame",
+              "id": "syuUb",
+              "name": "Next Steps",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "mCMeM",
+                  "name": "Next Tag",
+                  "fill": "#F5F5F5",
+                  "stroke": "#E0E0E0",
+                  "strokeWidth": 1,
+                  "padding": [
+                    6,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "yqpEx",
+                      "name": "Next Tag Text",
+                      "fill": "#666666",
+                      "content": "NEXT STEPS",
+                      "fontFamily": "IBM Plex Mono",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "K6UAiR",
+                  "name": "Next Item",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "nwjMS",
+                      "name": "Pri Tag",
+                      "fill": "#F5F5F5",
+                      "stroke": "#E0E0E0",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "c2nxJA",
+                          "name": "Pri Text",
+                          "fill": "#111111",
+                          "content": "P0",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "qIH4d",
+                      "name": "Next Text",
+                      "fill": "#111111",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "接入 SDXL 解锁跨生成器判定",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "nEhgI",
+                  "name": "Next Item",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "iMJo8",
+                      "name": "Pri Tag",
+                      "fill": "#F5F5F5",
+                      "stroke": "#E0E0E0",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "AjlXV",
+                          "name": "Pri Text",
+                          "fill": "#111111",
+                          "content": "P0",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "BhN0A",
+                      "name": "Next Text",
+                      "fill": "#111111",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "gate1 桶边界敏感性 + 更强特征",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "jJWPY",
+                  "name": "Next Item",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "c6I9na",
+                      "name": "Pri Tag",
+                      "fill": "#F5F5F5",
+                      "stroke": "#E0E0E0",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "y3Ijsh",
+                          "name": "Pri Text",
+                          "fill": "#999999",
+                          "content": "P1",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "tmER4",
+                      "name": "Next Text",
+                      "fill": "#111111",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "扩底图规模 (>200 张)",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "VCnEh",
+                  "name": "Next Item",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "ihW5c",
+                      "name": "Pri Tag",
+                      "fill": "#F5F5F5",
+                      "stroke": "#E0E0E0",
+                      "strokeWidth": 1,
+                      "padding": [
+                        4,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "oksBJ",
+                          "name": "Pri Text",
+                          "fill": "#999999",
+                          "content": "P1",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 13,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "gvh3i",
+                      "name": "Next Text",
+                      "fill": "#111111",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "真实 gate4 走完整 pipeline split",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variables": {
+    "accent": {
+      "type": "color",
+      "value": "#111111"
+    },
+    "border-primary": {
+      "type": "color",
+      "value": "#E0E0E0"
+    },
+    "border-subtle": {
+      "type": "color",
+      "value": "#EEEEEE"
+    },
+    "fg-muted": {
+      "type": "color",
+      "value": "#999999"
+    },
+    "fg-primary": {
+      "type": "color",
+      "value": "#111111"
+    },
+    "fg-secondary": {
+      "type": "color",
+      "value": "#666666"
+    },
+    "font-body": {
+      "type": "string",
+      "value": "Inter"
+    },
+    "font-heading": {
+      "type": "string",
+      "value": "Inter"
+    },
+    "font-mono": {
+      "type": "string",
+      "value": "IBM Plex Mono"
+    },
+    "partial": {
+      "type": "color",
+      "value": "#EA580C"
+    },
+    "pass": {
+      "type": "color",
+      "value": "#16A34A"
+    },
+    "surface-primary": {
+      "type": "color",
+      "value": "#FFFFFF"
+    },
+    "surface-secondary": {
+      "type": "color",
+      "value": "#F5F5F5"
+    },
+    "weak": {
+      "type": "color",
+      "value": "#D97706"
+    }
+  }
+}

@@ -73,6 +73,7 @@ def _cmd_probe(args) -> int:
         img2img_specs=imgs, inpainter_specs=inps,
         holdout_generators=set(data.get("holdout_generators", [])),
         backend=data.get("backend", "mock"), seed=int(data.get("seed", 0)),
+        cfg_grid=data.get("cfg_grid"), steps_grid=data.get("steps_grid"),
     )
     print(json.dumps(st, ensure_ascii=False, indent=2))
     return 0

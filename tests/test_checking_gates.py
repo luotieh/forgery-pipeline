@@ -35,6 +35,13 @@ def test_gate0(dd):
     assert 0.0 <= r["metrics"]["localization_auc"] <= 1.0
 
 
+def test_gate0_max_n_covers_masked_samples(dd):
+    # manifest 头部是 pristine + gate1 全图样本；头部截断会取不到任何掩码样本
+    from checking import gate0
+    r = gate0.run(dd["probe"], dd["ext"], max_n=12)
+    assert r["metrics"]["n_localization"] > 0
+
+
 def test_gate1(dd):
     from checking import gate1
     r = gate1.run(dd["probe"], dd["ext"])
@@ -43,6 +50,13 @@ def test_gate1(dd):
     assert 0.0 <= m["balanced_accuracy"] <= 1.0
     assert -1.0 <= m["spearman_rho"] <= 1.0
     assert "single_sigma_acc" in m
+    # 桶边界敏感性：三组边界下的 reg-bucket BA（判定不能只依赖单一桶界）
+    sens = m["bucket_sensitivity"]
+    assert set(sens) == {"0.30/0.60", "0.35/0.65", "0.40/0.70"}
+    assert all(0.0 <= v <= 1.0 for v in sens.values())
+    # 2 桶 median 探索性运行点（附加，不参与 verdict）
+    tb = m["two_bucket_median"]
+    assert 0.0 <= tb["ba"] <= 1.0 and "cut" in tb and "note" in tb
 
 
 def test_gate2(dd):
