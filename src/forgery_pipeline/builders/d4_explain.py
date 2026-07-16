@@ -31,10 +31,14 @@ def build_d4(out_dir, source_samples: list[Sample], n: int,
             mask_source=s.mask_source, mask_area_ratio=s.mask_area_ratio,
             explanation=expl,
             # D4 与源行共用同一张图（未产生新像素），provenance 字段原样回链
-            # （PATCH 7 字段引入时遗漏，导致 sample_kind/io_chain 缺失使 validator V2/V3 失真）
+            # （PATCH 7 字段引入时遗漏，导致 sample_kind/io_chain 缺失使 validator V2/V3 失真；
+            #  PATCH 9 Wave2 Task5 同理发现 operator/op_params 遗漏——D4-from-D2 行 io_chain
+            #  含 edit: 节点、generator_family 非 non_diffusion，落入 V11 扩散编辑行判定域，
+            #  但 op_params 未回链导致误判"缺 nuisance 记录"；同类回填，补齐）
             io_chain=s.io_chain, sample_kind=s.sample_kind,
             compositing=s.compositing, feather_px=s.feather_px,
             probe_group=s.probe_group, pair_id=s.pair_id,
+            operator=s.operator, op_params=s.op_params,
             base_id=s.base_id or s.image_id,
         ))
     return samples
