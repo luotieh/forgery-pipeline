@@ -12,6 +12,7 @@ from forgery_pipeline.builders.d1_whole import build_d1
 from forgery_pipeline.builders.d2_local import build_d2
 from forgery_pipeline.builders.d3_web import build_d3
 from forgery_pipeline.builders.d4_explain import build_d4
+from forgery_pipeline.builders.grid_ops import build_grid
 from forgery_pipeline.config import PipelineConfig
 from forgery_pipeline.postprocess.degradations import sample_and_apply
 from forgery_pipeline.split.leakage import check_leakage
@@ -67,12 +68,26 @@ def run_pipeline(cfg: PipelineConfig) -> dict:
                    policies=cfg)
           if st.get("d2") else [])
     d3 = build_d3(out, d3_bases, cfg.scales.d3, cfg.backend, seed) if st.get("d3") else []
+    # grid（img2img/outpaint 主 run 算子轴，PATCH 9 Wave2 T3）：底图取自 d3_bases（而非
+    # d0 头部/d2_bases）——沿用上面 D2/D3 已建立的"不相交底图池"不变式。若改用
+    # `d0[:grid_per_op]`，会与 d2_bases 重叠：build_d2 对约 20% 底图独立分配 holdout
+    # inpainter（其 pool_hold，与 grid 无关、grid 不知情），一旦 grid 与 D2 共享底图，
+    # grid 对该底图统一施加的 img2img 行（非 holdout 生成器）就会被同一 origin-group 的
+    # D2 holdout 行拖进 test_b——一旦同一生成器名在别的底图上落在 train，
+    # check_leakage 规则4（cross-generator 生成器不得同时出现在 train 与 test_b）即炸
+    # （已实测复现，非假设）。d3_bases 上的行只有 generator_name="manual-web-edit"
+    # （非 holdout），与 grid 共享安全。D4 explain 只消费 d2+d3（不变），grid 不喂给
+    # D4，只并入主 samples 流。
+    grid = (build_grid(out, d3_bases[:cfg.grid_per_op] or d0, cfg.img2img, cfg.inpainters, cfg,
+                       cfg.backend, seed, holdout_generators=holdout_gen,
+                       feather_px=cfg.compositing_feather_px)
+            if st.get("grid") and cfg.grid_per_op > 0 else [])
     d4 = build_d4(out, d2 + d3, cfg.scales.d4, cfg.backend) if st.get("d4") else []
 
-    for name, lib in [("d0", d0), ("d1", d1), ("d2", d2), ("d3", d3), ("d4", d4)]:
+    for name, lib in [("d0", d0), ("d1", d1), ("d2", d2), ("d3", d3), ("d4", d4), ("grid", grid)]:
         manifest.write_jsonl(out / f"{name}.jsonl", lib)
 
-    samples = d0 + d1 + d2 + d3 + d4
+    samples = d0 + d1 + d2 + d3 + d4 + grid
 
     if st.get("postprocess"):
         samples += apply_postprocess(out, samples, cfg.postprocess_prob, seed)
