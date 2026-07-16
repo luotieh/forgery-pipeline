@@ -86,6 +86,10 @@
 | **cross-generator holdout (Test-B)** | **Kandinsky 2.2**(异族unCLIP), **SDXL**, (PixArt/Flux 若显存允许) | inpaint/img2img | 只出现在 test_b |
 | 非扩散对照（可选） | LaMa / MAT | inpaint | 检验 score 场对非扩散编辑的行为 |
 
+### B1.5 存储格式决定（2026-07-16 冻结，B3 前不再摇摆）
+
+**主库 = PNG 母本**（维持 PATCH 7），拒绝"两边统一压 JPEG"。理由：统一 JPEG 只把混淆从「有无 JPEG 史」换成「双压 vs 单压」（经典取证特征，仍可学），却要付出三重代价——JPEG 量化吃掉多σ残差的高频信号（自残头牌方法）、Test-E 退化轴被二次压缩污染失去解释力、且不可逆（PNG 可派生 JPEG 评测变体，反向不行）。**源头 JPEG 史混淆的正解**（非存储层）：① Phase C 训练协议加两类同施的随机 Q JPEG 增广（Wang'20/Corvi'23 标准做法）；② B2 真实源掺 RAW 派生子集（RAISE/Dresden）并提升一片进 train；③ **压缩史混淆探针**（零 GPU：仅块效应/DCT 直方图特征的浅探针判 real/fake，量化残余可利用度，数字进论文）。工程：80k×512² PNG ≈ 24–36GB，**B3 前扩 AutoDL 数据盘**。
+
 ### B2. 真实底图域（供 Test-D cross-domain / Test-F real-only）
 - [ ] in-domain：COCO-val 子集（替换现 picsum，场景分布更标准）
 - [ ] cross-domain：另一域（RAISE/Dresden 相机原图 或 不同网图集）→ Test-D
