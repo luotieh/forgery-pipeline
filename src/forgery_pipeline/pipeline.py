@@ -63,7 +63,8 @@ def run_pipeline(cfg: PipelineConfig) -> dict:
     d2_bases = d0[:_half] or d0
     d3_bases = d0[_half:] or d0
     d2 = (build_d2(out, d2_bases, cfg.scales.d2, cfg.inpainters, cfg.backend, seed,
-                   holdout_inpainters=holdout_gen, feather_px=cfg.compositing_feather_px)
+                   holdout_inpainters=holdout_gen, feather_px=cfg.compositing_feather_px,
+                   policies=cfg)
           if st.get("d2") else [])
     d3 = build_d3(out, d3_bases, cfg.scales.d3, cfg.backend, seed) if st.get("d3") else []
     d4 = build_d4(out, d2 + d3, cfg.scales.d4, cfg.backend) if st.get("d4") else []
