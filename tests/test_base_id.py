@@ -21,9 +21,13 @@ def test_pipeline_rows_all_carry_base_id_and_groups_are_consistent(tmp_path):
             assert r.base_id == r.image_id                   # D0 自指
         if r.sample_kind == "real_vae_rt":
             assert r.base_id in real_ids                     # 继承源
-    # 同 base_id 组内 split 一致（V8 的数据前提）
+    # 同 base_id 组内 split 一致（V8 的数据前提；与 validate.check_v8 裁决A同规则：
+    # postprocess 退化行排除——splitter 的 test_a→test_e degradation carve-out 属既定
+    # 设计豁免，其归属由 V8 的母行断言单独管辖，见 check_v8 docstring）
     by_base = {}
     for r in rows:
+        if r.postprocess_of:
+            continue
         by_base.setdefault(r.base_id, set()).add(r.split)
     assert all(len(s) == 1 for s in by_base.values())
 

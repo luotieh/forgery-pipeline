@@ -1,4 +1,9 @@
-"""V1–V7 manifest 级别断言集（PATCH 7 收尾，spec `docs/PATCHES_addendum_06_07_2026-07-15.md`）。
+"""V1–V10 manifest 级别断言集（V1–V7：PATCH 7 收尾，spec
+`docs/PATCHES_addendum_06_07_2026-07-15.md`；V8–V10：PATCH 9 Wave 1 split 防泄漏）。
+
+范围说明（裁决B）：V8/V10 仅在 profile=="run" 时执行——probe 产物是受控仪器（故意让同一
+底图横跨 holdout 生成器、让算子网格进 train，这正是 Gate 1/2 的设计），validator 不罚
+仪器设计；V9 由 holdout_generators 参数门控即可（probe 的 holdout 行本就标 test_b）。
 
 设计约束：
 - 本模块**不**反向 import `forgery_pipeline.manifest`（`manifest.stats()` 要 import 本模块的
@@ -223,10 +228,85 @@ def check_v7(samples) -> list[str]:
     return errs
 
 
+def check_v8(samples, profile: str = "auto") -> list[str]:
+    """V8 底图组防泄漏（PATCH 9.3；裁决B：仅 profile=="run" 执行，见模块 docstring）：
+
+    - 同 base_id 的行须落在同一 split。base_id 未设置的行不参与；postprocess_of 非空的
+      退化行也排除在组一致性之外（裁决A）——其归属由下面的母行断言单独管辖。
+    - postprocess 退化行须与母行同 split，**唯一豁免**：mother.split=="test_a" 且
+      child.split=="test_e"。方法学依据（裁决A）：splitter 从 test_a 的退化 fake 中切出
+      degradation 测试集 test_e 属既定设计——这是 eval→eval 的移动，母行与退化行都不在
+      训练侧，不构成训练泄漏；母行在 train/val 时退化行必须同 split（豁免不适用）。
+      按 image_id 建母行索引，母行缺失时跳过该行（不误报）。
+    """
+    if profile != "run":
+        return []
+    errs: list[str] = []
+    groups: dict[str, set] = defaultdict(set)
+    for s in samples:
+        if s.base_id and not s.postprocess_of:
+            groups[s.base_id].add(s.split)
+    for base_id, splits in groups.items():
+        if len(splits) > 1:
+            errs.append(f"V8: base_id 组跨 split: {base_id} → {sorted(str(x) for x in splits)}")
+
+    by_id = {s.image_id: s for s in samples}
+    for s in samples:
+        if not s.postprocess_of:
+            continue
+        mother = by_id.get(s.postprocess_of)
+        if mother is None:
+            continue
+        if s.split == mother.split:
+            continue
+        if mother.split == "test_a" and s.split == "test_e":
+            continue    # 裁决A豁免：test_e degradation carve-out（eval→eval，无训练泄漏）
+        errs.append(f"V8: postprocess 行 split 与母行不一致: {s.image_id}")
+    return errs
+
+
+def check_v9(samples, holdout_generators=None) -> list[str]:
+    """V9 cross-generator holdout 防泄漏：holdout_generators（generator_name 或
+    generator_family 命中即算）不得出现在 train/val（须仅见于 test_b 等留出 split）。
+
+    holdout_generators 为 None 或空时跳过（未配置留出生成器，向后兼容默认关闭）。
+    """
+    if not holdout_generators:
+        return []
+    hold = set(holdout_generators)
+    errs: list[str] = []
+    for s in samples:
+        if s.split in ("train", "val") and (
+            (s.generator_name in hold) or (s.generator_family in hold)
+        ):
+            errs.append(f"V9: holdout 生成器泄入 {s.split}: {s.image_id} "
+                       f"({s.generator_name}/{s.generator_family})")
+    return errs
+
+
+def check_v10(samples, testc_holdout=None, profile: str = "auto") -> list[str]:
+    """V10 Test-C holdout 算子防泄漏：operator == testc_holdout 的行结构性留给 test_c
+    （PATCH 8.3 几何探针裁定，唯一 config 源见 configs/split.yaml），不得出现在 train/val。
+
+    testc_holdout 为 None 时跳过（未配置，向后兼容默认关闭）；
+    裁决B：仅 profile=="run" 执行——probe 的算子×生成器网格故意进 train，属仪器设计。
+    """
+    if profile != "run" or not testc_holdout:
+        return []
+    errs: list[str] = []
+    for s in samples:
+        if s.operator == testc_holdout and s.split in ("train", "val"):
+            errs.append(f"V10: Test-C holdout 算子泄入 {s.split}: {s.image_id}")
+    return errs
+
+
 def check_all(samples, profile: str = "auto", vae_rt_range=(0.05, 0.35),
-              min_real: int = 10) -> list[str]:
-    """跑全部 V1–V7（V5 只在 profile=="run" 时额外执行 run-profile legacy 禁令；
+              min_real: int = 10, holdout_generators=None, testc_holdout=None) -> list[str]:
+    """跑全部 V1–V10（V5 只在 profile=="run" 时额外执行 run-profile legacy 禁令；
     向后兼容语义主要由「backfill 后过 check_all」这条测试本身保证，见 check_v5 docstring）。
+
+    V8/V10 仅 profile=="run" 执行（裁决B，见模块 docstring）；V9/V10 另需
+    holdout_generators/testc_holdout（默认 None=跳过，向后兼容所有既存调用点不受影响）。
 
     `samples`：任意可迭代对象，元素只需 duck-typing 具备 Sample 的相应字段属性。
     返回空列表 = 全部通过；非空 = 每条以 "V{n}: " 为前缀的失败消息。
@@ -240,4 +320,7 @@ def check_all(samples, profile: str = "auto", vae_rt_range=(0.05, 0.35),
     errs += check_v5(samples, profile=profile)
     errs += check_v6(samples)
     errs += check_v7(samples)
+    errs += check_v8(samples, profile=profile)
+    errs += check_v9(samples, holdout_generators=holdout_generators)
+    errs += check_v10(samples, testc_holdout=testc_holdout, profile=profile)
     return errs
