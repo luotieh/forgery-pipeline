@@ -1,0 +1,37 @@
+# gate2 probe 设计冻结（PATCH 9.5）；冻结 commit=本文件入库 commit；生成随 B3 驱动；
+# 任何 gate2 标签–特征评估前必须锁定 docs/PREREG_gate2_v3_draft.md。
+#
+# 本文件不被现有代码路径读取（cli.py 无消费点）——它是 9.5 的设计冻结骨架/唯一 config
+# 源，供 B3 驱动生成 gate2 probe 时对齐，以及 docs/PREREG_gate2_v3_draft.md §0 P2/P3
+# 候选值锁定时的引用对象。
+
+# 算子集（K=6）：instruct_edit 落地随 PATCH 8.2（IP2P），本行先冻结算子集合，
+# 不代表 instruct_edit 生成器已接通。
+operators: [inpaint, outpaint, object_replacement, background_editing, img2img, instruct_edit]
+
+# 生成器集（按族分组，供 same-model/cross-model 判据切分）。
+generators:
+  sd15: [stable-diffusion-inpaint, stable-diffusion-img2img]
+  sdxl: [sdxl-inpaint, sdxl-img2img]
+  kandinsky: [kandinsky-inpaint]
+
+# 掩码面积桶界：引用 9.2b 默认，与 PipelineConfig.area_buckets 同源
+# （src/forgery_pipeline/config.py 的 area_buckets 字段默认值一致，勿在此处独立漂移）。
+# 仅对掩码类算子生效——img2img/instruct_edit 为全图算子，M 坐标退化，不进面积桶维。
+area_buckets: [0.05, 0.15, 0.35, 0.7]
+
+n_base: 200          # 底图数下限（9.5 原文，覆盖 same-model/cross-model/方向性预言/null-exceedance 各判定边际）
+per_cell_floor: 20    # 每 cell 计数下限（草案默认，保证每个 one-vs-rest 二分类臂两类均有足够样本）
+
+probe_group: gate2
+# 同底同掩码跨算子成对，控内容混淆——掩码类算子间同 base 同 mask 成对出现，
+# 非自由网格（实际生成量受此设计约束，非 n_base × cell 数的自由积）。
+pairing: same_base_cross_operator
+
+# nuisance：9.1 网格（CFG{5,7.5,10} × steps{30,50}，逐图 stable_hash 确定性采样）。
+# 注：prompt bank（9.2a）生效后 CFG 才真正活性——空 prompt 域下 cond≡uncond，CFG 项在
+# classifier-free guidance 中精确消去，此时 CFG 维实际惰性，敏感度只由 steps(+seed)
+# 承载（发现记录见 docs/paper_experiment_plan_2026-07-15.md B1.6「CFG 惰性发现」）。
+nuisance:
+  cfg_grid: [5.0, 7.5, 10.0]
+  steps_grid: [30, 50]

@@ -41,3 +41,4 @@ forgery-pipeline validate-manifest --path data/probe/manifest.jsonl
 - `probe_group` / `pair_id`：成对 probe 回链（compositing_pair / nd_pair，PATCH 7.3/8.1）。
 - `op_params`：算子参数 JSON 容器（cfg_scale/steps 等，PATCH 8.2；CFG/steps 抖动 probe 已用）。
 - `base_id`：底图组键（V8 split 互斥断言用；D0=自身 `image_id`，衍生行=底图 `image_id`，PATCH 9.3）。
+- `op_params` 扩展键（cfg_scale/steps/prompt/prompt_bank_version——9.1/9.2a 记录）。
