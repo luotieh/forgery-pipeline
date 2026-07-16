@@ -34,6 +34,7 @@ class PipelineConfig:
     postprocess_prob: float = 0.5
     split_config: str = "configs/split.yaml"
     vae_rt_frac: float = 0.15
+    compositing_feather_px: int = 8
 
 
 def load_generators(path) -> tuple[list[GeneratorSpec], list[GeneratorSpec],
@@ -60,4 +61,5 @@ def load_config(path) -> PipelineConfig:
         postprocess_prob=float(data.get("postprocess_prob", 0.5)),
         split_config=data.get("split_config", "configs/split.yaml"),
         vae_rt_frac=float(data.get("vae_rt_frac", 0.15)),
+        compositing_feather_px=int(data.get("compositing_feather_px", 8)),
     )

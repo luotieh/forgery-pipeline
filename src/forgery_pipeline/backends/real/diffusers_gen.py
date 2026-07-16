@@ -92,6 +92,9 @@ class DiffusersInpainter(base.Inpainter):
         self._ensure()
         seed = int(params.get("seed", 0))
         g = torch.Generator(self.device).manual_seed(seed)
+        # 审计守卫（PATCH 7.3）：diffusers 默认管线不做隐式 paste-back/overlay，
+        # padding_mask_crop 会让管线自行回贴掩码外区域——回贴必须走显式的 compositing()。
+        assert "padding_mask_crop" not in params, "禁止隐式 paste-back（PATCH 7.3 审计）：compositing 必须显式"
         out = self._pipe(prompt=prompt or "a realistic object, high quality",
                          image=Image.fromarray(image), mask_image=Image.fromarray(mask),
                          num_inference_steps=int(params.get("steps", 30)),

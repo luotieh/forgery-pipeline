@@ -1,9 +1,11 @@
 """D2 局部 AIGC 篡改：mask → prompt → inpaint（报告 §6，借鉴 GIM）。"""
 from __future__ import annotations
 from pathlib import Path
+import numpy as np
 from forgery_pipeline import image_io, ids
 from forgery_pipeline.backends import registry
 from forgery_pipeline.backends.mock import stable_hash
+from forgery_pipeline.compositing import composite
 from forgery_pipeline.config import GeneratorSpec
 from forgery_pipeline.masks.candidates import filter_and_sample, area_ratio
 from forgery_pipeline.masks import morphology
@@ -75,9 +77,12 @@ def build_d2(out_dir, base_samples: list[Sample], n: int,
         s = seed + attempts
         fake, _ = painter.inpaint(img, mask, tmpl, {"seed": s})
         iid = ids.make_image_id("local_edit", f"{base.image_id}-{mtype}-{s}")
-        img_rel = f"D2_local_aigc_edit/{iid}.jpg"
+        # PATCH 7.3：回贴显式化——50/50 决定是否羽化回贴到原图，而非隐式整图直出
+        mode = "paste_feather" if stable_hash(iid + "comp") % 2 else "none"
+        fake = composite(img, fake, (mask > 127).astype(np.float32), mode, feather_px=8)
+        img_rel = f"D2_local_aigc_edit/{iid}.png"
         mask_rel = f"D2_local_aigc_edit/masks/{iid}.png"
-        image_io.save_image(fake, out_dir / img_rel)
+        image_io.save_canonical(fake, out_dir / img_rel)
         image_io.save_mask(mask, out_dir / mask_rel)
         samples.append(Sample(
             image_id=iid, image_path=img_rel,
@@ -90,5 +95,8 @@ def build_d2(out_dir, base_samples: list[Sample], n: int,
             mask_source="SAM", mask_area_ratio=ratio, prompt=tmpl, seed=s,
             quality_score=round(score, 4), quality_bucket=bucket_from_score(score),
             source_dataset=base.source_dataset,
+            compositing=mode, feather_px=(8 if mode == "paste_feather" else None),
+            sample_kind="edited",
+            io_chain=image_io.chain("decode", f"rs{img.shape[0]}", f"edit:{inp.name}", "png"),
         ))
     return samples

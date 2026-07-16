@@ -11,6 +11,7 @@ from forgery_pipeline import image_io, ids, manifest
 from forgery_pipeline.backends import registry
 from forgery_pipeline.backends.mock import stable_hash
 from forgery_pipeline.builders.d0_real import build_d0
+from forgery_pipeline.compositing import composite
 from forgery_pipeline.config import GeneratorSpec
 from forgery_pipeline.schema import Sample, TaskType
 
@@ -142,9 +143,9 @@ def build_probe_operator(out_dir, bases: list[Sample], img2img_specs: list[Gener
                     mask = _mask_for(mkind, h, w, rng)
                     painter = registry.get_inpainter(backend, spec.name, spec.family)
                     fake, _ = painter.inpaint(img, mask, op, {"seed": sd})
-                    rel = f"probe/gate2_operator/{iid}.jpg"
+                    rel = f"probe/gate2_operator/{iid}.png"
                     mrel = f"probe/gate2_operator/masks/{iid}.png"
-                    image_io.save_image(fake, out / rel)
+                    image_io.save_canonical(fake, out / rel)
                     image_io.save_mask(mask, out / mrel)
                     samples.append(Sample(
                         image_id=iid, image_path=rel, real_image_path=base.image_path,
@@ -154,14 +155,64 @@ def build_probe_operator(out_dir, bases: list[Sample], img2img_specs: list[Gener
                         generator_name=spec.name, generator_family=spec.family,
                         operator=op, mask_source="probe", seed=sd, split=sp,
                         source_dataset=base.source_dataset,
+                        # masked 行整图直出（未走 composite），compositing 显式记为 none（PATCH 7.3）
+                        compositing="none", sample_kind="edited",
+                        io_chain=image_io.chain("decode", f"rs{img.shape[0]}", f"edit:{spec.name}", "png"),
                     ))
+    return samples
+
+
+def build_compositing_pairs(out_dir, bases: list[Sample], inpainter_specs: list[GeneratorSpec],
+                            n_pairs: int, backend: str, seed: int) -> list[Sample]:
+    """成对 compositing 探针（PATCH 7.3）：同一 base/mask/seed 只让 compositing 不同
+    （none vs paste_feather），供下游隔离估计"回贴痕迹"对判别的边际贡献。
+
+    每对共用同一次 painter.inpaint 输出（"同一 painter+seed 生成一次 gen"），
+    仅在 compositing() 混合阶段分叉出两行，避免生成器随机性混入回贴变量。
+    """
+    out = Path(out_dir)
+    samples: list[Sample] = []
+    if n_pairs <= 0 or not bases or not inpainter_specs:
+        return samples          # 与同文件其余 build_* 一致：空输入静默返回空列表而非报错
+    for k in range(n_pairs):
+        base = bases[k % len(bases)]
+        img = image_io.load_image(out / base.image_path)
+        h, w = img.shape[:2]
+        rng = np.random.default_rng((seed + k) & 0x7FFFFFFF)
+        mask = _mask_for("box", h, w, rng)
+        spec = inpainter_specs[k % len(inpainter_specs)]
+        painter = registry.get_inpainter(backend, spec.name, spec.family)
+        sd = seed + k
+        gen, _ = painter.inpaint(img, mask, "inpaint", {"seed": sd})
+        mask01 = (mask > 127).astype(np.float32)
+        pid = f"cp{k:04d}"
+        mrel = f"probe/compositing_pairs/masks/{pid}.png"
+        image_io.save_mask(mask, out / mrel)
+        for mode, feather_px in (("none", None), ("paste_feather", 8)):
+            fake = composite(img, gen, mask01, mode, feather_px=feather_px or 8)
+            iid = ids.make_image_id("probe_cp", f"{pid}-{mode}")
+            rel = f"probe/compositing_pairs/{iid}.png"
+            image_io.save_canonical(fake, out / rel)
+            samples.append(Sample(
+                image_id=iid, image_path=rel, real_image_path=base.image_path,
+                mask_path=mrel, is_fake=1, task_type=TaskType.localization,
+                manipulation_level1="partial_manipulated", manipulation_level2="AIGC-editing",
+                manipulation_level3="mask_guided_inpainting", manipulation_level4=spec.name,
+                generator_name=spec.name, generator_family=spec.family,
+                operator="inpaint", mask_source="probe", seed=sd,
+                source_dataset=base.source_dataset,
+                compositing=mode, feather_px=feather_px,
+                probe_group="compositing_pair", pair_id=pid,
+                sample_kind="edited",
+                io_chain=image_io.chain("decode", f"rs{img.shape[0]}", f"edit:{spec.name}", "png"),
+            ))
     return samples
 
 
 def run_probe(out_dir, *, n_base: int, strengths, operators,
               img2img_specs: list[GeneratorSpec], inpainter_specs: list[GeneratorSpec],
               holdout_generators=(), backend: str = "mock", seed: int = 0,
-              cfg_grid=None, steps_grid=None) -> dict:
+              cfg_grid=None, steps_grid=None, compositing_pairs: int = 0) -> dict:
     out = Path(out_dir); out.mkdir(parents=True, exist_ok=True)
     bases = build_d0(out, n_base, backend, seed)
     for b in bases:
@@ -172,6 +223,8 @@ def run_probe(out_dir, *, n_base: int, strengths, operators,
                               backend, seed, holdout_generators)
     manifest.write_jsonl(out / "gate1_strength.jsonl", g1)
     manifest.write_jsonl(out / "gate2_operator.jsonl", g2)
-    samples = bases + g1 + g2
+    pairs = (build_compositing_pairs(out, bases, inpainter_specs, compositing_pairs, backend, seed)
+             if compositing_pairs > 0 else [])
+    samples = bases + g1 + g2 + pairs
     manifest.write_jsonl(out / "manifest.jsonl", samples)
     return manifest.stats(samples)
