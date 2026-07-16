@@ -490,3 +490,11 @@ forgery-pipeline validate-manifest --path data/probe/manifest.jsonl
 ```
 
 应用顺序建议：**1 → 3 → 4 → 5（解锁闸门 + 修 bug）**，再 **2 → 6 → 7 → 8（完整性）**。
+
+---
+
+## PATCH 完成记录（2026-07-16）
+
+**PATCH 8.3 ✅ 完成**：`checking/testc_geometry_probe.py`（5 维掩码几何 + 手写 OvR logistic，sklearn-free）+ 5 测试。n=1600 掩码（mock probe n_base=100；probe 掩码由 `_mask_for` 几何原语生成，mock/real 同代码路径，几何分布与后端无关）。**结果**：outpaint 1.000 / background_editing 1.000 → geometry-trivial，不得作 Test-C holdout；inpaint 0.829 / object_replacement 0.829 → eligible；决定性配对 inpaint↔object_replacement AUC=0.487≈机会线。**裁定：Test-C holdout = object_replacement**（默认确认），已写回 experiment plan §3 B3。失效条件：Phase B 更改算子×掩码约定须重跑。报告 `checking/testc_geometry_report_2026-07-16.md`。
+
+**PATCH 6 ⤳ 被预注册 v2 路线取代**：其目标（gate1 回归口径、饱和诊断、预注册阈值）已由 `docs/PREREG_gate1_v2_2026-07-15.md`（锁定）+ `checking/gate1_confirmatory.py` 全部吸收并以更严格形式落地（cluster bootstrap / 嵌套 isotonic / 一次性评估）；相邻档位 AUC 曲线证实"单调+饱和"。不再单独实施。

@@ -94,6 +94,7 @@
 ### B3. 规模与划分（目标，均衡采样）
 - [ ] 主 `run`：每 生成器×算子 单元 ≥ 2–4k 编辑图 + 等量真实，总量 **~40–80k**；masks 齐全（定位监督）
 - [ ] 8 路 split：train/val/test_a(in-domain)/test_b(cross-gen)/test_c(cross-manip holdout 算子)/test_d(cross-domain)/test_e(degradation)/test_f(real-only)
+  - **Test-C holdout 已裁定（2026-07-16，PATCH 8.3 几何探针）= `object_replacement`**：outpaint/background_editing geometry-only AUC=1.0 → 几何平凡不得作 holdout；object_replacement 与 inpaint 配对几何 AUC=0.487≈机会线 → 合格。见 `checking/testc_geometry_report_2026-07-16.md`；Phase B 若改算子×掩码约定须重跑探针。
 - [ ] 受控 probe：强度网格 n_base≥200（gate1）+ 算子×族网格（gate2）
 - [ ] Test-E 退化：JPEG(Q40-90)/resize/高斯模糊/噪声/二次压缩，**独立成行** + `postprocess`/`postprocess_of` 回链
 - [ ] `validate-manifest` + `stats` 核验 `by_generator_name`/`by_operator` 计数均衡
