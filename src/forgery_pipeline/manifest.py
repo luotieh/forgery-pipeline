@@ -40,6 +40,18 @@ def merge(paths, out_path) -> int:
 
 
 def stats(samples: list[Sample]) -> dict:
+    # 延迟到函数内 import：manifest 依赖 validate（用其 nongen_chain），但 validate 不得
+    # 反向 import manifest，否则成环（见 validate.py 模块 docstring）。
+    from forgery_pipeline.validate import nongen_chain
+
+    io_chain_by_fake_split: dict = {}
+    for s in samples:
+        if not s.split:
+            continue
+        bucket = (io_chain_by_fake_split.setdefault(s.split, {})
+                 .setdefault(nongen_chain(s.io_chain), {"real": 0, "fake": 0}))
+        bucket["fake" if s.is_fake else "real"] += 1
+
     return {
         "total": len(samples),
         "real": sum(1 for s in samples if s.is_fake == 0),
@@ -52,4 +64,7 @@ def stats(samples: list[Sample]) -> dict:
             Counter(s.generator_name for s in samples if s.generator_name)),
         "by_operator": dict(Counter(s.operator for s in samples if s.operator)),
         "by_split": dict(Counter(s.split for s in samples if s.split)),
+        "by_sample_kind": dict(Counter(s.sample_kind for s in samples if s.sample_kind)),
+        "by_compositing": dict(Counter(s.compositing for s in samples if s.compositing)),
+        "io_chain_by_fake_split": io_chain_by_fake_split,
     }
