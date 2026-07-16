@@ -19,6 +19,10 @@ from forgery_pipeline.compositing import composite
 from forgery_pipeline.config import GeneratorSpec, PipelineConfig
 from forgery_pipeline.schema import Sample, TaskType
 
+# GATE_DATA.md 约定：init_timestep = round(strength × 1000)（SDEdit 起始 timestep），
+# 与 probe.py 的 _NUM_TRAIN_TIMESTEPS 同源同值。
+_NUM_TRAIN_TIMESTEPS = 1000
+
 
 def _split_for(name, holdout) -> str:
     """同 probe.py 的同名函数：本地复制而非跨 builder 导入（避免模块间私有耦合）。"""
@@ -90,7 +94,7 @@ def build_grid(out_dir, bases: list[Sample], img2img_specs: list[GeneratorSpec],
                 manipulation_level4=spec.name,
                 generator_name=spec.name, generator_family=spec.family,
                 operator="img2img", strength=st_final,
-                init_timestep=int(round(st_final * 999)),
+                init_timestep=int(round(st_final * _NUM_TRAIN_TIMESTEPS)),
                 seed=sd, split=_split_for(spec.name, holdout_generators),
                 source_dataset=base.source_dataset,
                 compositing="none", sample_kind="edited", base_id=base.image_id,

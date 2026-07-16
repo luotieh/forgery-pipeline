@@ -98,7 +98,8 @@ def test_build_grid_img2img_strength_continuous_and_init_timestep(tmp_path):
     assert len(distinct) > 10, "strength 应连续取值（非离散网格），唯一值应远超 10 个"
     for s in i2i:
         assert cfg.strength_range[0] <= s.strength <= cfg.strength_range[1]
-        assert s.init_timestep == round(s.strength * 999)
+        # ×1000 口径（GATE_DATA.md 约定，probe.py _NUM_TRAIN_TIMESTEPS 同源）：st=0.95 → 950
+        assert s.init_timestep == round(s.strength * 1000)
 
 
 # ---------------------------------------------------------------------------
