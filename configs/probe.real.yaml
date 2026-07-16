@@ -6,3 +6,5 @@ n_base: 8
 strengths: [0.1, 0.3, 0.5, 0.7, 0.9]
 operators: [img2img, inpaint, outpaint, object_replacement, background_editing]
 holdout_generators: [kandinsky-inpaint]
+# spec 7.3.5：~100 组成对样本（同 base/mask/seed，compositing=none/paste_feather 各一行）供 gate0 定位复查
+compositing_pairs: 100

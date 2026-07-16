@@ -188,6 +188,28 @@ def test_v5_backfilled_legacy_manifest_passes_check_all(tmp_path):
 
 
 # ---------------------------------------------------------------------------
+# V5：run profile legacy 禁令（spec 7.4："主 run 中不得出现 legacy"）
+# ---------------------------------------------------------------------------
+
+def test_v5_run_profile_bans_legacy_io_chain_rows():
+    rows = [
+        _row("r0", 0, split="train", io_chain="decode>rs256>png"),
+        _row("f0", 1, split="train", io_chain="legacy"),
+    ]
+    errs = check_all(rows, profile="run")
+    assert _has(errs, "V5: ")
+
+
+def test_v5_auto_profile_does_not_ban_legacy_io_chain_rows():
+    rows = [
+        _row("r0", 0, split="train", io_chain="decode>rs256>png"),
+        _row("f0", 1, split="train", io_chain="legacy"),
+    ]
+    errs = check_all(rows, profile="auto")
+    assert not _has(errs, "V5: ")
+
+
+# ---------------------------------------------------------------------------
 # V6：instruct_edit 行 op_params 完备性
 # ---------------------------------------------------------------------------
 

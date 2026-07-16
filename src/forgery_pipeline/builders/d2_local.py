@@ -35,7 +35,7 @@ MANIP_TYPES = [
 
 def build_d2(out_dir, base_samples: list[Sample], n: int,
              inpainters: list[GeneratorSpec], backend: str = "mock",
-             seed: int = 0, holdout_inpainters=()) -> list[Sample]:
+             seed: int = 0, holdout_inpainters=(), feather_px: int = 8) -> list[Sample]:
     out_dir = Path(out_dir)
     seg = registry.get_segmenter(backend, seed=seed)
     # 按底图把 inpainter 划入互斥池：保证每个 origin-group 只用一类生成器，
@@ -79,7 +79,7 @@ def build_d2(out_dir, base_samples: list[Sample], n: int,
         iid = ids.make_image_id("local_edit", f"{base.image_id}-{mtype}-{s}")
         # PATCH 7.3：回贴显式化——50/50 决定是否羽化回贴到原图，而非隐式整图直出
         mode = "paste_feather" if stable_hash(iid + "comp") % 2 else "none"
-        fake = composite(img, fake, (mask > 127).astype(np.float32), mode, feather_px=8)
+        fake = composite(img, fake, (mask > 127).astype(np.float32), mode, feather_px=feather_px)
         img_rel = f"D2_local_aigc_edit/{iid}.png"
         mask_rel = f"D2_local_aigc_edit/masks/{iid}.png"
         image_io.save_canonical(fake, out_dir / img_rel)
@@ -95,7 +95,7 @@ def build_d2(out_dir, base_samples: list[Sample], n: int,
             mask_source="SAM", mask_area_ratio=ratio, prompt=tmpl, seed=s,
             quality_score=round(score, 4), quality_bucket=bucket_from_score(score),
             source_dataset=base.source_dataset,
-            compositing=mode, feather_px=(8 if mode == "paste_feather" else None),
+            compositing=mode, feather_px=(feather_px if mode == "paste_feather" else None),
             sample_kind="edited",
             io_chain=image_io.chain("decode", f"rs{img.shape[0]}", f"edit:{inp.name}", "png"),
         ))

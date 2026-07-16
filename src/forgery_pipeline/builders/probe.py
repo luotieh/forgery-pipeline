@@ -188,6 +188,8 @@ def build_compositing_pairs(out_dir, bases: list[Sample], inpainter_specs: list[
         pid = f"cp{k:04d}"
         mrel = f"probe/compositing_pairs/masks/{pid}.png"
         image_io.save_mask(mask, out / mrel)
+        # 成对 probe 是固定诊断配置（要复查的是回贴痕迹本身），feather_px 固定为 8，
+        # 不接 cfg.compositing_feather_px——主 run 的羽化强度调整不应改变这条诊断探针的口径。
         for mode, feather_px in (("none", None), ("paste_feather", 8)):
             fake = composite(img, gen, mask01, mode, feather_px=feather_px or 8)
             iid = ids.make_image_id("probe_cp", f"{pid}-{mode}")

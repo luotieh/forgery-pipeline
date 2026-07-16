@@ -141,6 +141,27 @@ def check_v4(samples, profile: str = "auto", vae_rt_range=(0.05, 0.35),
     return errs
 
 
+def check_v5(samples, profile: str = "auto") -> list[str]:
+    """V5 run-profile legacy 禁令（spec 7.4："主 run 中不得出现 legacy"）：profile=="run" 时，
+    任何 io_chain 缺失（None）或仍为 "legacy" 的行判为 FAIL。
+
+    V5 的另一半语义（旧 manifest 经回填脚本后须过 V1–V4）不是运行时检查，由
+    `test_v5_backfilled_legacy_manifest_passes_check_all` 这条测试本身保证——那条路径用的是
+    profile="auto"，因此不会被这里的禁令拦下，向后兼容不受影响。
+
+    多条违规行合并成一条消息（只列前 5 个 image_id + 总数），避免刷屏。
+    """
+    if profile != "run":
+        return []
+    offenders = [s.image_id for s in samples if s.io_chain in (None, "legacy")]
+    if not offenders:
+        return []
+    head = ", ".join(offenders[:5])
+    suffix = "..." if len(offenders) > 5 else ""
+    return [f"V5: run profile 禁止 legacy/缺失 io_chain 行: {head}{suffix}"
+            f"（共 {len(offenders)} 条）"]
+
+
 def check_v6(samples) -> list[str]:
     """V6 instruct_edit 行 op_params 完备性：须为合法 JSON 且含 image_guidance_scale 键。"""
     errs: list[str] = []
@@ -204,7 +225,8 @@ def check_v7(samples) -> list[str]:
 
 def check_all(samples, profile: str = "auto", vae_rt_range=(0.05, 0.35),
               min_real: int = 10) -> list[str]:
-    """跑全部 V1–V7（V5 不是运行时检查，是「backfill 后过 check_all」这条测试本身）。
+    """跑全部 V1–V7（V5 只在 profile=="run" 时额外执行 run-profile legacy 禁令；
+    向后兼容语义主要由「backfill 后过 check_all」这条测试本身保证，见 check_v5 docstring）。
 
     `samples`：任意可迭代对象，元素只需 duck-typing 具备 Sample 的相应字段属性。
     返回空列表 = 全部通过；非空 = 每条以 "V{n}: " 为前缀的失败消息。
@@ -215,6 +237,7 @@ def check_all(samples, profile: str = "auto", vae_rt_range=(0.05, 0.35),
     errs += check_v2(samples)
     errs += check_v3(samples)
     errs += check_v4(samples, profile=profile, vae_rt_range=vae_rt_range, min_real=min_real)
+    errs += check_v5(samples, profile=profile)
     errs += check_v6(samples)
     errs += check_v7(samples)
     return errs

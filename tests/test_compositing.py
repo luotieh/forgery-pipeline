@@ -44,6 +44,17 @@ def test_d2_fifty_fifty_compositing(tmp_path):
     assert all(r.feather_px == 8 for r in rows if r.compositing == "paste_feather")
     assert all(r.sample_kind == "edited" and r.io_chain for r in rows)
 
+def test_d2_feather_px_configurable(tmp_path):
+    from forgery_pipeline.builders.d0_real import build_d0
+    from forgery_pipeline.builders.d2_local import build_d2
+    from forgery_pipeline.config import GeneratorSpec
+    bases = build_d0(tmp_path, 8, backend="mock", seed=0)
+    rows = build_d2(tmp_path, bases, 16, [GeneratorSpec("i1", "diffusion", "inpaint")],
+                    backend="mock", seed=0, feather_px=4)
+    feather_rows = [r for r in rows if r.compositing == "paste_feather"]
+    assert feather_rows                                # 确认羽化分支确实被触发
+    assert all(r.feather_px == 4 for r in feather_rows)  # 自定义 feather_px 生效
+
 def test_probe_compositing_pairs(tmp_path):
     from forgery_pipeline.builders.probe import run_probe
     from forgery_pipeline.config import GeneratorSpec
