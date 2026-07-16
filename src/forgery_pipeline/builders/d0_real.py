@@ -20,12 +20,14 @@ def build_d0(out_dir, n: int, backend: str = "mock", seed: int = 0) -> list[Samp
         if not ok or not dedup.add(img):
             continue
         iid = ids.make_image_id("real", ids.content_hash(img))
-        rel = f"D0_real_pristine/{iid}.jpg"
-        image_io.save_image(img, out_dir / rel)
+        rel = f"D0_real_pristine/{iid}.png"
+        image_io.save_canonical(img, out_dir / rel)
         samples.append(Sample(
             image_id=iid, image_path=rel, is_fake=0,
             task_type=TaskType.real_pristine,
             source_dataset=meta.get("source_dataset"),
             license=meta.get("license"),
+            sample_kind="real",
+            io_chain=image_io.chain("decode", f"rs{img.shape[0]}", "png"),
         ))
     return samples

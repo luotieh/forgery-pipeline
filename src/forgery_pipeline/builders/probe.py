@@ -86,7 +86,7 @@ def build_probe_strength(out_dir, bases: list[Sample], img2img_specs: list[Gener
                 fake, meta = gen.img2img(img, "", float(s), params or {"seed": sd})
                 iid = ids.make_image_id("probe_s", key)
                 rel = f"probe/gate1_strength/{iid}.png"
-                image_io.save_image(fake, out / rel)
+                image_io.save_canonical(fake, out / rel)
                 st = float(meta.get("strength", s))
                 samples.append(Sample(
                     image_id=iid, image_path=rel, real_image_path=base.image_path, is_fake=1,
@@ -97,6 +97,8 @@ def build_probe_strength(out_dir, bases: list[Sample], img2img_specs: list[Gener
                     strength=st, init_timestep=int(round(st * _NUM_TRAIN_TIMESTEPS)),
                     seed=sd, split=_split_for(spec.name, holdout_generators),
                     source_dataset=base.source_dataset,
+                    sample_kind="edited",
+                    io_chain=image_io.chain("decode", f"rs{img.shape[0]}", f"edit:{spec.name}", "png"),
                 ))
     return samples
 
@@ -123,7 +125,7 @@ def build_probe_operator(out_dir, bases: list[Sample], img2img_specs: list[Gener
                     gen = registry.get_img2img(backend, spec.name, spec.family)
                     fake, meta = gen.img2img(img, "", 0.6, {"seed": sd})
                     rel = f"probe/gate2_operator/{iid}.png"
-                    image_io.save_image(fake, out / rel)
+                    image_io.save_canonical(fake, out / rel)
                     st = float(meta.get("strength", 0.6))
                     samples.append(Sample(
                         image_id=iid, image_path=rel, real_image_path=base.image_path,
@@ -133,6 +135,8 @@ def build_probe_operator(out_dir, bases: list[Sample], img2img_specs: list[Gener
                         generator_family=spec.family, operator="img2img",
                         strength=st, init_timestep=int(round(st * _NUM_TRAIN_TIMESTEPS)),
                         seed=sd, split=sp, source_dataset=base.source_dataset,
+                        sample_kind="edited",
+                        io_chain=image_io.chain("decode", f"rs{img.shape[0]}", f"edit:{spec.name}", "png"),
                     ))
                 else:
                     mask = _mask_for(mkind, h, w, rng)
