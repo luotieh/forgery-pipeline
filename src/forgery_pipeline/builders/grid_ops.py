@@ -25,9 +25,11 @@ from forgery_pipeline.schema import Sample, TaskType
 # 与 probe.py 的 _NUM_TRAIN_TIMESTEPS 同源同值。
 _NUM_TRAIN_TIMESTEPS = 1000
 
+_GRID_SEED_BASE = 10_000_000  # 与 D2 的 seed+attempts 密集区间不相交：防 leakage 规则3 的 (prompt,seed) 跨 split 假阳（grid 与 D2 共享 background prompt bank 节；B3 量级实测期望碰撞 0.1–0.2/run）
+
 
 def _split_for(name, holdout) -> str:
-    """同 probe.py 的同名函数：本地复制而非跨 builder 导入（避免模块间私有耦合）。"""
+    """同 probe.py 的同名函数：本地复制而非跨 builder 导入（避免模块间私有耦合）。pipeline 语境下 assign_splits 会整体重赋 split，此预设仅 standalone 使用时生效（与 probe.py 同约）。"""
     return "test_b" if name in set(holdout) else "train"
 
 
@@ -143,7 +145,7 @@ def build_grid(out_dir, bases: list[Sample], img2img_specs: list[GeneratorSpec],
             st_v = policies.nuisance_steps_grid[
                 stable_hash(iid + "st") % len(policies.nuisance_steps_grid)]
             prompt_text = prompts.pick_prompt(bank, "img2img", iid)
-            sd = seed + bi * 1000 + stable_hash(spec.name) % 500
+            sd = seed + bi * 1000 + stable_hash(spec.name) % 500 + _GRID_SEED_BASE
             gen = registry.get_img2img(backend, spec.name, spec.family)
             fake, meta = gen.img2img(gen_img, prompt_text, s,
                                      {"seed": sd, "cfg_scale": cfg_v, "steps": st_v})
@@ -181,7 +183,7 @@ def build_grid(out_dir, bases: list[Sample], img2img_specs: list[GeneratorSpec],
             prompt_text = prompts.pick_prompt(bank, "background", iid)
             # 与本 base 的 img2img seed 命名空间区分（同 probe.py build_probe_operator 的
             # f"{op}-{name}" 加盐惯例），避免同名生成器跨算子池撞种子。
-            sd2 = seed + bi * 1000 + stable_hash(f"outpaint-{inp.name}") % 500
+            sd2 = seed + bi * 1000 + stable_hash(f"outpaint-{inp.name}") % 500 + _GRID_SEED_BASE
             painter = registry.get_inpainter(backend, inp.name, inp.family)
             fake, _ = painter.inpaint(img, mask, prompt_text,
                                       {"seed": sd2, "cfg_scale": cfg_v, "steps": st_v})

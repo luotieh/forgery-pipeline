@@ -100,7 +100,7 @@ B3 起跑前必须完成：**9.1** 主 run nuisance（CFG{5,7.5,10}×steps{30,50
 
 **✅ 9.3/9.4 工具层已落地（2026-07-16，Wave 1）**：base_id+V8–V10、preflight/rundir 就绪；剩余 B3 阻断 = 9.1/9.2（builder 采样）+ 9.5 冻结 + SDVaeRoundtrip GPU 冒烟 + 扩盘（建议 150GB，Flux 独立实例）。
 
-**✅ 9.1/9.2/9.5 已落地（Wave 2，2026-07-16）**：B3 阻断剩 GPU 冒烟 + 扩盘 + B3 驱动本体（rundir/preflight 工具就绪）+ B1 矩阵 1024 组双备约束解。
+**✅ 9.1/9.2/9.5 已落地（Wave 2，2026-07-16）**：剩余 B3 阻断 = GPU 冒烟（SDXL kwargs 30 秒确认 + SDVaeRoundtrip）+ 扩盘（150GB）+ B3 驱动本体（含 COCO fetch 超时/checksum 确认与 kill→重启演练）+ B1 矩阵 1024 组双备约束解（每分辨率组须 holdout 与非 holdout 双备）。
 
 ### B1.7 PATCH 7 阻断解除（2026-07-16）
 
