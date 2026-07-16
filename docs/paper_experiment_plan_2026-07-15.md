@@ -96,6 +96,10 @@ B3 起跑前必须完成：**9.1** 主 run nuisance（CFG{5,7.5,10}×steps{30,50
 
 **⚠️ CFG 惰性发现（2026-07-16，影响 9.1/9.6 与措辞）**：全部 probe 的 img2img 均为空 prompt → CFG 项在 classifier-free guidance 中精确消去（cond≡uncond）——实验⑤的 CFG 维度实为惰性，6 单元有效坍缩为 steps 30/50 两单元，跨 CFG 差异=各单元独立 seed。后效：①补充 probe 结论内部自洽（主 confirmatory 同为空 prompt 域），但 v2 §5 脚注应精确化为「空 prompt 机制下 CFG 惰性、敏感度由 steps+seed 承载」；②主库上 prompt bank（9.2a）激活 CFG 后其敏感度未被覆盖 → 固定 CFG 无从声称安全，9.1 逐图抖动是唯一诚实选项；③9.6 免费升级：同 steps 跨 CFG 单元的 ρ 波动=纯 seed 噪声地板，分解为 base/steps/seed 三视图。
 
+### B1.7 PATCH 7 阻断解除（2026-07-16）
+
+canonical I/O（全 PNG+io_chain）、VAE 往返负样本（vae_rt_frac=0.15，V4 配比校验含 min_real=10 守卫）、compositing 显式化（D2 50/50 + 成对 probe）、validator V1–V7 全部落地（176 passed，mock e2e 冒烟过）——**PATCH 7 对 B3 的阻断解除**。剩余 B3 阻断 = PATCH 9 的 9.1–9.5（见 B1.6）+ SDVaeRoundtrip 的 GPU 侧真实冒烟。
+
 ### B2. 真实底图域（供 Test-D cross-domain / Test-F real-only）
 - [ ] in-domain：COCO-val 子集（替换现 picsum，场景分布更标准）
 - [ ] cross-domain：另一域（RAISE/Dresden 相机原图 或 不同网图集）→ Test-D

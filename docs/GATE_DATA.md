@@ -35,3 +35,8 @@ forgery-pipeline validate-manifest --path data/probe/manifest.jsonl
 - `strength`：img2img/SDEdit 去噪强度 ∈ [0,1]，≈ t0/T。
 - `init_timestep`：= round(strength × 1000)，直接读 SDEdit 起始 timestep。
 - `postprocess_of`：退化样本回链原始 fake 的 `image_id`（退化样本独立成行）。
+- `io_chain`：逐节点处理链（`decode>rs512>edit:sd15_inpaint>png`；旧行=`legacy`）——V2 断言真假非生成链一致（PATCH 7.1）。
+- `sample_kind`：real / real_vae_rt / edited（VAE 往返硬负样本用，PATCH 7.2）。
+- `compositing` / `feather_px`：掩码算子回贴方式 none/paste/paste_feather 与羽化 σ（PATCH 7.3）。
+- `probe_group` / `pair_id`：成对 probe 回链（compositing_pair / nd_pair，PATCH 7.3/8.1）。
+- `op_params`：算子参数 JSON 容器（cfg_scale/steps 等，PATCH 8.2；CFG/steps 抖动 probe 已用）。

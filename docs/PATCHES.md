@@ -498,3 +498,12 @@ forgery-pipeline validate-manifest --path data/probe/manifest.jsonl
 **PATCH 8.3 ✅ 完成**：`checking/testc_geometry_probe.py`（5 维掩码几何 + 手写 OvR logistic，sklearn-free）+ 5 测试。n=1600 掩码（mock probe n_base=100；probe 掩码由 `_mask_for` 几何原语生成，mock/real 同代码路径，几何分布与后端无关）。**结果**：outpaint 1.000 / background_editing 1.000 → geometry-trivial，不得作 Test-C holdout；inpaint 0.829 / object_replacement 0.829 → eligible；决定性配对 inpaint↔object_replacement AUC=0.487≈机会线。**裁定：Test-C holdout = object_replacement**（默认确认），已写回 experiment plan §3 B3。失效条件：Phase B 更改算子×掩码约定须重跑。报告 `checking/testc_geometry_report_2026-07-16.md`。
 
 **PATCH 6 ⤳ 被预注册 v2 路线取代**：其目标（gate1 回归口径、饱和诊断、预注册阈值）已由 `docs/PREREG_gate1_v2_2026-07-15.md`（锁定）+ `checking/gate1_confirmatory.py` 全部吸收并以更严格形式落地（cluster bootstrap / 嵌套 isotonic / 一次性评估）；相邻档位 AUC 曲线证实"单调+饱和"。不再单独实施。
+
+---
+
+**PATCH 7 ✅ 完成（2026-07-16，分支 feat/patch7-canonical-io，Tasks 1–8 子代理驱动 + 逐任务审查）**
+
+- **落地**：Sample 新字段 io_chain/sample_kind/compositing/feather_px/probe_group/pair_id（回填脚本 `scripts/backfill_manifest_v7.py`）；`compositing.composite()`（none/paste/paste_feather）；canonical I/O（`image_io.chain/load_and_resize/save_canonical`，D0–D4+probe 全 PNG、真假共享非生成链）；VAE 往返硬负样本（`base.VaeRoundtrip`+Mock/SD1.5 实现+pipeline split 后分层插入+泄漏复查，`vae_rt_frac` 默认 0.15）；D2 掩码算子 50/50 显式回贴+probe 成对样本（`run_probe(compositing_pairs=N)`）+diffusers 隐式回贴审计守卫；validator **V1–V7**（`validate.check_all`，CLI `--profile auto|run`）+ stats 扩展（by_sample_kind/by_compositing/io_chain_by_fake_split）；e2e 冒烟（mock 全链 V1–V7 过 + `scripts/assert_compositing_pairs.py` 成对断言 + vae_rt 残差分布记录）。测试 131→**176 passed**。
+- **对 spec 的已记录偏差**：①V2 非生成链 strip 规则含 `gen:*` 且忽略首 `decode`（D1 全生成行无源可解码，字面规则结构性 FAIL）；②V4 增 `min_real=10` 守卫（小 n 时比值离散取值结构性落不进 band）；③成对断言两常数实证修正——羽化带膨胀 `8×feather_px+1`（cv2 float32 高斯核半宽=4σ，字面值 4× 实测 90% 假阳）与 none 行差异阈值 0.15（mock 合成图结构地板≈0.20，0.5 系随机噪声外推不适用）；④MockInpainter 输出加全局 mock-VAE 印记（忠实模拟真实管线整图 VAE 直出，使 7.5 断言在 mock 可测）。
+- **派生修复**：d4_explain 行补 io_chain/sample_kind 等字段回链（否则 V2 对含 D4 的 split 假阳）；labels.EDIT_OPERATORS 增 instruct_edit（V6 需要，§8.2 已预告）。
+- **GPU 侧待复核**：SDVaeRoundtrip 真实冒烟（下次开机随 PATCH 9/B3 一并）。
