@@ -36,6 +36,7 @@ def test_build_d2_localization(tmp_path):
         assert s.task_type.value == "localization"
         assert s.manipulation_level1 == "partial_manipulated"
         assert s.mask_path and (Path(tmp_path) / s.mask_path).exists()
+        assert 0.01 <= s.mask_area_ratio <= 0.50
         assert s.real_image_path is not None
 
 
@@ -48,9 +49,11 @@ def test_manip_types_cover_seven():
 # ---------------------------------------------------------------------------
 
 def test_build_d2_policies_none_leaves_new_fields_unset(tmp_path):
-    """回归锚：policies 缺省 None 时不设 operator/op_params/mask_area_ratio，prompt 仍是
+    """回归锚（裁决①修订）：policies 缺省 None 时不设 operator/op_params，prompt 仍是
     MANIP_TYPES 里的英文模板——config 驱动政策未接入前的口径，供既存调用点（d3/d4/probe
-    等未传 policies 的 build_d2 调用）保持不变。"""
+    等未传 policies 的 build_d2 调用）保持不变。mask_area_ratio 不受 policies 门控：该字段
+    自 D2 初版（commit 5a9320c）起就无条件落行，政策接线只新增 operator/op_params 与
+    prompt 政策，不得移除既有记录。"""
     base = build_d0(tmp_path, n=6, seed=0)
     inps = [GeneratorSpec("stable-diffusion-inpaint", "diffusion", "inpaint")]
     samples = build_d2(tmp_path, base, n=4, inpainters=inps, seed=0)
@@ -59,7 +62,7 @@ def test_build_d2_policies_none_leaves_new_fields_unset(tmp_path):
     for s in samples:
         assert s.operator is None
         assert s.op_params is None
-        assert s.mask_area_ratio is None
+        assert s.mask_area_ratio is not None and 0.01 <= s.mask_area_ratio <= 0.50
         assert s.prompt in templates
 
 

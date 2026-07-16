@@ -152,7 +152,9 @@ def build_d2(out_dir, base_samples: list[Sample], n: int,
             manipulation_level3=level3, manipulation_level4=inp.name,
             generator_name=inp.name, generator_family=inp.family,
             mask_source="SAM",
-            mask_area_ratio=(round(ratio, 4) if policies is not None else None),
+            # mask_area_ratio 自 D2 初版起就无条件落行（裁决①）：不受 policies 门控，
+            # 政策接线只新增 operator/op_params 与 prompt 政策三轴。
+            mask_area_ratio=round(ratio, 4),
             prompt=(prompt_text if policies is not None else tmpl), seed=s,
             quality_score=round(score, 4), quality_bucket=bucket_from_score(score),
             source_dataset=base.source_dataset,
