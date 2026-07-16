@@ -54,15 +54,31 @@ def run_pipeline(cfg: PipelineConfig) -> dict:
         rules = yaml.safe_load(Path(cfg.split_config).read_text(encoding="utf-8")) or {}
     holdout_gen = set(rules.get("holdout_generators", []))
 
-    d0 = build_d0(out, cfg.scales.d0, cfg.backend, seed) if st.get("d0") else []
+    # 多分辨率组摄取（PATCH 9 Wave2 9.2c）：resolutions 由 cfg.resolution_groups 键集派生
+    # 并排序（空 = 单组现状，resolutions=None，build_d0 逐字节保持 HEAD 行为）。
+    resolutions = sorted(cfg.resolution_groups.keys()) if cfg.resolution_groups else None
+    d0 = (build_d0(out, cfg.scales.d0, cfg.backend, seed, resolutions=resolutions)
+          if st.get("d0") else [])
     d1 = (build_d1(out, cfg.generators, cfg.scales.d1_per_generator, cfg.backend, seed)
           if st.get("d1") else [])
+    # D2/D3/grid 的"底图池"只消费基准组（resolutions[0]，分辨率最小的一组）行——其余
+    # 分辨率组（如 SDXL@1024）只出 real（+vae_rt）行，不参与 D2/D3 的局部编辑/网页伪造。
+    # fake 侧对非基准分辨率组的覆盖改由 grid 按 policies.resolution_groups 对 img2img
+    # spec 名分组路由负责（build_grid 的 resolution_pool 参数，见下方 grid 调用与
+    # builders/grid_ops.py 模块 docstring）——这样 V2（split 内 real/fake 非生成链集合
+    # 相等）才能在两个分辨率组间同时成立，而不需要 D2/D3 感知分辨率。resolutions=None
+    # 时 d0_base is d0，下面的过滤是 no-op（单组现状不变）。
+    if resolutions:
+        base_res = resolutions[0]
+        d0_base = [s for s in d0 if image_io.chain_resolution(s.io_chain) == base_res]
+    else:
+        d0_base = d0
     # D2 与 D3 使用不相交的底图子集：否则同一 origin-group 会同时含 D2 的 holdout 生成器
     # 与 D3 的 manual-web-edit，导致非 holdout 的 manual-web-edit 被拖入 test_b 触发泄漏。
     # 这补全 PATCH 6 的不变式「每个 origin-group 只含一类（holdout/非 holdout）生成器」。
-    _half = len(d0) // 2
-    d2_bases = d0[:_half] or d0
-    d3_bases = d0[_half:] or d0
+    _half = len(d0_base) // 2
+    d2_bases = d0_base[:_half] or d0_base
+    d3_bases = d0_base[_half:] or d0_base
     d2 = (build_d2(out, d2_bases, cfg.scales.d2, cfg.inpainters, cfg.backend, seed,
                    holdout_inpainters=holdout_gen, feather_px=cfg.compositing_feather_px,
                    policies=cfg)
@@ -78,9 +94,12 @@ def run_pipeline(cfg: PipelineConfig) -> dict:
     # （已实测复现，非假设）。d3_bases 上的行只有 generator_name="manual-web-edit"
     # （非 holdout），与 grid 共享安全。D4 explain 只消费 d2+d3（不变），grid 不喂给
     # D4，只并入主 samples 流。
-    grid = (build_grid(out, d3_bases[:cfg.grid_per_op] or d0, cfg.img2img, cfg.inpainters, cfg,
-                       cfg.backend, seed, holdout_generators=holdout_gen,
-                       feather_px=cfg.compositing_feather_px)
+    # resolution_pool=d0（全部分辨率行，非仅 d0_base）：grid 按 img2img spec 名反查
+    # policies.resolution_groups 所属分辨率组时，需要在其中查到 base 的同源分辨率兄弟行
+    # （见 build_grid docstring）。resolutions=None 时 d0_base is d0，反查恒落空，等价现状。
+    grid = (build_grid(out, d3_bases[:cfg.grid_per_op] or d0_base, cfg.img2img, cfg.inpainters,
+                       cfg, cfg.backend, seed, holdout_generators=holdout_gen,
+                       feather_px=cfg.compositing_feather_px, resolution_pool=d0)
             if st.get("grid") and cfg.grid_per_op > 0 else [])
     d4 = build_d4(out, d2 + d3, cfg.scales.d4, cfg.backend) if st.get("d4") else []
 
