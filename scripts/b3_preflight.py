@@ -15,11 +15,14 @@
 **事故 A**（COCO 底图 fetch 层 socket 挂起超时）不在本模块断言范围内：已在
 `scripts/fetch_real_images.py` 的 `socket.setdefaulttimeout` 处理，本预检不重复。
 
-**评估禁令公约（事故 B 的固化）**：「B3 生成驱动内不得内置任何对 probe/confirmatory 数据的
-评估步骤；评估脚本独立、预注册锁定后手动触发。」这一条纪律无法被 preflight 机械检测——它
-约束的是"驱动代码里写了什么逻辑"，不是任何运行时可观测的文件系统/进程状态，因此只能靠
-**文档公约 + 代码审查**双保险来落实。本 docstring 本身就是该公约的文本：任何 import 本模块
-的 B3 驱动代码，在拿到 `preflight()` 的同时也一并引入这份提醒。
+**评估禁令公约（事故 B 的固化）**，引 addendum §9.4「评估禁令」条目原文（字面一致，含原文
+着重星号）：「生成驱动内**不得内置**任何对 probe/confirmatory 数据的评估步骤；评估脚本独立、
+锁定后手动触发。以代码审查 + 驱动内注释断言双保险。」（释义："锁定"指预注册锁定——同文档
+§9.7 "v3 锁定 commit 先于任何 gate2 评估"；此处的驱动即 B3 生成驱动。）这一条纪律无法被
+preflight 机械检测——它约束的是"驱动代码里写了什么逻辑"，不是任何运行时可观测的文件系统/
+进程状态，只能靠原文规定的"代码审查 + 驱动内注释断言"双保险落实。本 docstring 即该公约在
+驱动侧的注释断言载体：任何 import 本模块的 B3 驱动代码，在拿到 `preflight()` 的同时也一并
+引入这份提醒。
 
 用法：python scripts/b3_preflight.py --min-free-gb 100 [--expected-head <commit>]
       [--data-dir <path>] [--repo-root <path>]

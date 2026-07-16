@@ -61,6 +61,28 @@ def test_detect_incomplete_tail_truncates_and_backs_up(tmp_path):
     assert half in backup_text
 
 
+def test_detect_incomplete_tail_cut_inside_multibyte_char(tmp_path):
+    """残尾恰好切在多字节 UTF-8 字符中间（磁盘写满/kill 中断写入的现实形态；
+    append_jsonl_fsync 以 ensure_ascii=False 写 CJK，字节级截断完全可能落在字符内部）：
+    须与普通残尾同样处理——返回 True、备份含原始全部字节、此前完整行的字节逐一原样保留——
+    而不是抛 UnicodeDecodeError 且不创建备份（审查修复的回归测试）。"""
+    p = tmp_path / "manifest.jsonl"
+    row0 = json.dumps({"i": 0, "t": "中文"}, ensure_ascii=False).encode("utf-8")
+    row1 = json.dumps({"i": 1, "t": "样本"}, ensure_ascii=False).encode("utf-8")
+    # "中" 的 UTF-8 编码为 e4 b8 ad（3 字节）；截去最后 1 字节留下 e4 b8——无法解码的半字符。
+    half = '{"i": 2, "t": "中'.encode("utf-8")[:-1]
+    raw = row0 + b"\n" + row1 + b"\n" + half
+    p.write_bytes(raw)
+
+    assert rundir.detect_incomplete_tail(p) is True
+
+    # 保留行必须逐字节原样（不经解码/重编码往返）。
+    assert p.read_bytes() == row0 + b"\n" + row1 + b"\n"
+    backup = p.with_name(p.name + ".bak")
+    assert backup.exists()
+    assert backup.read_bytes() == raw
+
+
 def test_detect_clean_file_noop(tmp_path):
     """末行可正常解析（干净文件）：detect 须返回 False 且完全不动文件（内容不变、不产生备份）。"""
     p = tmp_path / "manifest.jsonl"

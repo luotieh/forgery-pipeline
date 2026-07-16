@@ -15,9 +15,9 @@
   文件名只使用十六进制摘要，不受 key 本身含斜杠/空格/Unicode 等字符影响文件系统合法性。驱动
   重启后对每个待生成 cell 先查 `is_done`，已完成即跳过，从而实现断点续跑而不重新生成。
 - `detect_incomplete_tail`：重启时对 manifest.jsonl 做的"半批残留"检测。若上一次运行恰好在
-  某一行 fsync 之前被 kill，该行会以无法被 json.loads 解析的残缺文本形式留在文件末尾。本函数
-  负责发现它、把原文件整份逐字节备份、再截掉残尾，让驱动能在一个干净的行边界上继续追加，不
-  产生重复行或损坏行。
+  某一行 fsync 之前被 kill，该行会以残缺字节的形式留在文件末尾——可能是 JSON 不完整，也可能
+  截断点恰好落在多字节 UTF-8 字符中间（连解码都过不了）。本函数按字节发现它、把原文件整份
+  逐字节备份、再截掉残尾，让驱动能在一个干净的行边界上继续追加，不产生重复行或损坏行。
 
 三者组合起来即"中途 kill → 重启 → 无重复行、计数吻合"验收路径的实现基础：重启时先对
 manifest 跑一次 `detect_incomplete_tail` 清残尾，再对每个 cell 用 `is_done` 判断是否需要
@@ -67,16 +67,25 @@ def is_done(run_dir, cell_key: str) -> bool:
 
 
 def detect_incomplete_tail(path, backup_suffix: str = ".bak") -> bool:
-    """检测 path 末行是否是一次被中断的写入（json.loads 失败），是则备份+截断。
+    """检测 path 末行是否是一次被中断的写入，是则备份+截断（字节级，单次只截一条残尾行）。
 
-    文件不存在，或末行能被正常 json.loads 解析（干净文件）→ 直接返回 False，不触碰文件。
+    残尾判定：末行字节先尝试 UTF-8 解码、再 json.loads，**任一失败**即视为残尾——中断（kill/
+    磁盘写满）可能恰好切在多字节 UTF-8 字符（CJK 等；append_jsonl_fsync 以 ensure_ascii=False
+    写入）的中间，此时末行连解码都过不了，须与"可解码但 JSON 不完整"同样处理。因此本函数
+    全程按字节操作（read_bytes / 字节偏移截断），绝不对整个文件做解码——否则半个多字节字符
+    会让函数自己先抛 UnicodeDecodeError、且此时备份还没来得及创建（审查修复，见对应回归测试）。
+
+    文件不存在，或末行可正常解码+解析（干净文件）→ 直接返回 False，不触碰文件。
 
     检测到残尾时：
     1. 把原文件整份、逐字节原样 copy 到 `{path}{backup_suffix}`（不重新格式化，供事后排查/
        找回被截掉的残尾）；
-    2. 把 path 原地改写为去掉残尾行之后的内容——保留的其余行使用原始文本、不经
-       json.loads/json.dumps 往返改写（避免键序、空格等被悄悄改变）；
+    2. 按字节偏移截去残尾行：此前所有行保留原始字节、不经解码/重编码往返（键序、空格、
+       非 ASCII 字节都不会被悄悄改变）；
     3. 返回 True。
+
+    单次调用只截一条残尾行（append+fsync 的崩溃模型下最多只产生一条）；重启续跑的正确顺序：
+    先调本函数清残尾，再开始 append_jsonl_fsync 追加。
 
     全程不读系统时间、不用随机数：同样的输入总是产生同样的输出（确定性，便于测试与重复
     演练）。
@@ -85,27 +94,24 @@ def detect_incomplete_tail(path, backup_suffix: str = ".bak") -> bool:
     if not path.exists():
         return False
 
-    text = path.read_text(encoding="utf-8")
-    if text == "":
+    raw = path.read_bytes()
+    if raw == b"":
         return False
 
-    parts = text.split("\n")
-    if parts[-1] == "":
-        parts.pop()  # 正常结尾换行符产生的空 artifact，不是一行数据
-    if not parts:
-        return False
-
-    last_line = parts[-1]
+    # 结尾单个 b"\n" 是正常行终止符，不是一行数据；剥掉后最末一段字节即"末行"。
+    body = raw[:-1] if raw.endswith(b"\n") else raw
+    nl = body.rfind(b"\n")
+    last_line = body[nl + 1:]
     try:
-        json.loads(last_line)
-        return False  # 末行可解析：文件干净，不动它
+        json.loads(last_line.decode("utf-8"))
+        return False  # 末行可解码且可解析：文件干净，不动它
     except ValueError:
-        pass  # json.JSONDecodeError 是 ValueError 子类，一并覆盖
+        # json.JSONDecodeError 与 UnicodeDecodeError 均为 ValueError 子类，一并覆盖
+        # （半个 JSON 与半个多字节字符都是残尾）。
+        pass
 
     backup_path = Path(str(path) + backup_suffix)
     shutil.copy2(path, backup_path)
-
-    remaining_lines = parts[:-1]
-    new_text = "".join(line + "\n" for line in remaining_lines)
-    path.write_text(new_text, encoding="utf-8")
+    # nl == -1（整个文件只有一条残尾行）时 raw[:nl+1] == raw[:0] == b""，即清空文件。
+    path.write_bytes(raw[:nl + 1])
     return True
