@@ -15,3 +15,9 @@ holdout_domains: [Places]
 # 路由负责把 level3=object_replacement 的行整组送进 test_c；V10 负责断言没有漏网行落入
 # train/val——前者是机制、后者是校验，两键必须同步维护（改其一必须审视另一个）。
 testc_holdout: object_replacement  # PATCH 8.3 几何探针裁定（2026-07-16），Test-C holdout 唯一 config 源
+# Test-C 测算子泛化，分辨率非其轴；多分辨率摄取时该 split 只保留基准分辨率行（其余行为
+# 同底图分辨率副本，剔除无信息损失）——否则 real 侧 {rs512,rs1024} vs fake 侧 {rs512}
+# 结构性触发 V2（B3 真实矩阵下同样成立：1024 inpainter 均为 holdout→test_b，test_c 永远
+# 只有基准分辨率 fake）。消费方：pipeline.py（split+leakage 之后、vae_rt 插入之前过滤；
+# 键缺省/空 = 不过滤，旧行为）。PATCH 9 Wave2 T4 裁决（组成规则过滤，V2/D2/V8 语义零改动）。
+base_resolution_only_splits: [test_c]

@@ -123,6 +123,32 @@ def run_pipeline(cfg: PipelineConfig) -> dict:
         if leaks:
             raise RuntimeError("检测到数据泄漏: " + "; ".join(leaks))
 
+    # 基准分辨率组成规则（PATCH 9 Wave2 T4 裁决执行——第四案「组成规则过滤」，V2/D2/V8
+    # 语义零改动）：Test-C 测算子泛化，分辨率非其轴——多分辨率摄取时
+    # base_resolution_only_splits（configs/split.yaml）所列 split 只保留基准分辨率
+    # （resolutions[0]）行，其余行为同底图的分辨率副本，剔除无信息损失。若不过滤：D2 底图
+    # 池与 grid 底图池互斥（PATCH 6 不变式）且 D2 不做分辨率路由 → test_c 永远只有基准
+    # 分辨率 fake，real 侧却有全部分辨率兄弟行 → V2（split 内 real/fake 非生成链集合相等）
+    # 结构性必红（B3 真实矩阵下同样成立：1024 inpainter 均为 holdout→test_b）。
+    # 时点：split+leakage 之后、vae_rt 插入之前——vae_rt 只采 train/test_a/test_f 的
+    # real 行，与被过滤 split 无交集；过滤只删行不改行，泄漏检查的各集合只会收缩，之后的
+    # leakage/V 检照常。postprocess 子行与母行 io_chain 相同（model_copy 继承 rs 节点）且
+    # 同 split（test_a→test_e carve-out 不涉及所列 split），故不会出现母行被留、子行被剔
+    # 的拆散（e2e 有留存行 postprocess_of 完整性断言）。rs 节点缺失（None/legacy）的行
+    # 防御性保留（run profile 下 V5 已禁止此类行进入主 run）。
+    if st.get("split") and resolutions:
+        only_base_splits = set(rules.get("base_resolution_only_splits") or [])
+        if only_base_splits:
+            base_res = resolutions[0]
+
+            def _keep(s: Sample) -> bool:
+                if s.split not in only_base_splits:
+                    return True
+                res = image_io.chain_resolution(s.io_chain)
+                return res is None or res == base_res
+
+            samples = [s for s in samples if _keep(s)]
+
     if st.get("split") and cfg.vae_rt_frac > 0:
         rt = registry.get_vae_rt(cfg.backend)
         extra: list[Sample] = []

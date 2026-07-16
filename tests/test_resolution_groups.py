@@ -132,29 +132,13 @@ def test_load_config_resolution_groups_string_keys_coerced_to_int(tmp_path):
 # ---------------------------------------------------------------------------
 
 def test_pipeline_multi_resolution_groups_e2e_v2_holds(tmp_path):
-    """9.2c 核心断言：resolution_groups={64:["a"],128:["b"]} 时，manifest 里两个分辨率组
-    各自都有 real 行（D0）与 fake 行（grid 按 spec 名路由）——V2（split 内 real/fake
-    非生成链集合相等）在两组之间同时成立，而不需要 D2/D3 感知分辨率。
-
-    split_config 用本测试自带的零 holdout 中性配置，而非 configs/split.yaml 的生产配置
-    ——已实测确认（见 report Concerns）：生产 split.yaml 的 holdout_manipulation 把 D2 的
-    object_replacement/text_editing 行整组路由到 test_c，连带该组的分辨率兄弟行
-    （rs128，本任务的修复令其与 rs64 基准行同组同 split）一起进 test_c；但 grid 的按组
-    路由只覆盖 grid 自己的底图池，与 D2 的底图池互斥（PATCH 6 不变式，两池不相交）——
-    test_c 因而结构性只有 D2 产的 rs64 fake 行，没有任何 rs128 fake 行，real 侧却有
-    rs64+rs128（该组的分辨率兄弟行也在场），V2 在 test_c 内必红。这不是本任务 grid 路由
-    机制本身的缺陷（下面验证的所有分支——含 train/val/test_a/test_f 等由本测试中性配置
-    产生的 split——都成立），而是「D2 精确 pin 在基准组、从不做分辨率路由」（本任务
-    binding spec 明确裁决）与「Test-C holdout 只由 D2 的算子驱动」（PATCH 9 Wave2 Task2
-    裁决②）两个各自独立、且各自都合理的既有裁决叠加出的组合缺口，超出本任务 Files 授权
-    （d0_real.py/pipeline.py/grid_ops.py，不含 configs/split.yaml 或 d2_local.py 的分辨率
-    路由扩展）。已用 configs/split.yaml 实测复现（见 report），留给后续任务裁决。
-    """
-    neutral_split = tmp_path / "split_neutral.yaml"
-    neutral_split.write_text(yaml.dump({
-        "holdout_generators": [], "holdout_manipulation": [], "holdout_domains": [],
-    }), encoding="utf-8")
-
+    """9.2c 核心断言（裁决执行后恢复生产口径，见 task-4-report「裁决执行」）：
+    resolution_groups={64:["a"],128:["b"]} + 生产 configs/split.yaml（holdout_manipulation
+    含 object_replacement/text_editing、base_resolution_only_splits: [test_c]）下，两个
+    分辨率组各自都有 real 行（D0）与 fake 行（grid 按 spec 名路由），V2（split 内
+    real/fake 非生成链集合相等）在两组之间同时成立；test_c 经组成规则过滤（pipeline.py，
+    Test-C 测算子泛化、分辨率非其轴）后只含基准分辨率行，check_all 于 profile="run" +
+    testc_holdout 生产口径全绿。"""
     cfg = PipelineConfig(
         out_dir=str(tmp_path / "run"), seed=0, backend="mock",
         stages={"d0": True, "d1": False, "d2": True, "d3": True, "d4": True,
@@ -166,7 +150,7 @@ def test_pipeline_multi_resolution_groups_e2e_v2_holds(tmp_path):
         resolution_groups={64: ["a"], 128: ["b"]},
         grid_per_op=10,           # 覆盖全部 d3_bases（PATCH 6 不变式下 grid 的可用底图池）
         vae_rt_frac=0.25,
-        split_config=str(neutral_split),
+        split_config="configs/split.yaml",   # 生产配置（含 base_resolution_only_splits）
     )
     st = run_pipeline(cfg)
     assert st["total"] > 0
@@ -201,5 +185,43 @@ def test_pipeline_multi_resolution_groups_e2e_v2_holds(tmp_path):
         by_base.setdefault(r.base_id, set()).add(r.split)
     assert all(len(s) == 1 for s in by_base.values()), by_base
 
-    errs = check_all(rows, profile="run")
+    # test_c 组成规则：过滤后全部基准分辨率（Test-C 测算子泛化，分辨率非其轴）
+    tc = [r for r in rows if r.split == "test_c"]
+    assert tc, "前提：生产 holdout_manipulation 确实把 D2 组路由进了 test_c"
+    assert all(image_io.chain_resolution(r.io_chain) == 64 for r in tc), (
+        [(r.image_id, r.io_chain) for r in tc])
+
+    # 过滤不拆散 postprocess 母子行：留存行的 postprocess_of 必须仍指向留存行
+    ids_present = {r.image_id for r in rows}
+    assert all(r.postprocess_of in ids_present for r in rows if r.postprocess_of)
+
+    errs = check_all(rows, profile="run", testc_holdout="object_replacement")
     assert errs == [], f"check_all 非空: {errs[:10]}"
+
+
+def test_pipeline_without_base_resolution_only_splits_keeps_sibling_rows(tmp_path):
+    """回归锚：split 配置缺 base_resolution_only_splits 键（旧式配置；显式空列表走同一
+    falsy 分支）→ 不过滤，test_c 保留非基准分辨率的兄弟 real 行——证明组成规则过滤严格
+    config 门控，键缺省时多分辨率行为与裁决落地前一致。"""
+    legacy_split = tmp_path / "split_legacy.yaml"
+    legacy_split.write_text(yaml.dump({
+        "holdout_generators": [],
+        "holdout_manipulation": ["text_editing", "object_replacement"],
+        "holdout_domains": [],
+    }), encoding="utf-8")
+    cfg = PipelineConfig(
+        out_dir=str(tmp_path / "run"), seed=0, backend="mock",
+        stages={"d0": True, "d1": False, "d2": True, "d3": False, "d4": False,
+                "grid": False, "postprocess": False, "split": True},
+        scales=StageScales(d0=20, d1_per_generator=0, d2=10, d3=0, d4=0),
+        inpainters=[GeneratorSpec("stable-diffusion-inpaint", "diffusion", "inpaint")],
+        resolution_groups={64: ["a"], 128: ["b"]},
+        vae_rt_frac=0.0,
+        split_config=str(legacy_split),
+    )
+    run_pipeline(cfg)
+    rows = manifest.read_jsonl(Path(cfg.out_dir) / "manifest.jsonl")
+    tc = [r for r in rows if r.split == "test_c"]
+    assert tc, "前提：holdout_manipulation 确实把 D2 组路由进了 test_c"
+    res_in_tc = {image_io.chain_resolution(r.io_chain) for r in tc}
+    assert 128 in res_in_tc, res_in_tc   # 兄弟分辨率行仍在——未被过滤（旧行为锚）
