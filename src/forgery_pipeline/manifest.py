@@ -64,7 +64,9 @@ def stats(samples: list[Sample]) -> dict:
     # is_fake/io_chain 判定域——纯描述性计数，不是校验，行不需要"在 V11 判定域内"才被计入）。
     # 值非数值（如手工回填误存成字符串）时 :g 格式化会抛 TypeError/ValueError——stats()
     # 是尽力而为的描述性统计，静默跳过该行而不是让 pipeline.run_pipeline() 末尾崩溃
-    # （已实测复现，见 report；与上面 json.loads 的异常吞咽同一处理哲学）。
+    # （已实测复现，见 report；与上面 json.loads 的异常吞咽同一处理哲学）。cfg_scale 与
+    # steps 两键同约 :g（审查修复对称化：steps 裸 {} 会让字符串 "30" 与合法 st30 单元格
+    # 文本合并、[1,2] 拼出垃圾单元格——与 validate.check_v11 同一守卫口径）。
     by_nuisance_cell: Counter = Counter()
     for s in samples:
         if not s.op_params:
@@ -75,7 +77,7 @@ def stats(samples: list[Sample]) -> dict:
             continue
         if isinstance(params, dict) and "cfg_scale" in params and "steps" in params:
             try:
-                by_nuisance_cell[f"cfg{params['cfg_scale']:g}/st{params['steps']}"] += 1
+                by_nuisance_cell[f"cfg{params['cfg_scale']:g}/st{params['steps']:g}"] += 1
             except (TypeError, ValueError):
                 continue
 

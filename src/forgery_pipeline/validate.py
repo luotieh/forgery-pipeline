@@ -350,7 +350,8 @@ def check_v11(samples, profile: str = "auto", nuisance_cell_floor: int = 0) -> l
     失败原因拆分多条消息，因为 B3 只关心"这行有没有全须全尾地记录 nuisance"，原因不重要）。
 
     nuisance_cell_floor > 0 时另检查覆盖率下限：按 split 分组，域内合规行按
-    f"cfg{cfg_scale:g}/st{steps}" 归入单元格，**该 split 内实际出现过**的单元格计数
+    f"cfg{cfg_scale:g}/st{steps:g}" 归入单元格（int 值在 :g 下渲染不变，30→"30"），
+    **该 split 内实际出现过**的单元格计数
     < floor → FAIL。只检查出现过的单元格——(cfg, steps) 是笛卡尔积，某单元格在某 split
     从未出现，是该 split 结构性没有覆盖到该组合（例如 holdout 生成器只进 test_b），不是
     "记录不够"，不应报告为下限不足。
@@ -374,7 +375,10 @@ def check_v11(samples, profile: str = "auto", nuisance_cell_floor: int = 0) -> l
             offenders.append(s.image_id)
             continue
         try:
-            cell = f"cfg{params['cfg_scale']:g}/st{params['steps']}"
+            # 两键同约 :g 数值渲染（审查修复对称化：steps 若用裸 {} 则走 str() 兜底，
+            # 非数值静默通过——字符串 "30" 的文本与合法 st30 单元格合并会污染
+            # nuisance_cell_floor 计数、[1,2] 拼出垃圾单元格，均已实测复现）。
+            cell = f"cfg{params['cfg_scale']:g}/st{params['steps']:g}"
         except (TypeError, ValueError):
             # 键存在但值非数值（如手工回填误存成字符串）——记录不合格，同缺键处理，
             # 不让格式化异常穿透（这里不是防御性冗余：已实测复现，见 report）。

@@ -111,6 +111,32 @@ def test_v11_non_numeric_cfg_scale_value_fails_without_crashing():
     assert _has(errs, "V11: ")
 
 
+def test_v11_non_numeric_steps_string_fails_and_stats_excludes():
+    """审查修复回归锚（steps 侧守卫对称化）：steps 值为字符串 "30" 时，修复前 cell 拼装的
+    steps 位是裸 {}（str() 转换）——非数值静默通过且文本与合法 st30 单元格合并，实测可污染
+    nuisance_cell_floor 计数；现与 cfg_scale 同约（:g 渲染失败 → 记录不合格），check_v11
+    须发 V11 消息、manifest.stats() 的 by_nuisance_cell 须排除该行。"""
+    from forgery_pipeline import manifest
+    rows = [_row("f0", 1, io_chain="decode>rs256>edit:sd15>png",
+                 generator_family="diffusion", generator_name="sd15",
+                 op_params=json.dumps({"cfg_scale": 7.5, "steps": "30"}))]
+    errs = check_all(rows, profile="run")
+    assert _has(errs, "V11: ")
+    assert manifest.stats(rows)["by_nuisance_cell"] == {}
+
+
+def test_v11_non_numeric_steps_list_fails_and_stats_excludes():
+    """同上，steps=[1,2]（列表）：修复前裸 {} 格式化不抛异常，拼出 "st[1, 2]" 垃圾单元格
+    计入合规；现应同判记录不合格（:g 对 list 抛 TypeError，走 offenders 路径）。"""
+    from forgery_pipeline import manifest
+    rows = [_row("f0", 1, io_chain="decode>rs256>edit:sd15>png",
+                 generator_family="diffusion", generator_name="sd15",
+                 op_params=json.dumps({"cfg_scale": 7.5, "steps": [1, 2]}))]
+    errs = check_all(rows, profile="run")
+    assert _has(errs, "V11: ")
+    assert manifest.stats(rows)["by_nuisance_cell"] == {}
+
+
 def test_v11_non_diffusion_family_exempt():
     """豁免①：generator_family=="non_diffusion"（预留未来 LaMa 等非扩散 inpainter，无
     cfg/steps 概念）。"""
