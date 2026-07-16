@@ -106,6 +106,7 @@ class MockInpainter(base.Inpainter):
         k = np.ones((5, 5), np.uint8)
         edge = cv2.dilate(mask, k) - cv2.erode(mask, k)
         out[edge > 127] = blurred[edge > 127]
+        out = MockVaeRoundtrip().roundtrip(out)  # 模拟真实管线整图 VAE 直出（PATCH 7.3 审计口径）
         meta = {"generator_name": self.name, "generator_family": self.family,
                 "seed": seed}
         return out, meta
@@ -162,3 +163,12 @@ class MockImg2Img(base.Img2ImgGenerator):
                 "steps": int(params.get("steps", 30)),
                 "cfg_scale": float(params.get("cfg_scale", 7.5))}
         return out, meta
+
+
+class MockVaeRoundtrip(base.VaeRoundtrip):
+    """确定性全局印记：轻高斯 + uint8 往返，模拟 VAE 重采样足迹。"""
+    name = "mock"
+
+    def roundtrip(self, img: np.ndarray) -> np.ndarray:
+        out = cv2.GaussianBlur(img, (0, 0), 0.6)
+        return np.clip(out.astype(np.int16) + ((img.astype(np.int16) - out) // 3), 0, 255).astype(np.uint8)

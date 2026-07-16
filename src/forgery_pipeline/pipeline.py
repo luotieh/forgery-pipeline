@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import yaml
 from forgery_pipeline import image_io, manifest
+from forgery_pipeline.backends import registry
 from forgery_pipeline.backends.mock import stable_hash
 from forgery_pipeline.builders.d0_real import build_d0
 from forgery_pipeline.builders.d1_whole import build_d1
@@ -85,6 +86,27 @@ def run_pipeline(cfg: PipelineConfig) -> dict:
         leaks = check_leakage(samples)
         if leaks:
             raise RuntimeError("检测到数据泄漏: " + "; ".join(leaks))
+
+    if st.get("split") and cfg.vae_rt_frac > 0:
+        rt = registry.get_vae_rt(cfg.backend)
+        extra: list[Sample] = []
+        for s in samples:
+            if s.sample_kind != "real" or s.split not in {"train", "test_a", "test_f"}:
+                continue
+            if (stable_hash(s.image_id + "vaert") % 1000) / 1000.0 >= cfg.vae_rt_frac:
+                continue
+            img = image_io.load_image(out / s.image_path)
+            rel = str(Path(s.image_path).with_name(Path(s.image_path).stem + "__vaert.png"))
+            image_io.save_canonical(rt.roundtrip(img), out / rel)
+            v = s.model_copy(deep=True)
+            v.image_id = s.image_id + "__vaert"; v.image_path = rel
+            v.sample_kind = "real_vae_rt"; v.real_image_path = s.image_path
+            v.io_chain = s.io_chain.replace(">png", f">vae_rt:{rt.name}>png") if s.io_chain else f"vae_rt:{rt.name}"
+            extra.append(v)
+        samples += extra
+        leaks = check_leakage(samples)
+        if leaks:
+            raise RuntimeError("vae_rt 插入后泄漏: " + "; ".join(leaks))
 
     manifest.write_jsonl(out / "manifest.jsonl", samples)
     st_out = manifest.stats(samples)

@@ -98,3 +98,26 @@ class DiffusersInpainter(base.Inpainter):
                          guidance_scale=float(params.get("cfg_scale", 7.5)), generator=g)
         meta = {"generator_name": self.name, "generator_family": self.family, "seed": seed}
         return _to_uint8_like(out.images[0], image), meta
+
+
+class SDVaeRoundtrip:
+    """SD1.5 VAE encode→decode（fp32 防 NaN，懒加载；PATCH 7.2）。名称 sd15 记入 io_chain。"""
+    name = "sd15"
+
+    def __init__(self, model_id: str = "stable-diffusion-v1-5/stable-diffusion-v1-5",
+                 device: str = "cuda"):
+        self.model_id, self.device, self._vae = model_id, device, None
+
+    def roundtrip(self, img):
+        import torch
+        from diffusers import AutoencoderKL
+        if self._vae is None:
+            self._vae = AutoencoderKL.from_pretrained(
+                self.model_id, subfolder="vae", torch_dtype=torch.float32
+            ).to(self.device).eval()
+        import numpy as np
+        x = (torch.from_numpy(img).float().permute(2, 0, 1)[None] / 127.5 - 1.0).to(self.device)
+        with torch.no_grad():
+            y = self._vae.decode(self._vae.encode(x).latent_dist.mean).sample
+        y = ((y.clamp(-1, 1) + 1) * 127.5).round().byte()[0].permute(1, 2, 0).cpu().numpy()
+        return y

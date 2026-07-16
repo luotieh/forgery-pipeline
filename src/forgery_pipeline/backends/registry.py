@@ -79,3 +79,12 @@ def get_img2img(backend: str, name: str, family: str) -> base.Img2ImgGenerator:
         return _real_cached(f"img2img:{name}", lambda: dg.DiffusersImg2Img(
             model_id=model_id, name=name, family=fam))
     _unsupported(backend)
+
+
+def get_vae_rt(backend: str) -> base.VaeRoundtrip:
+    if backend == "mock":
+        return mock.MockVaeRoundtrip()
+    if backend == "real":
+        from forgery_pipeline.backends.real import diffusers_gen as dg
+        return dg.SDVaeRoundtrip()
+    _unsupported(backend)
