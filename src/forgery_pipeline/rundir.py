@@ -67,25 +67,49 @@ def is_done(run_dir, cell_key: str) -> bool:
 
 
 def detect_incomplete_tail(path, backup_suffix: str = ".bak") -> bool:
-    """检测 path 末行是否是一次被中断的写入，是则备份+截断（字节级，单次只截一条残尾行）。
+    """检测 path 末行是否是一次被中断的写入，是则备份 + 处理（字节级，单次只处理一条残尾
+    行；处理方式视残尾具体形态为"截断"或"补写换行符"，见下）。
 
-    残尾判定：末行字节先尝试 UTF-8 解码、再 json.loads，**任一失败**即视为残尾——中断（kill/
-    磁盘写满）可能恰好切在多字节 UTF-8 字符（CJK 等；append_jsonl_fsync 以 ensure_ascii=False
-    写入）的中间，此时末行连解码都过不了，须与"可解码但 JSON 不完整"同样处理。因此本函数
-    全程按字节操作（read_bytes / 字节偏移截断），绝不对整个文件做解码——否则半个多字节字符
-    会让函数自己先抛 UnicodeDecodeError、且此时备份还没来得及创建（审查修复，见对应回归测试）。
+    残尾判定分两层，任一命中即视为残尾：
 
-    文件不存在，或末行可正常解码+解析（干净文件）→ 直接返回 False，不触碰文件。
+    1. **缺收尾换行符**：`raw` 非空且不以 `b"\\n"` 结尾——append_jsonl_fsync 写入的每一行都
+       以 `\\n` 收尾，这是 append-only 写入器的不变量；短写（kill/磁盘写满）可能恰好停在收尾
+       的 `}` 之后、`\\n` 之前，产出一个 JSON 内容完整、但整份文件缺收尾换行符的末行。这种
+       末行**不能**仅因为自己能被 `json.loads` 解析就被判为"干净文件"直接放过——否则下次
+       `append_jsonl_fsync` 会紧贴着它继续写，串出 `{"i":2}{"i":3}` 式的行；而这种串行行本身
+       "末行不可解析"，下一轮 detect 会把两行一起当残尾静默截掉，等于悄悄丢失一条已经完整
+       落盘的记录。因此只要不以 `\\n` 结尾，无论末行内容是否可解析，一律按残尾处理。
+    2. **末行内容不完整**：末行字节先尝试 UTF-8 解码、再 `json.loads`，**任一失败**即视为
+       残尾——中断可能恰好切在多字节 UTF-8 字符（CJK 等；append_jsonl_fsync 以
+       `ensure_ascii=False` 写入）的中间，此时末行连解码都过不了，须与"可解码但 JSON 不
+       完整"同样处理。因此本函数全程按字节操作（read_bytes / 字节偏移截断），绝不对整个
+       文件做解码——否则半个多字节字符会让函数自己先抛 UnicodeDecodeError、且此时备份还
+       没来得及创建（审查修复，见对应回归测试）。
 
-    检测到残尾时：
+    两层判定的处理方式不同：
+    - 末行**可解析**、只是缺收尾换行符（第 1 层单独命中，第 2 层不命中）：备份后**保留该
+      行**、只补写缺失的换行符（`write_bytes(raw + b"\\n")`），不丢数据。
+    - 末行**不可解析**（第 2 层命中，无论是否也缺收尾换行符）：备份后按字节偏移**截去该行**
+      （既有路径，不变）。
+
+    文件不存在，或（末行可正常解码+解析 **且** 以 `\\n` 收尾——真正的干净文件）→ 直接返回
+    False，不触碰文件、不产生备份。
+
+    检测到残尾时（上述任一分支）：
     1. 把原文件整份、逐字节原样 copy 到 `{path}{backup_suffix}`（不重新格式化，供事后排查/
-       找回被截掉的残尾）；
-    2. 按字节偏移截去残尾行：此前所有行保留原始字节、不经解码/重编码往返（键序、空格、
-       非 ASCII 字节都不会被悄悄改变）；
+       找回被截掉或被补写前的原始内容）；
+    2. 按分支处理末行（截去残尾行，或原样保留+补写换行符）：截去分支中，此前所有行保留
+       原始字节、不经解码/重编码往返（键序、空格、非 ASCII 字节都不会被悄悄改变）；
     3. 返回 True。
 
-    单次调用只截一条残尾行（append+fsync 的崩溃模型下最多只产生一条）；重启续跑的正确顺序：
-    先调本函数清残尾，再开始 append_jsonl_fsync 追加。
+    备份说明：`{path}{backup_suffix}` 用 `shutil.copy2` 整份覆盖写——若连续两次运行都检测到
+    残尾（例如两次崩溃之间只重启了一次驱动、随即又被 kill），第二次的备份会覆盖第一次的
+    备份，只保留"最近一次崩溃前"的完整文件；会丢失的只是"前一次残尾片段"这一信息本身（该
+    片段从未在两次崩溃之间的干净运行里被读取或处理过，不影响 manifest 数据完整性）。这是
+    本模块的既定确定性权衡：不维护备份历史，只保证"当前 .bak 对应当前这次检测到的残尾"。
+
+    单次调用只处理一条残尾行（append+fsync 的崩溃模型下最多只产生一条）；重启续跑的正确
+    顺序：先调本函数清残尾，再开始 append_jsonl_fsync 追加。
 
     全程不读系统时间、不用随机数：同样的输入总是产生同样的输出（确定性，便于测试与重复
     演练）。
@@ -98,20 +122,30 @@ def detect_incomplete_tail(path, backup_suffix: str = ".bak") -> bool:
     if raw == b"":
         return False
 
+    ends_with_newline = raw.endswith(b"\n")
     # 结尾单个 b"\n" 是正常行终止符，不是一行数据；剥掉后最末一段字节即"末行"。
-    body = raw[:-1] if raw.endswith(b"\n") else raw
+    body = raw[:-1] if ends_with_newline else raw
     nl = body.rfind(b"\n")
     last_line = body[nl + 1:]
     try:
         json.loads(last_line.decode("utf-8"))
-        return False  # 末行可解码且可解析：文件干净，不动它
+        parseable = True
     except ValueError:
         # json.JSONDecodeError 与 UnicodeDecodeError 均为 ValueError 子类，一并覆盖
         # （半个 JSON 与半个多字节字符都是残尾）。
-        pass
+        parseable = False
+
+    if parseable and ends_with_newline:
+        return False  # 末行可解码且可解析、且收尾换行符完整：文件干净，不动它
 
     backup_path = Path(str(path) + backup_suffix)
     shutil.copy2(path, backup_path)
-    # nl == -1（整个文件只有一条残尾行）时 raw[:nl+1] == raw[:0] == b""，即清空文件。
-    path.write_bytes(raw[:nl + 1])
+
+    if parseable:
+        # 末行本身完整，只是缺收尾换行符：保留该行内容，只补写缺失的 \n。
+        path.write_bytes(raw + b"\n")
+    else:
+        # 末行不可解析（无论是否也缺收尾换行符）：按字节偏移截去该行（既有行为）。
+        # nl == -1（整个文件只有一条残尾行）时 raw[:nl+1] == raw[:0] == b""，即清空文件。
+        path.write_bytes(raw[:nl + 1])
     return True

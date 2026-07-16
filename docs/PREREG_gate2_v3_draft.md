@@ -1,13 +1,13 @@
 # 预注册 v3（草案）— gate2 验证性复测（算子机制可分性，same/cross-model，n_base≥200）
 
-> **状态**：**草案**（§0 占位符 P1–P5 未填毕，未锁定）。本文件本次改动**不构成锁定**；后续对占位符表的填写与协议文本的任何改动，必须在专门的"锁定" commit 中一次性完成，且该 commit 信息须显式包含"锁定"字样，方可使本文件升格为 confirmatory 协议（机制同 `docs/PREREG_gate1_v2_2026-07-15.md`）。
+> **状态**：**草案**（§0 占位符 P1–P6 未填毕，未锁定）。本文件本次改动**不构成锁定**；后续对占位符表的填写与协议文本的任何改动，必须在专门的"锁定" commit 中一次性完成，且该 commit 信息须显式包含"锁定"字样，方可使本文件升格为 confirmatory 协议（机制同 `docs/PREREG_gate1_v2_2026-07-15.md`）。
 > **锁定条件**：gate2 probe 数据的**生成**可先行于本文件锁定（生成不构成偷看——评估 = 计算或查看任何标签–特征关系，不含生成本身，与 v2 同一原则）；但**本文件的锁定 commit 必须先于对 gate2 probe 的任何标签–特征评估**（任何算子标签与残差/幅值/几何特征关系的查看，包括"部分数据先瞄一眼"）。
 > **失效条件**：见 §8（沿用 `docs/PREREG_gate1_v2_2026-07-15.md` §7 全部条款，据 gate2 场景调整措辞）+ **一次性评估保护**——confirmatory 报告文件已存在即拒跑（§7）。任何一条触发 → 本轮降为探索性，需新 probe + 预注册 v3' 才能恢复 confirmatory 地位。
 > **阈值声明**：主判据数值（same-model BA≥0.50、cross-model BA≥0.40）沿用 2026-07 原计划，**不因 gate1 t0 支验证性复测的大胜（ρ=0.700 confirmatory）而抬高或降低**（`docs/PATCHES_addendum_06_07_2026-07-15.md` §9.5「阈值不因 gate1 大胜而抬高或降低」/ §9.8「prereg v3 阈值沿用 7 月计划原值（0.50/0.40）」）。两支判据（t0 与算子）相互独立，互不构成对方放宽或收紧的证据。
 
 ---
 
-## 0. 待填占位符（锁定前必须填完，共 5 处）
+## 0. 待填占位符（锁定前必须填完，共 6 处）
 
 | # | 占位符 | 草案阶段状态（锁定时确认/替换） |
 |---|---|---|
@@ -16,6 +16,7 @@
 | P3 | nuisance 采样声明 | 依据 9.1 网格：CFG∈{5,7.5,10}×steps∈{30,50}（或 config 连续采样 CFG~U(4.5,10.5)）。**须显式声明本轮 probe 生成时 prompt bank（9.2a）是否已接入**：若仍空 prompt，则据 CFG 惰性发现（`paper_experiment_plan` §3 B1.6 附注，2026-07-16：空 prompt 下 cond≡uncond，CFG 项在 classifier-free guidance 中精确消去）本轮 CFG 维实际不活性，敏感度只由 steps(+seed) 承载，须在报告 DATA 节写明"本轮 CFG 惰性"；prompt bank 生效后的后续轮次须重新声明本项状态，不得默认沿用旧声明。 |
 | P4 | n_base 与每 cell 计数下限 | n_base ≥ 200（9.5 原文，覆盖 same-model/cross-model/方向性预言/null-exceedance 各判定边际）；每 cell 计数下限 = config 项，草案默认沿用 V12 同类设计原则（保证每个 one-vs-rest 二分类臂在两类上均有足够样本）；实际生成量受"同底图跨算子成对"设计约束（掩码类算子间同 base 同 mask 成对出现，非自由网格），具体数字与实测计数矩阵锁定时填。 |
 | P5 | 方向性预言两估计器（空间头 CNN / 全局幅值 probe）的实现冻结 commit | 待定——两估计器须在**同一 commit** 下一起冻结（架构、超参、训练协议），冻结后不得为追平判据而调整；草案阶段留空。null baseline（`checking/testc_geometry_probe.py`）改动很小（见 §2），不占用本占位符，但若有改动仍须在同一冻结 commit 内一并锁定。 |
+| P6 | repeated group K-fold 参数（n_splits × n_repeats） | 锁定时填死；gate1 v2 用 5×20，gate2 可另定但须先于评估锁定。 |
 
 ---
 
@@ -90,11 +91,11 @@
 ## 6. nuisance 分支（按 P3 声明二选一，现在生效）
 
 - **P3 声明 = prompt bank 已接入（CFG 活性）**：主张全额——"算子机制可分（若过线）"不携带 CFG 限定。
-- **P3 声明 = prompt bank 未接入 / 仍空 prompt（CFG 惰性）**：本轮 confirmatory 主张自动限定为"算子机制可分（空 prompt / CFG 惰性条件下）"，verdict 与论文措辞必须携带该限定；并预注册一个补充 probe（非空 prompt 网格，仿 gate1 v2 §5 的 CFG/steps 抖动补充 probe 设计）在投稿前完成——若补充 probe 上 same-model/cross-model BA 相对本轮跌幅使某一级从"过线"变"不过线"，限定升级为正文 limitation 而非脚注（判定精神与 gate1 v2 §5、9.6 的"跌幅>0.10 升级"一致；数值待 P3 实际声明后另定，因算子分类 BA 与 t0 的 ρ 不同量纲，不能直接借用 0.10）。
+- **P3 声明 = prompt bank 未接入 / 仍空 prompt（CFG 惰性）**：本轮 confirmatory 主张自动限定为"算子机制可分（空 prompt / CFG 惰性条件下）"，verdict 与论文措辞必须携带该限定；并预注册一个补充 probe（非空 prompt 网格，仿 gate1 v2 §5 的 CFG/steps 抖动补充 probe 设计）在投稿前完成——若补充 probe 上 same-model/cross-model BA 相对本轮跌幅使某一级从"过线"变"不过线"，限定升级为正文 limitation 而非脚注（机械规则，阈值无关——只看该级判据是否翻面，不设具体跌幅数值门槛）。
 
 ## 7. 输出契约
 
-单一报告 `checking/gate2_confirmatory_report_<date>.md`（执行脚本 `checking/gate2_confirmatory.py`，**尚未编写**，随 B3 数据落地后随附本预注册协议实现——本次为草案，不含脚本），固定结构 DATA（含 P1–P5 回填值、manifest hash、实测 cell 计数矩阵、same/cross 各自 K 与机会线）/ CRITERIA（本文件逐条引用）/ RESULTS（§3 全部数字 + CI）/ VERDICT（§5 对应行的抄写）/ EXPLORATORY-ADDENDA（此后任何追加分析置于此节且显式标注，含 §4 纤维子集指标）。
+单一报告 `checking/gate2_confirmatory_report_<date>.md`（执行脚本 `checking/gate2_confirmatory.py`，**尚未编写**，随 B3 数据落地后随附本预注册协议实现——本次为草案，不含脚本），固定结构 DATA（含 P1–P6 回填值、manifest hash、实测 cell 计数矩阵、same/cross 各自 K 与机会线）/ CRITERIA（本文件逐条引用）/ RESULTS（§3 全部数字 + CI）/ VERDICT（§5 对应行的抄写）/ EXPLORATORY-ADDENDA（此后任何追加分析置于此节且显式标注，含 §4 纤维子集指标）。
 
 **一次性评估保护**：`checking/gate2_confirmatory.py` 起跑前必须检查输出报告路径是否已存在；**已存在即拒跑**（非 0 退出，不覆盖、不追加、不重算）；需要重算须人工删除该文件（删除行为进入 git 历史，不允许静默覆盖）——防止"跑了看一眼不满意再跑一次"式的隐蔽多次评估/择优。
 
@@ -111,4 +112,4 @@
 - **一次性评估保护被绕过**：confirmatory 报告文件已存在时仍重新运行并覆盖/追加（本条为新增条款，构成隐蔽的多次评估/择优；gate1 v2 未显式列出，本文件据 9.5 原文"一次性保护"要求补齐，精神与 v2 §7 一致）。
 
 ---
-*本文件当前状态：**草案**，尚未锁定。锁定时须：①填毕 §0 全部占位符（P1–P5）；②将本段替换为「锁定人/时间/commit」记录（格式同 `docs/PREREG_gate1_v2_2026-07-15.md` 文末）；③将文首状态头由"草案"改为"已锁定"，并把"锁定条件"改写为已满足的事实陈述。锁定 commit 必须先于对 gate2 probe 的任何标签–特征评估——数据生成可先行，评估不可先行。*
+*本文件当前状态：**草案**，尚未锁定。锁定时须：①填毕 §0 全部占位符（P1–P6）；②将本段替换为「锁定人/时间/commit」记录（格式同 `docs/PREREG_gate1_v2_2026-07-15.md` 文末）；③将文首状态头由"草案"改为"已锁定"，并把"锁定条件"改写为已满足的事实陈述。锁定 commit 必须先于对 gate2 probe 的任何标签–特征评估——数据生成可先行，评估不可先行。*

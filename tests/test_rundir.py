@@ -83,6 +83,32 @@ def test_detect_incomplete_tail_cut_inside_multibyte_char(tmp_path):
     assert backup.read_bytes() == raw
 
 
+def test_detect_incomplete_tail_missing_trailing_newline_appends_newline(tmp_path):
+    """末行 JSON 内容完整、但整份文件缺收尾换行符（append-only 写入器每行必带 "\\n"；短写可能
+    恰好停在收尾的 "}" 之后、"\\n" 之前，产出一个"看起来完整"实则残缺的末行）：detect 须仍
+    返回 True——不能因为末行"可解析"就误判为干净文件，否则下次 append 会紧贴着这行继续写，
+    串出 {"i":2}{"i":3} 式的行，且下一轮 detect 会把两行一起当残尾静默截掉，悄悄丢失一条已
+    完整落盘的记录。处理方式与"末行不可解析"不同：保留该行内容，只补写缺失的换行符；备份
+    文件保存的是补写前的原始字节（审查修复的回归测试）。
+    """
+    p = tmp_path / "manifest.jsonl"
+    row0 = json.dumps({"i": 0}).encode("utf-8")
+    row1 = json.dumps({"i": 1}).encode("utf-8")
+    raw = row0 + b"\n" + row1  # 两行内容均完整，但整份文件末尾缺换行符
+
+    p.write_bytes(raw)
+
+    assert rundir.detect_incomplete_tail(p) is True
+
+    # 该行被保留，只是补上了缺失的换行符——不是被当成残尾截掉。
+    assert p.read_bytes() == raw + b"\n"
+
+    backup = p.with_name(p.name + ".bak")
+    assert backup.exists()
+    # 备份是补写前的原始字节（逐字节保真，不含补写的换行符）。
+    assert backup.read_bytes() == raw
+
+
 def test_detect_clean_file_noop(tmp_path):
     """末行可正常解析（干净文件）：detect 须返回 False 且完全不动文件（内容不变、不产生备份）。"""
     p = tmp_path / "manifest.jsonl"

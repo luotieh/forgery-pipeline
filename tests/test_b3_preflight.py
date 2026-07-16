@@ -8,7 +8,7 @@ from __future__ import annotations
 import os
 import subprocess
 import pytest
-from scripts.b3_preflight import preflight
+from scripts.b3_preflight import main, preflight
 
 _GIT_ENV = {
     "GIT_AUTHOR_NAME": "test", "GIT_AUTHOR_EMAIL": "test@example.com",
@@ -59,3 +59,14 @@ def test_preflight_all_green(tmp_git_repo):
     head7 = _head(tmp_git_repo)[:7]
     errs = preflight(head7, min_free_gb=0, repo_root=str(tmp_git_repo))
     assert errs == []
+
+
+def test_main_rejects_empty_expected_head():
+    """--expected-head "" 空串防退化（终审修复 Fix 4）：str.startswith("") 对任意 HEAD 都
+    判定为"匹配"，若放行会让 HEAD 断言在传入空串时静默失效（调用方一旦把可能为空的变量
+    原样传进来就等于没检查、且不报错——比"忘了传"更危险，因为看起来像是传了）。argparse
+    层直接拒绝显式空串，逼调用方要么不传该参数（显式跳过检查）要么传真实 commit 前缀。
+    """
+    with pytest.raises(SystemExit) as exc_info:
+        main(["--expected-head", "", "--min-free-gb", "0"])
+    assert exc_info.value.code != 0

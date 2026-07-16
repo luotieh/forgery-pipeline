@@ -8,4 +8,6 @@ holdout_generators: [ideogram, progan, kandinsky-inpaint]
 holdout_manipulation: [text_editing]
 # 指定哪些来源域仅出现在 cross-domain 测试集（Test-D）
 holdout_domains: [Places]
+# 注意：holdout_manipulation（level3 键，splitter 消费）与 testc_holdout（operator 键，仅
+# V10 消费）是两个独立机制，不要混用/相互替代。
 testc_holdout: object_replacement  # PATCH 8.3 几何探针裁定（2026-07-16），Test-C holdout 唯一 config 源

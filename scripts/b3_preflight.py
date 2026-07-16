@@ -38,12 +38,19 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
 def preflight(expected_head: str | None, min_free_gb: float, repo_root=".", data_dir=None) -> list[str]:
-    """三条起跑前断言，返回违规消息列表（空列表 = 全部通过）。"""
+    """三条起跑前断言，返回违规消息列表（空列表 = 全部通过）。
+
+    expected_head 为空串（""）时按 None 处理（跳过 HEAD 断言）——防退化：`str.startswith("")`
+    对任意字符串都判定为 True，若把空串当正常值直接拿去比对，HEAD 断言会在"传了空串"时
+    对任何实际 HEAD 都静默判定为匹配，等于没检查却不报错（比忘了传更危险）。CLI 层
+    （`main()` 的 `--expected-head`）另有独立防线，直接拒绝显式传入的空串；这里是防止绕过
+    CLI、直接调用本函数时的第二层防护。
+    """
     repo_root = str(repo_root)
     errs: list[str] = []
 
     # ①HEAD 断言（事故 C）：驱动实际跑的 commit 必须与期望一致（前缀匹配，大小写不敏感）。
-    if expected_head is not None:
+    if expected_head:
         actual = subprocess.run(
             ["git", "-C", repo_root, "rev-parse", "HEAD"],
             capture_output=True, text=True, check=True,
@@ -70,10 +77,21 @@ def preflight(expected_head: str | None, min_free_gb: float, repo_root=".", data
     return errs
 
 
+def _expected_head_arg(value: str) -> str:
+    """argparse type 校验：拒绝显式传入的空串（"防退化"——见 preflight() docstring）。
+    真正想跳过 HEAD 检查应直接不传 --expected-head，而不是传一个空串。
+    """
+    if value == "":
+        raise argparse.ArgumentTypeError(
+            "--expected-head 不得为空串；跳过 HEAD 检查请直接不传该参数")
+    return value
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="B3 驱动起跑前预检（HEAD/净树/磁盘三条断言）")
-    ap.add_argument("--expected-head", default=None,
-                    help="期望的 git HEAD（前缀匹配，大小写不敏感；不传则跳过该项）")
+    ap.add_argument("--expected-head", default=None, type=_expected_head_arg,
+                    help="期望的 git HEAD（前缀匹配，大小写不敏感；不传则跳过该项；"
+                         "显式传空串会被拒绝，见 --help 外的 preflight() docstring）")
     ap.add_argument("--min-free-gb", type=float, required=True, help="数据盘最小余量（GB）")
     ap.add_argument("--data-dir", default=None, help="磁盘余量检查目录（默认 --repo-root）")
     ap.add_argument("--repo-root", default=".", help="git 仓库根目录（默认当前目录）")

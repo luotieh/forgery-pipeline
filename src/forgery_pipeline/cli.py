@@ -45,14 +45,31 @@ def _cmd_validate(args) -> int:
         rules = yaml.safe_load(split_config.read_text(encoding="utf-8")) or {}
         holdout_generators = set(rules.get("holdout_generators", [])) or None
         testc_holdout = rules.get("testc_holdout")
+
+    # 诚实输出：V1–V7 恒执行；V8/V10 仅 profile=="run" 执行（裁决B），V9/V10 另需
+    # split-config 提供对应 holdout 清单——三者任一未满足，该检查就没有真的跑过，成功行
+    # 不得笼统宣称"V1–V10 通过"（见 forgery_pipeline.validate 模块 docstring 裁决B）。
+    skipped: list[str] = []
+    if args.profile != "run":
+        skipped += ["V8", "V10"]
+        print("注意：V8/V10 未执行（profile=auto，用 --profile run 启用）")
+    missing_split_cfg = []
+    if holdout_generators is None:
+        missing_split_cfg.append("V9")
+    if testc_holdout is None and "V10" not in skipped:
+        missing_split_cfg.append("V10")
+    if missing_split_cfg:
+        skipped += missing_split_cfg
+        print(f"注意：{'/'.join(missing_split_cfg)} 跳过（--split-config 未提供 holdout 清单）")
+
     errs = check_all(samples, profile=args.profile,
                      holdout_generators=holdout_generators, testc_holdout=testc_holdout)
     if errs:
         for e in errs:
             print(e, file=sys.stderr)
         return 1
-    print(f"OK: {len(samples)} 条样本全部通过校验")
-    print("V1–V10 通过")
+    executed = [c for c in (f"V{i}" for i in range(1, 11)) if c not in skipped]
+    print(f"OK: {len(samples)} 条样本通过 schema + {', '.join(executed)} 校验")
     return 0
 
 
