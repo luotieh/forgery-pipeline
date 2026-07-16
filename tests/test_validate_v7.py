@@ -264,6 +264,15 @@ def test_v7_compositing_pair_generator_name_mismatch_fails():
 # ---------------------------------------------------------------------------
 
 def test_check_all_green_path_passes_on_well_formed_manifest():
+    """PATCH 9 Wave2 Task5 派生修复（不在该任务 brief 的文件清单内，为保全套绿必需，同
+    W2T2 d4_explain.py 先例）：check_all 新增 V11/V12 后，本用例原本缺 op_params 的
+    cfg_scale/steps（f1/f2/cp0/cp1/nd0/nd1 六行）与 masked 行的 mask_area_ratio
+    （f1/cp0/cp1 三行）不再算"well-formed"——补齐字段，语义不变（这些字段此前就该有，
+    只是 V11/V12 落地前没有校验器会揪出缺失）。f2 是 instruct_edit 行：cfg_scale/steps
+    与 V6 已要求的 image_guidance_scale 合并进同一个 op_params dict（真实
+    InstructPix2Pix 管线本就同时接受 num_inference_steps/guidance_scale 与
+    image_guidance_scale，语义相容，非拼凑）。"""
+    edit_params = json.dumps({"cfg_scale": 7.5, "steps": 30})
     rows = [
         _row("r0", 0, split="train", io_chain="decode>rs256>png"),
         _row("r1", 0, split="train", io_chain="decode>rs256>png"),
@@ -272,26 +281,30 @@ def test_check_all_green_path_passes_on_well_formed_manifest():
              real_image_path="r0.png", io_chain="decode>rs256>vae_rt:mock>png"),
         _row("f0", 1, split="train", io_chain="gen:sd15>rs256>png"),
         _row("f1", 1, split="train", mask_path="m.png", operator="inpaint",
-             compositing="paste_feather", feather_px=8,
+             compositing="paste_feather", feather_px=8, mask_area_ratio=0.12,
+             op_params=edit_params,
              io_chain="decode>rs256>edit:sd15_inpaint>png"),
         _row("f2", 1, split="train", operator="instruct_edit",
-             op_params=json.dumps({"image_guidance_scale": 1.5, "guidance_scale": 7.5}),
+             op_params=json.dumps({"image_guidance_scale": 1.5, "guidance_scale": 7.5,
+                                   "cfg_scale": 7.5, "steps": 30}),
              io_chain="decode>rs256>edit:ip2p>png"),
         _row("cp0", 1, split="train", mask_path="m.png", probe_group="compositing_pair",
              pair_id="cp0", seed=7, real_image_path="base.png", operator="inpaint",
-             compositing="none", generator_name="g1",
+             compositing="none", generator_name="g1", mask_area_ratio=0.12,
+             op_params=edit_params,
              io_chain="decode>rs256>edit:g1>png"),
         _row("cp1", 1, split="train", mask_path="m.png", probe_group="compositing_pair",
              pair_id="cp0", seed=7, real_image_path="base.png", operator="inpaint",
              compositing="paste_feather", feather_px=8, generator_name="g1",
+             mask_area_ratio=0.12, op_params=edit_params,
              io_chain="decode>rs256>edit:g1>png"),
         _row("nd0", 1, split="train", mask_path="m.png", probe_group="nd_pair",
              pair_id="nd0", seed=9, real_image_path="base2.png",
-             compositing="none", generator_name="gA",
+             compositing="none", generator_name="gA", op_params=edit_params,
              io_chain="decode>rs256>edit:gA>png"),
         _row("nd1", 1, split="train", mask_path="m.png", probe_group="nd_pair",
              pair_id="nd0", seed=9, real_image_path="base2.png",
-             compositing="none", generator_name="gB",
+             compositing="none", generator_name="gB", op_params=edit_params,
              io_chain="decode>rs256>edit:gB>png"),
     ]
     assert check_all(rows, profile="run") == []

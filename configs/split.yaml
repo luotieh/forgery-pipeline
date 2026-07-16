@@ -5,9 +5,23 @@ ratios: {train: 0.70, val: 0.10, test_a: 0.05, test_b: 0.05, test_c: 0.03,
 # 含一个 inpainter（kandinsky-inpaint），让 D2 局部篡改也有 cross-generator test_b
 holdout_generators: [ideogram, progan, kandinsky-inpaint]
 # 指定哪类篡改仅出现在 cross-manipulation 测试集（Test-C）
-holdout_manipulation: [text_editing]
+# object_replacement：PATCH 9 Wave2 裁决②加入——D2 政策接线后 operator=object_replacement
+# 的行 level3 恰为同名值，借既有 level3 路由零新代码闭环 V10（见下方三句说明）。
+holdout_manipulation: [text_editing, object_replacement]
 # 指定哪些来源域仅出现在 cross-domain 测试集（Test-D）
 holdout_domains: [Places]
-# 注意：holdout_manipulation（level3 键，splitter 消费）与 testc_holdout（operator 键，仅
-# V10 消费）是两个独立机制，不要混用/相互替代。
+# 注意（PATCH 9 Wave2 裁决②）：testc_holdout（operator 键，V10 消费）与 holdout_manipulation
+# 中的 object_replacement（level3 键，splitter 按 origin-group 路由 test_c）现在协同工作。
+# 路由负责把 level3=object_replacement 的行整组送进 test_c；V10 负责断言没有漏网行落入
+# train/val——前者是机制、后者是校验，两键必须同步维护（改其一必须审视另一个）。
 testc_holdout: object_replacement  # PATCH 8.3 几何探针裁定（2026-07-16），Test-C holdout 唯一 config 源
+# Test-C 测算子泛化，分辨率非其轴；多分辨率摄取时该 split 只保留基准分辨率行（其余行为
+# 同底图分辨率副本，剔除无信息损失）——否则 real 侧 {rs512,rs1024} vs fake 侧 {rs512}
+# 结构性触发 V2（B3 真实矩阵下同样成立：1024 inpainter 均为 holdout→test_b，test_c 永远
+# 只有基准分辨率 fake）。消费方：pipeline.py（split+leakage 之后、vae_rt 插入之前过滤；
+# 键缺省/空 = 不过滤，旧行为）。PATCH 9 Wave2 T4 裁决（组成规则过滤，V2/D2/V8 语义零改动）。
+# test_b 不在此名单：跨生成器轴需要各分辨率组的 holdout fake（B3：kandinsky@512 +
+# sdxl@1024）。设计约束——holdout 生成器须覆盖每个参与 test_b 的分辨率组；若某组无
+# holdout，要么调整组配置、要么显式把 test_b 加入本名单，否则 V2 将如实咬住（期望行为；
+# 正负双回归见 tests/test_resolution_groups.py 的两条 test_b 用例）。
+base_resolution_only_splits: [test_c]

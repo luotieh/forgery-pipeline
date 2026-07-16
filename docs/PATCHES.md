@@ -524,3 +524,24 @@ forgery-pipeline validate-manifest --path data/probe/manifest.jsonl
 
 **待办（Wave 2）**：9.1/9.2 builder 采样政策（CFG/steps 逐图抖动、强度连续采样、prompt bank、掩码面积分层、分辨率组配套 real/vae_rt 行）；9.5 设计冻结 config（cell 网格 commit 进 config）+ PREREG_gate2_v3 评估前锁定；latent 复用（GPU 侧，`diffusers_gen` 内 VAE encode 缓存）；COCO fetch（`scripts/fetch_real_images.py` 新数据源路径的 socket timeout 生效性确认 + 归档 checksum）。
 - **GPU 侧待复核**：SDVaeRoundtrip 真实冒烟（下次开机随 PATCH 9/B3 一并）。
+
+---
+
+**PATCH 9 Wave 2 ✅ 完成（2026-07-16，分支 `feat/patch9-wave2`，Tasks 1–6）**
+
+- **9.1**（nuisance 逐图采样 + 强度连续 + V11）：`PipelineConfig` 新增采样政策字段——`nuisance_cfg_grid`/`nuisance_steps_grid`/`strength_range`/`area_buckets`/`outpaint_border_fracs`/`resolution_groups`/`prompt_bank`/`grid_per_op`（`e3755a7`）；D2/grid 行按 `stable_hash(iid+salt)` 逐图确定性抽样 CFG{5,7.5,10}×steps{30,50}（`09bd1b7`/`2a3a9a9`）；grid 的 img2img 行强度连续 `U(0.1,0.95)`（`s=0.1+0.85·(stable_hash(iid+"s")%10000)/10000`，确定性）；`validate.check_v11` 扩散编辑行 nuisance 记录完备性 + 逐 split 单元下限（`d9f7c56`，`cea93dc` 补 steps 侧非数值守卫对称化）。
+- **9.2a**（prompt bank v1）：`configs/prompt_bank.yaml`（img2img/inpaint/object/background 四节英文模板）+ `prompts.py`（`bank_version()` sha1[:12] / `pick_prompt()` 确定性抽取），逐行记入 `op_params.prompt`/`prompt_bank_version`（`e3755a7`）。
+- **9.2b**（面积分桶 + V12 + outpaint 边带网格）：D2 按 `area_buckets` 对候选 mask 分层轮转选桶（空桶顺延），`mask_area_ratio` 恢复无条件落行（`09bd1b7`，`d22c46c` 修正 Task2 规格误标）；`grid_ops.build_grid` 新增 outpaint 边带宽度网格行（`outpaint_border_fracs`）；`validate.check_v12` masked 算子行 `mask_area_ratio` 完备性 + 面积分桶下限（`d9f7c56`）。
+- **9.2c**（多分辨率组）：`build_d0(resolutions=...)` 多分辨率摄取（`resize_square` 抽出接线（`load_and_resize` 委托同核，B2 COCO 摄取时启用））+ grid 按组路由同源分辨率兄弟行（`1c981b6`）；`configs/split.yaml` 新增 `base_resolution_only_splits: [test_c]`（test_c 基准分辨率组成规则，`f34e3c6`）+ test_b 覆盖设计约束文档化（`af20d73`）——**V2（split 内 real/fake 非生成链集合相等）天然承担 9.2c 断言，零新判据**。
+- **9.5**：`configs/gate2_probe.yaml` 设计冻结骨架入库（本任务，Task 6）；`docs/PREREG_gate2_v3_draft.md` P2/P3 关联注记指向该 config。
+- **+ grid_ops 主 run 算子轴**：新 `builders/grid_ops.py::build_grid`（每底图×每 img2img spec 一行 img2img + 每底图一行 outpaint，`2a3a9a9`），pipeline stage `"grid"` 接线；**SDXL 映射条目**：`diffusers_gen.py` MODEL 映射补 `sdxl-img2img`/`sdxl-inpaint`（代码级，GPU 冒烟另行）。
+
+**裁决记录**：D2 七类操纵→operator 映射五合一进 `inpaint`（`object_replacement`/`background_editing` 保留原名，其余五类粗分进 `inpaint`，level3/level4 保留细粒度）；grid 池分离恢复 PATCH 6 不变式——img2img/outpaint 按 `holdout_generators` 二分 `pool_hold`/`pool_train`（镜像 `d2_local.py`，B3 holdout 形态可构造）+ `d3_bases` 二分为不相交的 grid 池（前半）/D3 池（后半）（`05e58c5`）；**「每个分辨率组须同时有 holdout 与非 holdout 成员」B3 config 约束**——非 holdout 侧缺位时 train/val/test_a 的 real `{rs64,rs128}` vs fake `{rs64}` 结构性触发 V2，故 `test_b` 不进 `base_resolution_only_splits`（`af20d73`）；**测试反模式教训：小 n 全栈 `check_all()==[]` 是掷币，机制作用域断言 + firing 锚是正解**——三条多分辨率 e2e 原用全局空断言，把无关 split 的小 n 组合噪声一并背上（seed/规模掷币），重写为确定性性质（不变量本体 + 定向前缀断言 + 条件守卫 firing 计数），验证 sweep `seed∈{0..5}×d0∈{16,20,28}` = 54/54 全过、firing 统计 A `grid_hold` 18/18、A `d2_hold` 18/18、B `fired` 18/18（`4beab3c`）。
+
+**偏差记录**（相对 PATCH 9 Wave 2 原文字面的修正）：
+- V11 cell-floor 仅检查 split 内出现过的单元（结构性——check_v11 不接收网格枚举；B3 驱动应另从 stats.by_nuisance_cell 断言全网格在场）
+- mask_area_ratio 现统一 round(4)（含 policies=None 路径，与旧原始 float 有精度级差异，科学无害）
+
+测试 **207 → 266 passed**。
+
+**待办（B3/GPU 侧）**：COCO fetch 层（9.4 事故A：socket 超时对新数据源生效性确认 + 归档 checksum）随 B3 驱动/B2 摄取 + SDXL/SDVaeRoundtrip GPU 冒烟、B1 矩阵 SDXL 双栖张力解、连续 CFG 采样、LaMa/IP2P/Flux + grid seed 命名空间已修（本 commit）。

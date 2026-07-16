@@ -35,6 +35,16 @@ class PipelineConfig:
     split_config: str = "configs/split.yaml"
     vae_rt_frac: float = 0.15
     compositing_feather_px: int = 8
+    # PATCH 9 Wave 2：生成时采样政策全部进 config（9.7 零硬编码验收）；新字段全部有默认，
+    # 追加在既有字段之后，向后兼容（旧 yaml/旧构造点不受影响）。
+    nuisance_cfg_grid: list[float] = field(default_factory=lambda: [5.0, 7.5, 10.0])
+    nuisance_steps_grid: list[int] = field(default_factory=lambda: [30, 50])
+    strength_range: tuple[float, float] = (0.1, 0.95)
+    area_buckets: list[float] = field(default_factory=lambda: [0.05, 0.15, 0.35, 0.7])  # 桶界
+    outpaint_border_fracs: list[float] = field(default_factory=lambda: [0.125, 0.25])
+    resolution_groups: dict[int, list[str]] = field(default_factory=dict)  # {512:[生成器名...],1024:[...]}；空=单组现状
+    prompt_bank: str = "configs/prompt_bank.yaml"
+    grid_per_op: int = 0  # grid builder 每算子底图数，0=关
 
 
 def load_generators(path) -> tuple[list[GeneratorSpec], list[GeneratorSpec],
@@ -62,4 +72,13 @@ def load_config(path) -> PipelineConfig:
         split_config=data.get("split_config", "configs/split.yaml"),
         vae_rt_frac=float(data.get("vae_rt_frac", 0.15)),
         compositing_feather_px=int(data.get("compositing_feather_px", 8)),
+        nuisance_cfg_grid=list(data.get("nuisance_cfg_grid", [5.0, 7.5, 10.0])),
+        nuisance_steps_grid=list(data.get("nuisance_steps_grid", [30, 50])),
+        strength_range=tuple(data.get("strength_range", (0.1, 0.95))),
+        area_buckets=list(data.get("area_buckets", [0.05, 0.15, 0.35, 0.7])),
+        outpaint_border_fracs=list(data.get("outpaint_border_fracs", [0.125, 0.25])),
+        resolution_groups={int(k): v for k, v in
+                           data.get("resolution_groups", {}).items()},
+        prompt_bank=data.get("prompt_bank", "configs/prompt_bank.yaml"),
+        grid_per_op=int(data.get("grid_per_op", 0)),
     )

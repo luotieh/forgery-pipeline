@@ -46,13 +46,19 @@ def _cmd_validate(args) -> int:
         holdout_generators = set(rules.get("holdout_generators", [])) or None
         testc_holdout = rules.get("testc_holdout") or None
 
-    # 诚实输出：V1–V7 恒执行；V8/V10 仅 profile=="run" 执行（裁决B），V9/V10 另需
+    # 诚实输出：V1–V7 恒执行；V8/V10/V11/V12 仅 profile=="run" 执行（裁决B），V9/V10 另需
     # split-config 提供对应 holdout 清单——三者任一未满足，该检查就没有真的跑过，成功行
     # 不得笼统宣称"V1–V10 通过"（见 forgery_pipeline.validate 模块 docstring 裁决B）。
+    # W2T6：V11/V12（PATCH 9 Wave 2 nuisance 记录/面积分桶下限）与 V8/V10 同一门控条件
+    # （check_all 内部已按 profile 各自门控，此处只是让 cli 的 executed/skipped 记账追上
+    # check_all 实际的执行范围——此前 executed 硬编码 V1–V10，profile=="run" 时 V11/V12
+    # 明明已执行却从未出现在成功行，是记账缺口而非执行缺口）。
     skipped: list[str] = []
     if args.profile != "run":
         skipped += ["V8", "V10"]
         print("注意：V8/V10 未执行（profile=auto，用 --profile run 启用）")
+        skipped += ["V11", "V12"]
+        print("注意：V11/V12 未执行（profile=auto，用 --profile run 启用）")
     missing_split_cfg = []
     if holdout_generators is None:
         missing_split_cfg.append("V9")
@@ -68,7 +74,7 @@ def _cmd_validate(args) -> int:
         for e in errs:
             print(e, file=sys.stderr)
         return 1
-    executed = [c for c in (f"V{i}" for i in range(1, 11)) if c not in skipped]
+    executed = [c for c in (f"V{i}" for i in range(1, 13)) if c not in skipped]
     print(f"OK: {len(samples)} 条样本通过 schema + {', '.join(executed)} 校验")
     return 0
 

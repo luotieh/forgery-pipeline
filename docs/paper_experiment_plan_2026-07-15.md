@@ -100,6 +100,8 @@ B3 起跑前必须完成：**9.1** 主 run nuisance（CFG{5,7.5,10}×steps{30,50
 
 **✅ 9.3/9.4 工具层已落地（2026-07-16，Wave 1）**：base_id+V8–V10、preflight/rundir 就绪；剩余 B3 阻断 = 9.1/9.2（builder 采样）+ 9.5 冻结 + SDVaeRoundtrip GPU 冒烟 + 扩盘（建议 150GB，Flux 独立实例）。
 
+**✅ 9.1/9.2/9.5 已落地（Wave 2，2026-07-16）**：剩余 B3 阻断 = GPU 冒烟（SDXL kwargs 30 秒确认 + SDVaeRoundtrip）+ 扩盘（150GB）+ B3 驱动本体（含 COCO fetch 超时/checksum 确认与 kill→重启演练）+ B1 矩阵 1024 组双备约束解（每分辨率组须 holdout 与非 holdout 双备）。
+
 ### B1.7 PATCH 7 阻断解除（2026-07-16）
 
 canonical I/O（全 PNG+io_chain）、VAE 往返负样本（vae_rt_frac=0.15，V4 配比校验含 min_real=10 守卫）、compositing 显式化（D2 50/50 + 成对 probe）、validator V1–V7 全部落地（176 passed，mock e2e 冒烟过）——**PATCH 7 对 B3 的阻断解除**。剩余 B3 阻断 = PATCH 9 的 9.1–9.5（见 B1.6）+ SDVaeRoundtrip 的 GPU 侧真实冒烟。

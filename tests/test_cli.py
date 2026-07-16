@@ -40,9 +40,12 @@ def test_validate_manifest_auto_profile_output_is_honest(tmp_path, capsys):
     assert main(["validate-manifest", "--path", str(mani)]) == 0
     out = capsys.readouterr().out
     assert "V8/V10 未执行" in out
+    assert "V11/V12 未执行" in out  # W2T6：profile=auto 时 V11/V12 同样未执行，须如实提示
     success_line = next(line for line in out.splitlines() if line.startswith("OK:"))
     assert "V10" not in success_line
     assert "V8" not in success_line
+    assert "V11" not in success_line  # W2T6：未执行的检查不得混入成功行
+    assert "V12" not in success_line
     assert "V1–V10 通过" not in out
 
 
@@ -63,3 +66,8 @@ def test_validate_manifest_empty_testc_holdout_string_skips_v10(tmp_path, capsys
     assert "V10 跳过" in out  # 应输出 V10 因缺 testc_holdout 而跳过
     success_line = next(line for line in out.splitlines() if line.startswith("OK:"))
     assert "V10" not in success_line  # V10 不应在已执行清单中
+    # W2T6：profile=run 下 V11/V12 实际执行（check_all 内部早已按 profile 门控 V11/V12，
+    # 此前 cli.py 的 executed 清单硬编码 range(1,11) 未纳入，是纯粹的诚实输出缺口）——
+    # 成功行必须如实列出。
+    assert "V11" in success_line
+    assert "V12" in success_line

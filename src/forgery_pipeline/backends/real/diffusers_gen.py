@@ -16,14 +16,21 @@ from forgery_pipeline.backends import base
 _SD = "stable-diffusion-v1-5/stable-diffusion-v1-5"
 _SD_INPAINT = "stable-diffusion-v1-5/stable-diffusion-inpainting"
 _KANDINSKY_INPAINT = "kandinsky-community/kandinsky-2-2-decoder-inpaint"
+_SDXL = "stabilityai/stable-diffusion-xl-base-1.0"
+_SDXL_INPAINT = "stabilityai/stable-diffusion-xl-1.0-inpainting-0.1"
 
 # spec name -> (model_id, family)；未列出的 name 落到 SD1.5（族仍如实取 spec）
+# sdxl-img2img/sdxl-inpaint（PATCH 9 Wave2 T3）：SDXL 1024 分辨率先验，供 grid_ops 的
+# resolution_groups 高分辨率组使用；懒加载路径复用 _load_pipeline 不变，fp16 变体已在
+# 数据盘预缓存；GPU 冒烟随 Wave2 T4（分辨率组接线）另行验证，此处仅代码级映射。
 IMG2IMG_MODELS = {
     "stable-diffusion-img2img": (_SD, "diffusion"),
+    "sdxl-img2img": (_SDXL, "diffusion-sdxl"),
 }
 INPAINT_MODELS = {
     "stable-diffusion-inpaint": (_SD_INPAINT, "diffusion"),
     "kandinsky-inpaint": (_KANDINSKY_INPAINT, "kandinsky"),
+    "sdxl-inpaint": (_SDXL_INPAINT, "diffusion-sdxl"),
 }
 
 

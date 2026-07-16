@@ -1,9 +1,26 @@
 import numpy as np, pytest
-from forgery_pipeline.image_io import load_and_resize, save_canonical, chain, load_image
+from forgery_pipeline.image_io import (
+    load_and_resize, save_canonical, chain, load_image, resize_square, chain_resolution)
 
 
 def test_chain_joins_nodes():
     assert chain("decode", "rs512", "edit:m", "png") == "decode>rs512>edit:m>png"
+
+
+def test_resize_square_center_crop():
+    """resize_square 是 load_and_resize 的裁剪+缩放核（PATCH 9 Wave2 9.2c 抽出，供多分辨率
+    组摄取复用）：接收内存中的 ndarray（无需先落盘再读），中心裁剪为方形后 LANCZOS 缩放。"""
+    img = np.zeros((40, 80, 3), np.uint8); img[:, 40:] = 255   # 右半白
+    out = resize_square(img, 32)
+    assert out.shape == (32, 32, 3)
+    assert out.dtype == np.uint8
+
+
+def test_chain_resolution_extracts_rs_node():
+    assert chain_resolution("decode>rs512>png") == 512
+    assert chain_resolution("decode>rs64>edit:sd15>png") == 64
+    assert chain_resolution("legacy") is None
+    assert chain_resolution(None) is None
 
 
 def test_save_canonical_enforces_png(tmp_path):

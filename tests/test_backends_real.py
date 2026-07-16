@@ -62,3 +62,16 @@ def test_registry_real_multi_generator_mapping():
     assert kd.name == "kandinsky-inpaint" and kd.family == "kandinsky"
     assert sd.name == "stable-diffusion-inpaint" and sd.family == "diffusion"
     assert kd._pipe is None  # 懒加载不变
+
+
+def test_sdxl_model_map_entries_present():
+    # PATCH 9 Wave2 T3：sdxl-img2img/sdxl-inpaint 代码级映射（GPU 冒烟另行，随分辨率组接线）
+    from forgery_pipeline.backends.real import diffusers_gen as dg
+    assert dg.IMG2IMG_MODELS["sdxl-img2img"] == (
+        "stabilityai/stable-diffusion-xl-base-1.0", "diffusion-sdxl")
+    assert dg.INPAINT_MODELS["sdxl-inpaint"] == (
+        "stabilityai/stable-diffusion-xl-1.0-inpainting-0.1", "diffusion-sdxl")
+    i2i = registry.get_img2img("real", "sdxl-img2img", "diffusion-sdxl")
+    assert i2i.model_id == "stabilityai/stable-diffusion-xl-base-1.0"
+    inp = registry.get_inpainter("real", "sdxl-inpaint", "diffusion-sdxl")
+    assert inp.model_id == "stabilityai/stable-diffusion-xl-1.0-inpainting-0.1"

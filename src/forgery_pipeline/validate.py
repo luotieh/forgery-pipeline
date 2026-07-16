@@ -1,9 +1,12 @@
-"""V1–V10 manifest 级别断言集（V1–V7：PATCH 7 收尾，spec
-`docs/PATCHES_addendum_06_07_2026-07-15.md`；V8–V10：PATCH 9 Wave 1 split 防泄漏）。
+"""V1–V12 manifest 级别断言集（V1–V7：PATCH 7 收尾，spec
+`docs/PATCHES_addendum_06_07_2026-07-15.md`；V8–V10：PATCH 9 Wave 1 split 防泄漏；
+V11–V12：PATCH 9 Wave 2 nuisance 记录/面积分桶下限）。
 
-范围说明（裁决B）：V8/V10 仅在 profile=="run" 时执行——probe 产物是受控仪器（故意让同一
-底图横跨 holdout 生成器、让算子网格进 train，这正是 Gate 1/2 的设计），validator 不罚
-仪器设计；V9 由 holdout_generators 参数门控即可（probe 的 holdout 行本就标 test_b）。
+范围说明（裁决B）：V8/V10/V11/V12 仅在 profile=="run" 时执行——probe 产物是受控仪器（故意
+让同一底图横跨 holdout 生成器、让算子网格进 train，这正是 Gate 1/2 的设计），validator 不罚
+仪器设计（且 probe 从未与主 run manifest 合并后过 check_all(profile="run")，故 V11/V12
+在现有调用点上只约束 D1–D4/grid 的主链行，与 probe 无实际交互）；V9 由 holdout_generators
+参数门控即可（probe 的 holdout 行本就标 test_b）。
 
 设计约束：
 - 本模块**不**反向 import `forgery_pipeline.manifest`（`manifest.stats()` 要 import 本模块的
@@ -13,15 +16,21 @@
   `decode` 并过滤 `edit:*`/`vae_rt:*`/`gen:*` 节点——D1 全生成行无源可解码（链头是
   `gen:{name}`），字面比较链头会结构性 FAIL；V2 的本意是「管线附加处理（分辨率/编码）不可
   预测 is_fake」，不是要求生成器链头字面相同，故做此归一。
+- **V11 豁免键的实证修正**（相对 brief 字面的已记录偏差）：`d3_web.py` 的 manual-web-edit
+  行实际写入 `generator_family="editing"`（非 brief 猜测的 "non_diffusion"/"manual"），
+  故 V11 对 D3 的豁免改用 `generator_name=="manual-web-edit"` 命中，见 `_is_diffusion_edit_row`。
 """
 from __future__ import annotations
 import json
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
+import numpy as np
 
 _SAMPLE_KIND_ENUM = {"real", "real_vae_rt", "edited"}
 _COMPOSITING_ENUM = {"none", "paste", "paste_feather"}
-_V3_OPERATOR_SCOPE = {"inpaint", "outpaint", "object_replacement", "background_editing"}
+# masked（掩码引导）算子集合——V3（compositing 完备性）与 V12（mask_area_ratio 完备性/
+# 面积分桶下限）共享同一判定域，故提取为模块级常量（PATCH 9 Wave2 Task5）。
+_MASKED_OPS = {"inpaint", "outpaint", "object_replacement", "background_editing"}
 _V4_SPLITS = ("train", "test_a", "test_f")
 _V7_PAIR_GROUPS = {"compositing_pair", "nd_pair"}
 
@@ -104,7 +113,7 @@ def check_v3(samples) -> list[str]:
             errs.append(f"V3: image_id={s.image_id} sample_kind 非法: {s.sample_kind!r}")
         if s.compositing is not None and s.compositing not in _COMPOSITING_ENUM:
             errs.append(f"V3: image_id={s.image_id} compositing 非法: {s.compositing!r}")
-        if s.operator in _V3_OPERATOR_SCOPE:
+        if s.operator in _MASKED_OPS:
             if s.compositing is None:
                 errs.append(f"V3: image_id={s.image_id} operator={s.operator!r} "
                            f"缺 compositing（须 ∈ {_COMPOSITING_ENUM}）")
@@ -300,13 +309,152 @@ def check_v10(samples, testc_holdout=None, profile: str = "auto") -> list[str]:
     return errs
 
 
+def _is_diffusion_edit_row(s) -> bool:
+    """V11 扩散编辑行判定域（PATCH 9 Wave2 Task5 控制器裁决）：`is_fake==1` 且 `io_chain`
+    含 `"edit:"` 节点。判定域刻意用 io_chain 而非 op_params 自指——否则缺记录的行会因为
+    域定义本身依赖 op_params 而结构性逃出判定域，检查空转（见 wave2 计划"风险自查"）。
+
+    豁免（不落入判定域）：
+    - `generator_family == "non_diffusion"`：预留给未来 LaMa 等非扩散 inpainter（无
+      cfg_scale/steps 概念）。
+    - `io_chain == "legacy"`：旧谱系整体标记；结构上本就不含 `"edit:"` 子串，此处显式复述
+      spec 原文豁免口径作为双重保险（不依赖"legacy 字面不含 edit:"这一事实性质）。
+    - `generator_name == "manual-web-edit"`：D3 网页人工篡改行的豁免键。brief 原文猜测的
+      豁免键是 `generator_family in {"non_diffusion", "manual"}`，但读 `d3_web.py` 源码
+      核实其实际写入的是 `generator_family="editing"`（不是 "manual"），故改用
+      `generator_name=="manual-web-edit"` 命中——D3 是人工合成的高对比色块贴片，不存在
+      cfg/steps 概念，语义上仍应豁免。
+    """
+    if s.is_fake != 1:
+        return False
+    chain = s.io_chain
+    if not chain or chain == "legacy" or "edit:" not in chain:
+        return False
+    if s.generator_family == "non_diffusion":
+        return False
+    if s.generator_name == "manual-web-edit":
+        return False
+    return True
+
+
+def check_v11(samples, profile: str = "auto", nuisance_cell_floor: int = 0) -> list[str]:
+    """V11 扩散编辑行 nuisance（cfg_scale/steps）记录完备性（run-profile only，裁决B同 V8/V10：
+    probe 是受控仪器，不受罚；但 probe 从不与主 run manifest 合并过 check_all(profile="run")，
+    故本检查在现有调用点上只约束 D1–D4/grid 的主链行）。
+
+    判定域见 `_is_diffusion_edit_row`。域内每行的 op_params 须是可解析 JSON object 且同时
+    含 "cfg_scale"/"steps" 键、且两者的值须能以 `:g` 数值格式渲染（非数值类型，如手工
+    回填 manifest 里误存成字符串的 "7.5"，视同未合规记录，同样计入失败——而不是让格式化
+    本身抛出未捕获异常砸穿 validate-manifest CLI）；None/空串/非法 JSON/非 dict/缺键，
+    一律计入同一条聚合失败消息（只列前 5 个 image_id + 总数，沿用 V5 风格——不像 V6 按
+    失败原因拆分多条消息，因为 B3 只关心"这行有没有全须全尾地记录 nuisance"，原因不重要）。
+
+    nuisance_cell_floor > 0 时另检查覆盖率下限：按 split 分组，域内合规行按
+    f"cfg{cfg_scale:g}/st{steps:g}" 归入单元格（int 值在 :g 下渲染不变，30→"30"），
+    **该 split 内实际出现过**的单元格计数
+    < floor → FAIL。只检查出现过的单元格——(cfg, steps) 是笛卡尔积，某单元格在某 split
+    从未出现，是该 split 结构性没有覆盖到该组合（例如 holdout 生成器只进 test_b），不是
+    "记录不够"，不应报告为下限不足。
+    """
+    if profile != "run":
+        return []
+    offenders: list[str] = []
+    cell_counts: dict = defaultdict(Counter)
+    for s in samples:
+        if not _is_diffusion_edit_row(s):
+            continue
+        params = None
+        if s.op_params:
+            try:
+                parsed = json.loads(s.op_params)
+            except (TypeError, ValueError):
+                parsed = None
+            if isinstance(parsed, dict):
+                params = parsed
+        if not params or "cfg_scale" not in params or "steps" not in params:
+            offenders.append(s.image_id)
+            continue
+        try:
+            # 两键同约 :g 数值渲染（审查修复对称化：steps 若用裸 {} 则走 str() 兜底，
+            # 非数值静默通过——字符串 "30" 的文本与合法 st30 单元格合并会污染
+            # nuisance_cell_floor 计数、[1,2] 拼出垃圾单元格，均已实测复现）。
+            cell = f"cfg{params['cfg_scale']:g}/st{params['steps']:g}"
+        except (TypeError, ValueError):
+            # 键存在但值非数值（如手工回填误存成字符串）——记录不合格，同缺键处理，
+            # 不让格式化异常穿透（这里不是防御性冗余：已实测复现，见 report）。
+            offenders.append(s.image_id)
+            continue
+        cell_counts[s.split][cell] += 1
+
+    errs: list[str] = []
+    if offenders:
+        head = ", ".join(offenders[:5])
+        suffix = "..." if len(offenders) > 5 else ""
+        errs.append(f"V11: 扩散编辑行缺 nuisance 记录: {head}{suffix}（共 {len(offenders)} 条）")
+    if nuisance_cell_floor > 0:
+        for split, counts in cell_counts.items():
+            for cell, n in counts.items():
+                if n < nuisance_cell_floor:
+                    errs.append(f"V11: split={split} cell={cell} 计数 {n} < {nuisance_cell_floor}")
+    return errs
+
+
+def check_v12(samples, profile: str = "auto", area_bucket_floor: int = 0,
+              area_buckets=(0.05, 0.15, 0.35, 0.7)) -> list[str]:
+    """V12 masked 算子行 mask_area_ratio 完备性 + 面积分桶下限（run-profile only，裁决B同
+    V8/V10/V11）。
+
+    判定域：`operator in _MASKED_OPS`（复用 V3 的同一集合常量）。域内每行 mask_area_ratio
+    须非 None，否则计入同一条聚合失败消息（同 V11/V5 风格：前 5 个 image_id + 总数）。
+
+    area_bucket_floor > 0 时另检查覆盖率下限：域内且 mask_area_ratio 非 None 的行按
+    area_buckets 用 np.digitize 归桶（桶号 0..len(area_buckets)-1；np.digitize 对
+    >= 最高边界的值返回 len(area_buckets)，该溢出桶不参与下限检查——与
+    d2_local.py `_bucketed_pick` 的分层丢弃口径一致）。逐桶计数 < floor → FAIL，
+    全 manifest 聚合（不分 split——D2 的面积分层本身是全局设计，非按 split 分层，故此处
+    与 V11 的逐 split 检查口径不同，均按 spec 字面）。桶完全无命中（计数 0）同样 < floor，
+    与"有命中但不够"同等报告——面积分层覆盖率下限的本意正是要能抓住"某一档面积完全没有
+    样本"这种最严重的覆盖缺口，而非只在"该桶曾出现过"时才检查。
+    """
+    if profile != "run":
+        return []
+    offenders: list[str] = []
+    n_buckets = len(area_buckets)
+    bucket_counts: Counter = Counter()
+    for s in samples:
+        if s.operator not in _MASKED_OPS:
+            continue
+        if s.mask_area_ratio is None:
+            offenders.append(s.image_id)
+            continue
+        bi = int(np.digitize(s.mask_area_ratio, area_buckets))
+        if bi < n_buckets:
+            bucket_counts[bi] += 1
+
+    errs: list[str] = []
+    if offenders:
+        head = ", ".join(offenders[:5])
+        suffix = "..." if len(offenders) > 5 else ""
+        errs.append(f"V12: masked 算子行缺 mask_area_ratio: {head}{suffix}（共 {len(offenders)} 条）")
+    if area_bucket_floor > 0:
+        for bi in range(n_buckets):
+            n = bucket_counts.get(bi, 0)
+            if n < area_bucket_floor:
+                errs.append(f"V12: 面积桶 {bi} 计数 {n} < {area_bucket_floor}")
+    return errs
+
+
 def check_all(samples, profile: str = "auto", vae_rt_range=(0.05, 0.35),
-              min_real: int = 10, holdout_generators=None, testc_holdout=None) -> list[str]:
-    """跑全部 V1–V10（V5 只在 profile=="run" 时额外执行 run-profile legacy 禁令；
+              min_real: int = 10, holdout_generators=None, testc_holdout=None,
+              nuisance_cell_floor: int = 0, area_bucket_floor: int = 0,
+              area_buckets=(0.05, 0.15, 0.35, 0.7)) -> list[str]:
+    """跑全部 V1–V12（V5 只在 profile=="run" 时额外执行 run-profile legacy 禁令；
     向后兼容语义主要由「backfill 后过 check_all」这条测试本身保证，见 check_v5 docstring）。
 
-    V8/V10 仅 profile=="run" 执行（裁决B，见模块 docstring）；V9/V10 另需
-    holdout_generators/testc_holdout（默认 None=跳过，向后兼容所有既存调用点不受影响）。
+    V8/V10/V11/V12 仅 profile=="run" 执行（裁决B，见模块 docstring）；V9/V10 另需
+    holdout_generators/testc_holdout，V11/V12 另需 nuisance_cell_floor/area_bucket_floor
+    （默认皆 0/None=跳过覆盖率下限检查，向后兼容所有既存调用点不受影响——新增参数纯尾附，
+    不改变任何既有位置参数的顺序/语义）。
 
     `samples`：任意可迭代对象，元素只需 duck-typing 具备 Sample 的相应字段属性。
     返回空列表 = 全部通过；非空 = 每条以 "V{n}: " 为前缀的失败消息。
@@ -323,4 +471,7 @@ def check_all(samples, profile: str = "auto", vae_rt_range=(0.05, 0.35),
     errs += check_v8(samples, profile=profile)
     errs += check_v9(samples, holdout_generators=holdout_generators)
     errs += check_v10(samples, testc_holdout=testc_holdout, profile=profile)
+    errs += check_v11(samples, profile=profile, nuisance_cell_floor=nuisance_cell_floor)
+    errs += check_v12(samples, profile=profile, area_bucket_floor=area_bucket_floor,
+                      area_buckets=area_buckets)
     return errs
