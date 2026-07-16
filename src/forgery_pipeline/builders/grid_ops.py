@@ -2,11 +2,13 @@
 （PATCH 9 Wave2 Task3）。
 
 D0-D4 主链没有 img2img/outpaint 两类操纵行——B1 矩阵要求它们作为训练可见轴。本模块
-为每个底图产 len(img2img_specs) 行 img2img（全图重绘、无掩码，operator="img2img"）+
-1 行 outpaint（边带掩码，operator="outpaint"），nuisance/prompt/op_params 记录方式
-逐字复刻 d2_local.py 的 policies 分支（cfg/steps 网格、prompt bank 确定性抽取、
-op_params 四键 JSON）。policies 是必填 PipelineConfig——grid 是全新算子轴，没有"政策
-接入前"的旧行为需要向后兼容，故不像 build_d2 那样支持 policies=None。
+为每个底图产【本池】img2img spec 数行 img2img（全图重绘、无掩码，operator="img2img"）+
+1 行 outpaint（边带掩码，operator="outpaint"，本池 inpainter 侧非空时），nuisance/
+prompt/op_params 记录方式逐字复刻 d2_local.py 的 policies 分支（cfg/steps 网格、prompt
+bank 确定性抽取、op_params 四键 JSON）；两轴的 hold/train 池分离机制同样镜像 d2_local
+（PATCH 9 Wave2 T4 裁决3，行数公式见 build_grid docstring）。policies 是必填
+PipelineConfig——grid 是全新算子轴，没有"政策接入前"的旧行为需要向后兼容，故不像
+build_d2 那样支持 policies=None。
 """
 from __future__ import annotations
 import json
@@ -43,12 +45,20 @@ def build_grid(out_dir, bases: list[Sample], img2img_specs: list[GeneratorSpec],
                inpainter_specs: list[GeneratorSpec], policies: PipelineConfig,
                backend: str = "mock", seed: int = 0, holdout_generators=(),
                feather_px: int = 8, resolution_pool: list[Sample] | None = None) -> list[Sample]:
-    """每 base × 每 img2img spec 产一行 img2img + 每 base 产一行 outpaint。
+    """每 base × 每【本池】img2img spec 产一行 img2img + 每 base（本池 inpainter 池非空
+    时）产一行 outpaint。
+
+    行数公式（PATCH 9 Wave2 T4 裁决3 池分离后）：
+        |train 池底图| × |train i2i 池| + |train 池底图| × [train inp 池非空]
+      + |hold 池底图| × |hold i2i 池|  + |hold 池底图| × [hold inp 池非空]
+    holdout_generators=() 时 hold 池恒空、全部底图落 train 池，退化为
+    len(bases) × (len(img2img_specs) + 1)——与池分离前行为逐行一致（回归锚：
+    test_grid_ops.py::test_build_grid_row_counts_and_field_conventions 的逐底图断言）。
 
     空 bases，或 img2img_specs 与 inpainter_specs 皆空时优雅返回 []（同 probe.py 的
     build_compositing_pairs 惯例：空输入静默返回空列表而非报错）。两条算子轴各自独立
-    降级——img2img_specs 空时该 base 只产 outpaint 行，inpainter_specs 空时只产
-    img2img 行。
+    降级——本池 i2i 侧空时该 base 只产 outpaint 行，本池 inpainter 侧空时只产
+    img2img 行（不回退混池，见下方池分离注释）。
 
     resolution_pool（PATCH 9 Wave2 9.2c 多分辨率组路由，可选，默认 None=不路由/现状）：
     D0 产出的**全部**分辨率行（不止 bases 所在的基准组）。img2img 行按 spec.name 在
@@ -89,22 +99,33 @@ def build_grid(out_dir, bases: list[Sample], img2img_specs: list[GeneratorSpec],
             res = image_io.chain_resolution(row.io_chain)
             if res is not None and row.base_id:
                 siblings_by_base.setdefault(row.base_id, {})[res] = row
-    # outpaint 生成器池排除 holdout（PATCH 6 不变式「每个 origin-group 只含一类
-    # holdout/非 holdout 生成器」）：img2img 行对每个 base 无条件套用全部 img2img_specs
-    # （非 holdout，见下），若 outpaint 按裸 `bi % len` 轮转到 holdout 生成器，该 base 的
-    # origin-group 会被 splitter 整组划入 test_b，拖着同 base 的非 holdout img2img
-    # 生成器名一起进 test_b——一旦别的 base 上同一生成器名落在 train，
-    # check_leakage 规则4（cross-generator 生成器不得同时出现在 train 与 test_b）即炸
-    # （已用 configs/pipeline.example.yaml + configs/split.yaml 实测复现）。全部落 holdout
-    # 时无可选生成器，退回原始全量池（同 d2_local.py 的 pool_train fallback 惯例）。
-    hold = {i.name for i in inpainter_specs if i.name in set(holdout_generators)}
-    outpaint_pool = [i for i in inpainter_specs if i.name not in hold] or inpainter_specs
+    # 池分离（PATCH 9 Wave2 T4 裁决3，恢复 PATCH 6 不变式「每个 origin-group 只含一类
+    # （holdout/非 holdout）生成器」；机制镜像 d2_local.py 的 pool_hold/pool_train）：
+    # img2img 与 inpainter 两轴各自按 holdout_generators 名二分为 hold/train 池；每个底图
+    # 按 okey 哈希整体选边（~20% 走 holdout 池，与 d2_local 同公式同盐——同一 origin-group
+    # 两轴同池），选边后只从本侧池取生成器：holdout 池底图只产 holdout 行（整组随 splitter
+    # 进 test_b），train 池底图只产非 holdout 行。任一侧某轴池空 → 该底图该轴的行优雅跳过，
+    # **绝不回退混池**：混池正是泄漏源——holdout img2img 行把底图组拖进 test_b 时，同组的
+    # 非 holdout outpaint 行会让同名生成器同时出现在 train（D2 侧同名池）与 test_b，
+    # check_leakage 规则4 必炸（W2T3 递延的 img2img 守卫缺口，已实测复现，裁决3 到期修复；
+    # W2T3 时代的「outpaint 排除 holdout + 全 holdout 回退全量池」旧方案随本裁决废除）。
+    hold_names = set(holdout_generators)
+    pool_hold_i2i = [s for s in img2img_specs if s.name in hold_names]
+    pool_train_i2i = [s for s in img2img_specs if s.name not in hold_names]
+    pool_hold_inp = [i for i in inpainter_specs if i.name in hold_names]
+    pool_train_inp = [i for i in inpainter_specs if i.name not in hold_names]
 
     for bi, base in enumerate(bases):
         img = image_io.load_image(out / base.image_path)
         h, w = img.shape[:2]
+        # 同 d2_local.py：~20% 底图走 holdout 池（任一轴存在 holdout spec 才启用），
+        # 同一 origin-group 的生成器全部同池。
+        okey = base.real_image_path or base.image_path
+        use_hold = bool(pool_hold_i2i or pool_hold_inp) and (stable_hash(okey) % 5 == 0)
+        i2i_pool = pool_hold_i2i if use_hold else pool_train_i2i
+        inp_pool = pool_hold_inp if use_hold else pool_train_inp
 
-        for spec in img2img_specs:
+        for spec in i2i_pool:
             # 分辨率组路由（见上方 docstring）：spec 名命中某非基准分辨率组、且该 base
             # 在该组存在同源行时，生成输入换成该行图像；否则退回基准组 img/h（现状）。
             gen_img, gen_h = img, h
@@ -147,8 +168,8 @@ def build_grid(out_dir, bases: list[Sample], img2img_specs: list[GeneratorSpec],
                 io_chain=image_io.chain("decode", f"rs{gen_h}", f"edit:{spec.name}", "png"),
             ))
 
-        if inpainter_specs:
-            inp = outpaint_pool[bi % len(outpaint_pool)]
+        if inp_pool:   # 本池 inpainter 侧空 → 该底图不产 outpaint 行（不回退混池，见上）
+            inp = inp_pool[bi % len(inp_pool)]
             fracs = policies.outpaint_border_fracs
             b_frac = fracs[stable_hash(base.image_id + "bf") % len(fracs)]
             mask = _border_mask(h, w, b_frac)

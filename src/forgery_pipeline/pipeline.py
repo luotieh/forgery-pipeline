@@ -83,7 +83,6 @@ def run_pipeline(cfg: PipelineConfig) -> dict:
                    holdout_inpainters=holdout_gen, feather_px=cfg.compositing_feather_px,
                    policies=cfg)
           if st.get("d2") else [])
-    d3 = build_d3(out, d3_bases, cfg.scales.d3, cfg.backend, seed) if st.get("d3") else []
     # grid（img2img/outpaint 主 run 算子轴，PATCH 9 Wave2 T3）：底图取自 d3_bases（而非
     # d0 头部/d2_bases）——沿用上面 D2/D3 已建立的"不相交底图池"不变式。若改用
     # `d0[:grid_per_op]`，会与 d2_bases 重叠：build_d2 对约 20% 底图独立分配 holdout
@@ -91,13 +90,27 @@ def run_pipeline(cfg: PipelineConfig) -> dict:
     # grid 对该底图统一施加的 img2img 行（非 holdout 生成器）就会被同一 origin-group 的
     # D2 holdout 行拖进 test_b——一旦同一生成器名在别的底图上落在 train，
     # check_leakage 规则4（cross-generator 生成器不得同时出现在 train 与 test_b）即炸
-    # （已实测复现，非假设）。d3_bases 上的行只有 generator_name="manual-web-edit"
-    # （非 holdout），与 grid 共享安全。D4 explain 只消费 d2+d3（不变），grid 不喂给
-    # D4，只并入主 samples 流。
+    # （已实测复现，非假设）。D4 explain 只消费 d2+d3（不变），grid 不喂给 D4，只并入主
+    # samples 流。
+    # 裁决3 补全（PATCH 6 不变式在接线层的另一半）：grid 池分离后 holdout 池底图会产
+    # holdout 行（build_grid，W2T3 的「d3_bases 上只有非 holdout 的 manual-web-edit、与
+    # grid 共享安全」前提不再成立）——若 grid 的 holdout 池底图同时承载 D3 行，整组进
+    # test_b 时拖 manual-web-edit 同去，而其余 D3 底图上的同名行在 train，规则4 即炸
+    # （production e2e 确定性复现）。故 d3+grid 同时启用时把 d3_bases 再二分为不相交的
+    # grid 池（前半）与 D3 池（后半）；任一 stage 关闭则无共存冲突，保持整池（grid-off
+    # 的既有测试与运行零影响）。len(d3_bases)==1 的退化情形二分产生空片，由 `or` 回退
+    # 整池（同 d2_bases/d3_bases 的既有惯例——极小规模下不保证不相交，正常规模无此虞）。
+    if st.get("d3") and st.get("grid") and cfg.grid_per_op > 0:
+        _g = len(d3_bases) // 2
+        grid_pool = d3_bases[:_g] or d3_bases
+        d3_pool = d3_bases[_g:] or d3_bases
+    else:
+        grid_pool = d3_pool = d3_bases
+    d3 = build_d3(out, d3_pool, cfg.scales.d3, cfg.backend, seed) if st.get("d3") else []
     # resolution_pool=d0（全部分辨率行，非仅 d0_base）：grid 按 img2img spec 名反查
     # policies.resolution_groups 所属分辨率组时，需要在其中查到 base 的同源分辨率兄弟行
     # （见 build_grid docstring）。resolutions=None 时 d0_base is d0，反查恒落空，等价现状。
-    grid = (build_grid(out, d3_bases[:cfg.grid_per_op] or d0_base, cfg.img2img, cfg.inpainters,
+    grid = (build_grid(out, grid_pool[:cfg.grid_per_op] or d0_base, cfg.img2img, cfg.inpainters,
                        cfg, cfg.backend, seed, holdout_generators=holdout_gen,
                        feather_px=cfg.compositing_feather_px, resolution_pool=d0)
             if st.get("grid") and cfg.grid_per_op > 0 else [])

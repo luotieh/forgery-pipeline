@@ -138,9 +138,17 @@ def test_pipeline_multi_resolution_groups_e2e_v2_holds(tmp_path):
     分辨率组各自都有 real 行（D0）与 fake 行（grid 按 spec 名路由），V2（split 内
     real/fake 非生成链集合相等）在两组之间同时成立；test_c 经组成规则过滤（pipeline.py，
     Test-C 测算子泛化、分辨率非其轴）后只含基准分辨率行，check_all 于 profile="run" +
-    testc_holdout 生产口径全绿。"""
+    testc_holdout 生产口径全绿。
+
+    seed=2/d0=20 是经验扫描结果（同 test_cli d0=60 的先例，非公式推导）：裁决3 的
+    d3_bases 二分接线后 grid 组占全部 origin-group 的 ~25%，mock 小规模下小 split
+    （val/test_a）可能抽不到任何 grid 组——该 split 便没有 rs128 fake、real 侧却有两
+    分辨率兄弟行 → V2 红（B3 真实规模下每 split 数百组，此覆盖问题消失；这正是
+    「每个分辨率组须有非 holdout 成员」约束在小样本下的表现，非缺陷）。扫描
+    {seed 0,1,2}×{d0 20,24} 唯 seed=2/d0=20 六项断言全绿；改动 split 哈希盐/采样逻辑
+    /底图二分比例时需重扫。"""
     cfg = PipelineConfig(
-        out_dir=str(tmp_path / "run"), seed=0, backend="mock",
+        out_dir=str(tmp_path / "run"), seed=2, backend="mock",
         stages={"d0": True, "d1": False, "d2": True, "d3": True, "d4": True,
                 "grid": True, "postprocess": True, "split": True},
         scales=StageScales(d0=20, d1_per_generator=0, d2=10, d3=10, d4=3),
@@ -235,20 +243,22 @@ def test_pipeline_without_base_resolution_only_splits_keeps_sibling_rows(tmp_pat
 # ---------------------------------------------------------------------------
 
 def test_testb_holdout_covers_every_resolution_group_v2_green(tmp_path):
-    """正向（B3 形态）：两个分辨率组各配一个 holdout 生成器——64 组 kandinsky-inpaint 走
-    D2 @基准、128 组 "b" 走 grid 按组路由——test_b 两侧非生成链集合相等，check_all(run)
-    全绿；并按裁决第 5 点核对 grid 的 holdout img2img 行确实落 test_b（_split_for 标注 +
-    assign_splits 组路由同向）。
+    """正向（真字面 B3 形态，裁决3 grid 池分离后可构造）：holdout = {grid 的 128 组
+    img2img spec "b", D2 的基准组 inpainter kandinsky-inpaint}；train = {基准组 img2img
+    spec "a"、128 组 img2img spec "b2"、非 holdout inpainter stable-diffusion-inpaint}。
+    裁决3 之前该形态直接 RuntimeError（check_leakage 规则4：holdout "b" 把 grid 底图组
+    整组拖进 test_b，同组非 holdout outpaint 行令 stable-diffusion-inpaint 同现
+    train/test_b——见 report「裁决执行 2/3」）；池分离后 holdout 池底图只产 holdout 行，
+    PATCH 6 不变式恢复。断言：无 RuntimeError（leakage 绿）、test_b 两侧非生成链集合 ==
+    {rs64,rs128}（D2-holdout 供 rs64 fake、grid-holdout 供 rs128 fake）、check_all(run)
+    全绿（含 V8）、train 侧生成器名绝不出现在 test_b（池分离的直接效果）。
 
-    形态注记（如实记录，见 report「裁决执行 2」）：inpainter 池全 holdout（仅 kandinsky）
-    是当前代码下唯一可构造的形态——grid 对每个底图无条件套用全部 img2img specs（无
-    holdout 池分离，W2T3 报告已记录的 deferred 设计缺口），holdout img2img "b" 会把全部
-    grid 底图组拖进 test_b，任何同组共存的非 holdout 生成器名（outpaint 池 = D2 的
-    pool_train，两者结构性同集合）只要同时出现在 train 就触发 check_leakage 规则4。已实
-    测复现：inpainters 含非 holdout 的 stable-diffusion-inpaint 时 run_pipeline 直接
-    RuntimeError「cross-generator 生成器出现在 train: ['stable-diffusion-inpaint']」。
-    B3 真实配置（sd15 非 holdout + sdxl holdout img2img 并存）启用前须先裁决 grid 的
-    img2img holdout 池分离——本测试锁定的是约束满足时 test_b 的双侧链集合语义。"""
+    "b2"（128 组、非 holdout）是设计约束的镜像半边（实现期实证）：约束的完整形态是
+    「每个分辨率组须同时有 holdout 与非 holdout 生成器」——holdout 侧覆盖 test_b（裁决2
+    正断言），非 holdout 侧覆盖 train/val/test_a（缺了它们，这些 split 的 real 侧照样有
+    两分辨率兄弟行、fake 侧却只有基准组 → V2 在 train 侧同构地红）。B3 真实 config 的
+    1024 组同样需要一个非 holdout 成员，见 report「裁决执行 3」。d3 关闭（本测试聚焦
+    grid 池分离语义本身；d3+grid 共存时的底图二分接线见 pipeline.py 裁决3 补全注释）。"""
     sp = tmp_path / "split_b3.yaml"
     sp.write_text(yaml.dump({
         "holdout_generators": ["kandinsky-inpaint", "b"],
@@ -256,26 +266,41 @@ def test_testb_holdout_covers_every_resolution_group_v2_green(tmp_path):
     }), encoding="utf-8")
     cfg = PipelineConfig(
         out_dir=str(tmp_path / "run"), seed=0, backend="mock",
-        stages={"d0": True, "d1": False, "d2": True, "d3": True, "d4": False,
-                "grid": True, "postprocess": True, "split": True},
-        scales=StageScales(d0=20, d1_per_generator=0, d2=6, d3=6, d4=0),
-        inpainters=[GeneratorSpec("kandinsky-inpaint", "kandinsky", "inpaint")],
+        stages={"d0": True, "d1": False, "d2": True, "d3": False, "d4": False,
+                "grid": True, "postprocess": False, "split": True},
+        scales=StageScales(d0=20, d1_per_generator=0, d2=10, d3=0, d4=0),
+        inpainters=[GeneratorSpec("stable-diffusion-inpaint", "diffusion", "inpaint"),
+                    GeneratorSpec("kandinsky-inpaint", "kandinsky", "inpaint")],
         img2img=[GeneratorSpec("a", "diffusion", "img2img"),
-                 GeneratorSpec("b", "diffusion-sdxl", "img2img")],
-        resolution_groups={64: ["a"], 128: ["b"]},
-        grid_per_op=10,     # 覆盖全部 d3_bases：D3 的 manual-web-edit 随组整体进 test_b，
-                            # 不在 train 留同名行（否则 check_leakage 规则4）
-        vae_rt_frac=0.0,
+                 GeneratorSpec("b", "diffusion-sdxl", "img2img"),
+                 GeneratorSpec("b2", "diffusion-sdxl", "img2img")],
+        resolution_groups={64: ["a"], 128: ["b", "b2"]},
+        grid_per_op=10,
+        vae_rt_frac=0.15,
         split_config=str(sp),
     )
-    run_pipeline(cfg)
+    run_pipeline(cfg)   # 裁决3 前此行即 RuntimeError（TDD 红锚）
     rows = manifest.read_jsonl(Path(cfg.out_dir) / "manifest.jsonl")
 
-    # 裁决第 5 点：holdout img2img "b" 的行全部落 test_b，且经按组路由生成在 128
+    # holdout img2img "b"（grid 池分离 + 按组路由）：行全落 test_b、生成在 128
     b_rows = [r for r in rows if r.generator_name == "b"]
     assert b_rows
     assert {r.split for r in b_rows} == {"test_b"}
     assert {image_io.chain_resolution(r.io_chain) for r in b_rows} == {128}
+
+    # holdout inpainter（D2 池分离，既有机制）：行落 test_b、生成在基准 64
+    kd_rows = [r for r in rows if r.generator_name == "kandinsky-inpaint"]
+    assert kd_rows
+    assert {r.split for r in kd_rows} == {"test_b"}
+    assert {image_io.chain_resolution(r.io_chain) for r in kd_rows} == {64}
+
+    # 池分离的直接效果：train 侧生成器名（a / b2 / stable-diffusion-inpaint）绝不出现在
+    # test_b；镜像半边：非 holdout 的 128 组 spec "b2" 在 train 侧供 rs128 fake
+    assert all(r.split != "test_b" for r in rows
+               if r.generator_name in {"a", "b2", "stable-diffusion-inpaint"})
+    b2_rows = [r for r in rows if r.generator_name == "b2"]
+    assert b2_rows
+    assert {image_io.chain_resolution(r.io_chain) for r in b2_rows} == {128}
 
     # test_b 两侧非生成链集合相等，且恰为两个分辨率组
     chains_tb = manifest.stats(rows)["io_chain_by_fake_split"]["test_b"]
