@@ -110,11 +110,15 @@ def check_v3(samples) -> list[str]:
     return errs
 
 
-def check_v4(samples, profile: str = "auto", vae_rt_range=(0.05, 0.35)) -> list[str]:
+def check_v4(samples, profile: str = "auto", vae_rt_range=(0.05, 0.35),
+             min_real: int = 10) -> list[str]:
     """V4 real_vae_rt 占比：train/test_a/test_f 中每个含 real 行的 split 须落在 vae_rt_range。
 
     触发条件：profile=="run"，或 profile=="auto" 且 manifest 中存在任一 real_vae_rt 行；
     否则跳过（不产生任何消息）。
+
+    min_real 守卫：split 内 real 行数 < min_real 时跳过该 split 的配比断言（不产生消息）——
+    小 n 时比值离散取值结构性落不进 band，配比断言只对达到统计规模的 split 有意义。
     """
     has_vae_rt = any(s.sample_kind == "real_vae_rt" for s in samples)
     if not (profile == "run" or (profile == "auto" and has_vae_rt)):
@@ -127,7 +131,7 @@ def check_v4(samples, profile: str = "auto", vae_rt_range=(0.05, 0.35)) -> list[
     errs: list[str] = []
     for split in _V4_SPLITS:
         c = counts.get(split)
-        if not c or c["real"] == 0:
+        if not c or c["real"] == 0 or c["real"] < min_real:
             continue
         ratio = c["real_vae_rt"] / c["real"]
         if not (lo <= ratio <= hi):
@@ -198,7 +202,8 @@ def check_v7(samples) -> list[str]:
     return errs
 
 
-def check_all(samples, profile: str = "auto", vae_rt_range=(0.05, 0.35)) -> list[str]:
+def check_all(samples, profile: str = "auto", vae_rt_range=(0.05, 0.35),
+              min_real: int = 10) -> list[str]:
     """跑全部 V1–V7（V5 不是运行时检查，是「backfill 后过 check_all」这条测试本身）。
 
     `samples`：任意可迭代对象，元素只需 duck-typing 具备 Sample 的相应字段属性。
@@ -209,7 +214,7 @@ def check_all(samples, profile: str = "auto", vae_rt_range=(0.05, 0.35)) -> list
     errs += check_v1(samples)
     errs += check_v2(samples)
     errs += check_v3(samples)
-    errs += check_v4(samples, profile=profile, vae_rt_range=vae_rt_range)
+    errs += check_v4(samples, profile=profile, vae_rt_range=vae_rt_range, min_real=min_real)
     errs += check_v6(samples)
     errs += check_v7(samples)
     return errs

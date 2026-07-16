@@ -116,16 +116,18 @@ def test_v3_bad_sample_kind_value_fails():
 # ---------------------------------------------------------------------------
 
 def test_v4_profile_run_forces_check_and_fails_without_any_vae_rt_row():
-    rows = [_row(f"r{i}", 0, split="train") for i in range(3)]
+    # 规模改为 range(10)（原 3）：min_real 守卫默认阈值=10，real 行数须达标才不被跳过
+    rows = [_row(f"r{i}", 0, split="train") for i in range(10)]
     errs = check_all(rows, profile="run")
     v4 = [e for e in errs if e.startswith("V4: ")]
     assert v4 and "train" in v4[0]
 
 
 def test_v4_ratio_out_of_range_fails():
-    rows = [_row(f"r{i}", 0, split="train") for i in range(2)]
+    # 规模改为 range(10)+range(10)（原 2+2，比值同为 1.0）：同上，避免被 min_real 守卫跳过
+    rows = [_row(f"r{i}", 0, split="train") for i in range(10)]
     rows += [_row(f"v{i}", 0, split="train", sample_kind="real_vae_rt",
-                  real_image_path=f"r{i}.png") for i in range(2)]
+                  real_image_path=f"r{i}.png") for i in range(10)]
     errs = check_all(rows)   # profile="auto" 默认；含 real_vae_rt 行即触发
     v4 = [e for e in errs if e.startswith("V4: ")]
     assert v4 and "train" in v4[0]
@@ -133,8 +135,36 @@ def test_v4_ratio_out_of_range_fails():
 
 def test_v4_profile_auto_skips_when_no_vae_rt_rows_present():
     rows = [_row(f"r{i}", 0, split="train") for i in range(2)]
-    errs = check_all(rows)   # 无 real_vae_rt 行、profile="auto" → 不触发 V4
+    errs = check_all(rows)   # 无 real_vae_rt 行、profile="auto" → 不触发 V4（min_real 守卫不涉及此分支）
     assert not _has(errs, "V4: ")
+
+
+# ---------------------------------------------------------------------------
+# V4 min_real 守卫（小 n 时比值离散取值结构性落不进 band，见 check_v4 docstring）
+# ---------------------------------------------------------------------------
+
+def test_v4_min_real_guard_skips_split_below_threshold():
+    """real 行数=5 < min_real(默认 10)：即使比值 0/5=0.0 越界也跳过，不产生 V4 消息。"""
+    rows = [_row(f"r{i}", 0, split="train") for i in range(5)]
+    errs = check_all(rows, profile="run")
+    assert not _has(errs, "V4: ")
+
+
+def test_v4_min_real_guard_still_fails_at_or_above_threshold():
+    """real 行数=12 ≥ min_real(默认 10)：守卫不豁免，比值 0/12=0.0 越界须 FAIL。"""
+    rows = [_row(f"r{i}", 0, split="train") for i in range(12)]
+    errs = check_all(rows, profile="run")
+    v4 = [e for e in errs if e.startswith("V4: ")]
+    assert v4 and "train" in v4[0]
+
+
+def test_v4_min_real_param_threads_through_check_all():
+    """min_real 须由 check_all 原样传给 check_v4（非硬编码默认值）。"""
+    rows = [_row(f"r{i}", 0, split="train") for i in range(5)]
+    assert not _has(check_all(rows, profile="run"), "V4: ")             # 默认 min_real=10 → 跳过
+    errs = check_all(rows, profile="run", min_real=3)                   # 显式调小阈值 → 5≥3 生效
+    v4 = [e for e in errs if e.startswith("V4: ")]
+    assert v4 and "train" in v4[0]
 
 
 # ---------------------------------------------------------------------------
