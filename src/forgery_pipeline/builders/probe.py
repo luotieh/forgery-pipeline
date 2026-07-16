@@ -98,7 +98,7 @@ def build_probe_strength(out_dir, bases: list[Sample], img2img_specs: list[Gener
                     strength=st, init_timestep=int(round(st * _NUM_TRAIN_TIMESTEPS)),
                     seed=sd, split=_split_for(spec.name, holdout_generators),
                     source_dataset=base.source_dataset,
-                    sample_kind="edited",
+                    sample_kind="edited", base_id=base.image_id,
                     io_chain=image_io.chain("decode", f"rs{img.shape[0]}", f"edit:{spec.name}", "png"),
                 ))
     return samples
@@ -136,7 +136,7 @@ def build_probe_operator(out_dir, bases: list[Sample], img2img_specs: list[Gener
                         generator_family=spec.family, operator="img2img",
                         strength=st, init_timestep=int(round(st * _NUM_TRAIN_TIMESTEPS)),
                         seed=sd, split=sp, source_dataset=base.source_dataset,
-                        sample_kind="edited",
+                        sample_kind="edited", base_id=base.image_id,
                         io_chain=image_io.chain("decode", f"rs{img.shape[0]}", f"edit:{spec.name}", "png"),
                     ))
                 else:
@@ -154,7 +154,7 @@ def build_probe_operator(out_dir, bases: list[Sample], img2img_specs: list[Gener
                         manipulation_level3=l3, manipulation_level4=spec.name,
                         generator_name=spec.name, generator_family=spec.family,
                         operator=op, mask_source="probe", seed=sd, split=sp,
-                        source_dataset=base.source_dataset,
+                        source_dataset=base.source_dataset, base_id=base.image_id,
                         # masked 行整图直出（未走 composite），compositing 显式记为 none（PATCH 7.3）
                         compositing="none", sample_kind="edited",
                         io_chain=image_io.chain("decode", f"rs{img.shape[0]}", f"edit:{spec.name}", "png"),
@@ -202,7 +202,7 @@ def build_compositing_pairs(out_dir, bases: list[Sample], inpainter_specs: list[
                 manipulation_level3="mask_guided_inpainting", manipulation_level4=spec.name,
                 generator_name=spec.name, generator_family=spec.family,
                 operator="inpaint", mask_source="probe", seed=sd,
-                source_dataset=base.source_dataset,
+                source_dataset=base.source_dataset, base_id=base.image_id,
                 compositing=mode, feather_px=feather_px,
                 probe_group="compositing_pair", pair_id=pid,
                 sample_kind="edited",

@@ -96,7 +96,7 @@ def build_d2(out_dir, base_samples: list[Sample], n: int,
             quality_score=round(score, 4), quality_bucket=bucket_from_score(score),
             source_dataset=base.source_dataset,
             compositing=mode, feather_px=(feather_px if mode == "paste_feather" else None),
-            sample_kind="edited",
+            sample_kind="edited", base_id=base.image_id,
             io_chain=image_io.chain("decode", f"rs{img.shape[0]}", f"edit:{inp.name}", "png"),
         ))
     return samples

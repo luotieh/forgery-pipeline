@@ -28,6 +28,7 @@ def build_d0(out_dir, n: int, backend: str = "mock", seed: int = 0) -> list[Samp
             source_dataset=meta.get("source_dataset"),
             license=meta.get("license"),
             sample_kind="real",
+            base_id=iid,
             io_chain=image_io.chain("decode", f"rs{img.shape[0]}", "png"),
         ))
     return samples

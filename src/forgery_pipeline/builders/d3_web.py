@@ -72,7 +72,7 @@ def build_d3(out_dir, base_samples: list[Sample], n: int,
             mask_source="diff", mask_area_ratio=ratio,
             quality_score=round(score, 4), quality_bucket=bucket_from_score(score),
             source_dataset=base.source_dataset,
-            sample_kind="edited",
+            sample_kind="edited", base_id=base.image_id,
             io_chain=image_io.chain("decode", f"rs{real.shape[0]}", f"edit:{gen_name}", "png"),
         ))
     return samples
