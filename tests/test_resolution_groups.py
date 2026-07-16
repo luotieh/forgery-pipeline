@@ -225,3 +225,104 @@ def test_pipeline_without_base_resolution_only_splits_keeps_sibling_rows(tmp_pat
     assert tc, "前提：holdout_manipulation 确实把 D2 组路由进了 test_c"
     res_in_tc = {image_io.chain_resolution(r.io_chain) for r in tc}
     assert 128 in res_in_tc, res_in_tc   # 兄弟分辨率行仍在——未被过滤（旧行为锚）
+
+
+# ---------------------------------------------------------------------------
+# test_b 分辨率覆盖设计约束（裁决执行 2）：正负双回归
+# 约束：holdout 生成器须覆盖每个参与 test_b 的分辨率组；违反时 V2 红是期望的响亮失败
+# （test_b 刻意不进 base_resolution_only_splits——跨生成器轴需要各分辨率组的 holdout
+# fake，过滤会把 1024 侧整个删掉，见 configs/split.yaml 注释）。
+# ---------------------------------------------------------------------------
+
+def test_testb_holdout_covers_every_resolution_group_v2_green(tmp_path):
+    """正向（B3 形态）：两个分辨率组各配一个 holdout 生成器——64 组 kandinsky-inpaint 走
+    D2 @基准、128 组 "b" 走 grid 按组路由——test_b 两侧非生成链集合相等，check_all(run)
+    全绿；并按裁决第 5 点核对 grid 的 holdout img2img 行确实落 test_b（_split_for 标注 +
+    assign_splits 组路由同向）。
+
+    形态注记（如实记录，见 report「裁决执行 2」）：inpainter 池全 holdout（仅 kandinsky）
+    是当前代码下唯一可构造的形态——grid 对每个底图无条件套用全部 img2img specs（无
+    holdout 池分离，W2T3 报告已记录的 deferred 设计缺口），holdout img2img "b" 会把全部
+    grid 底图组拖进 test_b，任何同组共存的非 holdout 生成器名（outpaint 池 = D2 的
+    pool_train，两者结构性同集合）只要同时出现在 train 就触发 check_leakage 规则4。已实
+    测复现：inpainters 含非 holdout 的 stable-diffusion-inpaint 时 run_pipeline 直接
+    RuntimeError「cross-generator 生成器出现在 train: ['stable-diffusion-inpaint']」。
+    B3 真实配置（sd15 非 holdout + sdxl holdout img2img 并存）启用前须先裁决 grid 的
+    img2img holdout 池分离——本测试锁定的是约束满足时 test_b 的双侧链集合语义。"""
+    sp = tmp_path / "split_b3.yaml"
+    sp.write_text(yaml.dump({
+        "holdout_generators": ["kandinsky-inpaint", "b"],
+        "holdout_manipulation": [], "holdout_domains": [],
+    }), encoding="utf-8")
+    cfg = PipelineConfig(
+        out_dir=str(tmp_path / "run"), seed=0, backend="mock",
+        stages={"d0": True, "d1": False, "d2": True, "d3": True, "d4": False,
+                "grid": True, "postprocess": True, "split": True},
+        scales=StageScales(d0=20, d1_per_generator=0, d2=6, d3=6, d4=0),
+        inpainters=[GeneratorSpec("kandinsky-inpaint", "kandinsky", "inpaint")],
+        img2img=[GeneratorSpec("a", "diffusion", "img2img"),
+                 GeneratorSpec("b", "diffusion-sdxl", "img2img")],
+        resolution_groups={64: ["a"], 128: ["b"]},
+        grid_per_op=10,     # 覆盖全部 d3_bases：D3 的 manual-web-edit 随组整体进 test_b，
+                            # 不在 train 留同名行（否则 check_leakage 规则4）
+        vae_rt_frac=0.0,
+        split_config=str(sp),
+    )
+    run_pipeline(cfg)
+    rows = manifest.read_jsonl(Path(cfg.out_dir) / "manifest.jsonl")
+
+    # 裁决第 5 点：holdout img2img "b" 的行全部落 test_b，且经按组路由生成在 128
+    b_rows = [r for r in rows if r.generator_name == "b"]
+    assert b_rows
+    assert {r.split for r in b_rows} == {"test_b"}
+    assert {image_io.chain_resolution(r.io_chain) for r in b_rows} == {128}
+
+    # test_b 两侧非生成链集合相等，且恰为两个分辨率组
+    chains_tb = manifest.stats(rows)["io_chain_by_fake_split"]["test_b"]
+    real_set = {c for c, v in chains_tb.items() if v["real"] > 0}
+    fake_set = {c for c, v in chains_tb.items() if v["fake"] > 0}
+    assert real_set == fake_set == {"rs64>png", "rs128>png"}
+
+    errs = check_all(rows, profile="run", holdout_generators={"kandinsky-inpaint", "b"})
+    assert errs == [], f"check_all 非空: {errs[:10]}"
+
+
+def test_testb_holdout_missing_resolution_group_v2_red_is_expected(tmp_path):
+    """负向（文档化守门行为，复刻审查者场景）：holdout 只覆盖基准组（kandinsky@64 走
+    D2），128 组无任何 holdout → test_b 的 real 侧有 {rs64,rs128} 兄弟行、fake 侧只有
+    rs64 → **V2 红是对的**：「holdout 生成器须覆盖每个参与 test_b 的分辨率组」是设计
+    约束，违反时 V2 如实咬住（期望的响亮失败，而非需要修复的 bug；修复方向是调整组
+    配置或显式把 test_b 加入 base_resolution_only_splits，见 configs/split.yaml 注释）。
+    本测试断言这声失败可靠发出——若未来有人改动让它静默通过，等于拆掉守门。"""
+    sp = tmp_path / "split_reviewer.yaml"
+    sp.write_text(yaml.dump({
+        "holdout_generators": ["kandinsky-inpaint"],
+        "holdout_manipulation": [], "holdout_domains": [],
+    }), encoding="utf-8")
+    cfg = PipelineConfig(
+        out_dir=str(tmp_path / "run"), seed=0, backend="mock",
+        stages={"d0": True, "d1": False, "d2": True, "d3": False, "d4": False,
+                "grid": True, "postprocess": False, "split": True},
+        scales=StageScales(d0=20, d1_per_generator=0, d2=10, d3=0, d4=0),
+        inpainters=[GeneratorSpec("stable-diffusion-inpaint", "diffusion", "inpaint"),
+                    GeneratorSpec("kandinsky-inpaint", "kandinsky", "inpaint")],
+        img2img=[GeneratorSpec("a", "diffusion", "img2img"),
+                 GeneratorSpec("b", "diffusion-sdxl", "img2img")],   # 均非 holdout
+        resolution_groups={64: ["a"], 128: ["b"]},
+        grid_per_op=10,
+        vae_rt_frac=0.15,   # 让 V4 绿（0.25 实测 8/22=0.36 出带），把红隔离到 V2/test_b
+        split_config=str(sp),
+    )
+    run_pipeline(cfg)   # 不 crash：泄漏规则不涉及（kandinsky 只在 test_b，无同名 train 行）
+    rows = manifest.read_jsonl(Path(cfg.out_dir) / "manifest.jsonl")
+
+    tb = [r for r in rows if r.split == "test_b"]
+    assert {image_io.chain_resolution(r.io_chain) for r in tb if r.is_fake == 0} == {64, 128}
+    assert {image_io.chain_resolution(r.io_chain) for r in tb if r.is_fake == 1} == {64}
+
+    errs = check_all(rows, profile="run", holdout_generators={"kandinsky-inpaint"})
+    assert any(("V2" in e) and ("test_b" in e) for e in errs), (
+        f"设计约束违反必须触发含 V2 与 test_b 的失败消息，实得: {errs}")
+    # 隔离性：V2 的红只在 test_b（其余 split 该约束未被违反；不对非 V2 检查器做排他断言，
+    # 避免未来 V11/V12 等新增校验器误伤本测试）
+    assert all("test_b" in e for e in errs if e.startswith("V2:")), errs

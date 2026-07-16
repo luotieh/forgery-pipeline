@@ -162,6 +162,11 @@ def run_pipeline(cfg: PipelineConfig) -> dict:
             image_io.save_canonical(rt.roundtrip(img), out / rel)
             v = s.model_copy(deep=True)
             v.image_id = s.image_id + "__vaert"; v.image_path = rel
+            # 多分辨率下源 s 若是非基准分辨率 sibling 行，这里 real_image_path 指向 sibling
+            # 自身路径 → origin_key(v) 成孤儿单例（不与基准行或任何其它行同组）。无碍：
+            # v.split 直接继承 s 已定的 split（本块在 assign_splits 之后，不再重新哈希），
+            # V8 组一致走 base_id（下一行已正确继承）——但未来代码不要信任 vae_rt 行的
+            # origin_key 语义（PATCH 9 Wave2 T4 裁决执行 2 注记）。
             v.sample_kind = "real_vae_rt"; v.real_image_path = s.image_path
             v.base_id = s.base_id or s.image_id
             v.io_chain = s.io_chain.replace(">png", f">vae_rt:{rt.name}>png") if s.io_chain else f"vae_rt:{rt.name}"
