@@ -44,7 +44,7 @@ def _cmd_validate(args) -> int:
         import yaml
         rules = yaml.safe_load(split_config.read_text(encoding="utf-8")) or {}
         holdout_generators = set(rules.get("holdout_generators", [])) or None
-        testc_holdout = rules.get("testc_holdout")
+        testc_holdout = rules.get("testc_holdout") or None
 
     # 诚实输出：V1–V7 恒执行；V8/V10 仅 profile=="run" 执行（裁决B），V9/V10 另需
     # split-config 提供对应 holdout 清单——三者任一未满足，该检查就没有真的跑过，成功行
