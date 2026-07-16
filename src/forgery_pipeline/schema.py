@@ -66,6 +66,7 @@ class Sample(BaseModel):
     feather_px: Optional[int] = None        # paste_feather 羽化 σ（像素）
     probe_group: Optional[str] = None       # 成对 probe 组名（compositing_pair / nd_pair，PATCH 7.3/8.1）
     pair_id: Optional[str] = None           # 成对样本回链 id
+    base_id: Optional[str] = None  # 底图组键（V8 split 互斥用；D0=自身 image_id，衍生行=底图 image_id）
     postprocess_of: Optional[str] = None    # 退化样本回链原始 fake 的 image_id；原图为 None
 
     @field_validator("is_fake")

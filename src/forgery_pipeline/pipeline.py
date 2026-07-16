@@ -102,6 +102,7 @@ def run_pipeline(cfg: PipelineConfig) -> dict:
             v = s.model_copy(deep=True)
             v.image_id = s.image_id + "__vaert"; v.image_path = rel
             v.sample_kind = "real_vae_rt"; v.real_image_path = s.image_path
+            v.base_id = s.base_id or s.image_id
             v.io_chain = s.io_chain.replace(">png", f">vae_rt:{rt.name}>png") if s.io_chain else f"vae_rt:{rt.name}"
             extra.append(v)
         samples += extra

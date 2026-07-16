@@ -45,6 +45,7 @@ def build_d1(out_dir, generators: list[GeneratorSpec], per_generator: int,
                 steps=meta["steps"], cfg_scale=meta["cfg_scale"],
                 quality_bucket=bucket,
                 sample_kind="edited",
+                base_id=iid,
                 io_chain=image_io.chain(f"gen:{gen.name}", f"rs{img.shape[0]}", "png"),
             ))
     return samples

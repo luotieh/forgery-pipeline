@@ -26,6 +26,10 @@ def test_mock_smoke_passes_v1_v7_and_pair_assertions(tmp_path):
     st = run_pipeline(cfg)
     rows = manifest.read_jsonl(tmp_path / "run" / "manifest.jsonl")
     assert check_all(rows, profile="run") == []
+    # W1T2 接线冒烟：V9/V10 参数透传不破坏主链 manifest（本 run 无 kandinsky 行、
+    # builder 不设 operator 字段 → 空真绿，但证明参数通路接通且 V8 裁决A豁免生效）
+    assert check_all(rows, profile="run", holdout_generators={"kandinsky-inpaint"},
+                     testc_holdout="object_replacement") == []
     assert "by_sample_kind" in st and "io_chain_by_fake_split" in st
     # amendment B：存在性断言——证明 vae_rt 分层插入确实跑了（而非被 min_real 守卫豁免所掩盖）
     assert any(r.sample_kind == "real_vae_rt" for r in rows)

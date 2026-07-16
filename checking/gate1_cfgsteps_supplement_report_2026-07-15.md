@@ -35,7 +35,7 @@ s\* = 0.8
 - §3.3 加档：许可「信息量不低于三桶 BA 0.55」声明
 
 ## EXPLORATORY-ADDENDA
-（此后任何追加分析置于此节并显式标注。当前：无。）
+- **2026-07-16 PATCH 9.6 单元分解**（`checking/gate1_nuisance_decomposition_2026-07-16.md`，探索性）：CFG 惰性发现（空 prompt → CFG 项消去）下，敏感维几乎全在 **steps**（边际 ρ：st30 0.707 vs st50 0.514）；(7.5,30) 重拟合 ρ=0.721 → nuis_effect=+0.113 > 0.10 → **按 9.6 预定规则，「固定 CFG/steps」限定升级为正文 limitation**（下方 §SUPPLEMENT-JUDGMENT 的"留脚注"判定基于 pooled 跌幅 0.092，系双峰混合平均——两判定并存如实记录，正文采 9.6 的更细分解）。
 
 ## SUPPLEMENT-JUDGMENT（v2 §5 机械判定）
 - 主 confirmatory ρ = 0.6999；本补充 probe ρ = 0.6076；跌幅 = +0.0923

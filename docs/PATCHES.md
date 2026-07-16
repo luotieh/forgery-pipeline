@@ -506,4 +506,21 @@ forgery-pipeline validate-manifest --path data/probe/manifest.jsonl
 - **落地**：Sample 新字段 io_chain/sample_kind/compositing/feather_px/probe_group/pair_id（回填脚本 `scripts/backfill_manifest_v7.py`）；`compositing.composite()`（none/paste/paste_feather）；canonical I/O（`image_io.chain/load_and_resize/save_canonical`，D0–D4+probe 全 PNG、真假共享非生成链）；VAE 往返硬负样本（`base.VaeRoundtrip`+Mock/SD1.5 实现+pipeline split 后分层插入+泄漏复查，`vae_rt_frac` 默认 0.15）；D2 掩码算子 50/50 显式回贴+probe 成对样本（`run_probe(compositing_pairs=N)`）+diffusers 隐式回贴审计守卫；validator **V1–V7**（`validate.check_all`，CLI `--profile auto|run`）+ stats 扩展（by_sample_kind/by_compositing/io_chain_by_fake_split）；e2e 冒烟（mock 全链 V1–V7 过 + `scripts/assert_compositing_pairs.py` 成对断言 + vae_rt 残差分布记录）。测试 131→**176 passed**。
 - **对 spec 的已记录偏差**：①V2 非生成链 strip 规则含 `gen:*` 且忽略首 `decode`（D1 全生成行无源可解码，字面规则结构性 FAIL）；②V4 增 `min_real=10` 守卫（小 n 时比值离散取值结构性落不进 band）；③成对断言两常数实证修正——羽化带膨胀 `8×feather_px+1`（cv2 float32 高斯核半宽=4σ，字面值 4× 实测 90% 假阳）与 none 行差异阈值 0.15（mock 合成图结构地板≈0.20，0.5 系随机噪声外推不适用）；④MockInpainter 输出加全局 mock-VAE 印记（忠实模拟真实管线整图 VAE 直出，使 7.5 断言在 mock 可测）。
 - **派生修复**：d4_explain 行补 io_chain/sample_kind 等字段回链（否则 V2 对含 D4 的 split 假阳）；labels.EDIT_OPERATORS 增 instruct_edit（V6 需要，§8.2 已预告）。
+
+---
+
+**PATCH 9 Wave 1 ✅ 完成记录（2026-07-16，分支 `feat/patch9-wave1`）**
+
+- **9.3 全部**（split 防泄漏）：`base_id` 底图组键全链落地（`d082b90`，六个 builder 构造点 + pipeline 的 vae_rt/postprocess 行继承 + `backfill_manifest_v7` 回填扩展）；`validate.py` 新增 V8–V10 + 各配注毒负例单测 + `--split-config`（`0366147`），含**裁决A**（V8 豁免既有 test_a→test_e 退化 carve-out——母行 test_a、退化子行 test_e 视为 eval→eval 移动、非训练泄漏，不算 split 不一致）与**裁决B**（V8/V10 仅在 `profile=="run"` 时执行，probe 产物是受控仪器，故意让同一算子×生成器网格进 train，validator 不罚仪器设计）；`testc_holdout: object_replacement` 写死 `configs/split.yaml`（PATCH 8.3 几何探针裁定结果落地为唯一 config 源）。
+- **9.4 工具层**（B3 驱动加固的可本地部分）：`scripts/b3_preflight.py` 三断言（HEAD 一致性/工作区净树/磁盘余量）+ `src/forgery_pipeline/rundir.py` 断点续跑幂等原语（`append_jsonl_fsync` / `mark_done`+`is_done` / `detect_incomplete_tail`）（`63c4caa`），`detect_incomplete_tail` 后续修复为字节级处理多字节 UTF-8 残尾（`21e0761`，审查发现）。评估禁令（事故B）无法被 preflight 机械检测，以模块 docstring 公约 + 代码审查双保险固化。latent 复用与 COCO fetch 的 GPU 侧驱动本体不在本 wave（见下方待办）。
+- **9.5 草案**：`docs/PREREG_gate2_v3_draft.md`（本 deliverable，占位符 P1–P5 未填、未锁定；design freeze config 与评估前锁定另行）。
+- **9.6 已另行执行**：`28ff0d0`（`checking/gate1_nuisance_decomposition_2026-07-16.md`）——nuisance 敏感维全部落在 steps（st30 ρ=0.707 ≈ 主 confirmatory 复现，st50 ρ=0.514，Δ≈−0.19），(7.5,30) 重拟合 nuis_effect=+0.113>0.10 → 按预定规则「固定 CFG/steps」限定机械升级为正文 limitation。
+
+测试 **180 → 203 passed**（本 wave 新增 `test_base_id.py` / `test_validate_v8_v10.py` / `test_rundir.py` / `test_b3_preflight.py` 等）。
+
+**偏差记录**（相对 PATCH 9 原文字面的修正，如实记）：
+- 原文 9.3 字面「退化行继承母行 split」修正为**承认既有 test_a→test_e Test-E carve-out**（裁决A）——退化样本本就有一条既定的 test_a→test_e 特例通路（评测侧转移、非训练泄漏），V8 若不豁免会对这条既有合法路径产生结构性假阳；母行在 train/val 时退化行仍须同 split，豁免不适用于该情形。
+- V8/V10 限定为**仅 run profile 执行**（裁决B）——`data/probe` 产物的性质是"受控仪器"：探针网格故意让所有算子×生成器组合都在同一批数据里出现（包括主 run 会 holdout 的 `object_replacement`），以便探针自身测出算子的可分性/几何平凡性；对 probe 数据套用主 run 的 split 互斥断言会误伤仪器设计本身。
+
+**待办（Wave 2）**：9.1/9.2 builder 采样政策（CFG/steps 逐图抖动、强度连续采样、prompt bank、掩码面积分层、分辨率组配套 real/vae_rt 行）；9.5 设计冻结 config（cell 网格 commit 进 config）+ PREREG_gate2_v3 评估前锁定；latent 复用（GPU 侧，`diffusers_gen` 内 VAE encode 缓存）；COCO fetch（`scripts/fetch_real_images.py` 新数据源路径的 socket timeout 生效性确认 + 归档 checksum）。
 - **GPU 侧待复核**：SDVaeRoundtrip 真实冒烟（下次开机随 PATCH 9/B3 一并）。

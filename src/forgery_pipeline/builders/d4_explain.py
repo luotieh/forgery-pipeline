@@ -35,5 +35,6 @@ def build_d4(out_dir, source_samples: list[Sample], n: int,
             io_chain=s.io_chain, sample_kind=s.sample_kind,
             compositing=s.compositing, feather_px=s.feather_px,
             probe_group=s.probe_group, pair_id=s.pair_id,
+            base_id=s.base_id or s.image_id,
         ))
     return samples
