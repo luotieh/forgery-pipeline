@@ -53,3 +53,22 @@ def test_probe_cli_via_probe_yaml(tmp_path):
     assert any(r.split == "test_b" for r in rows)          # 留出生成器被标记
     assert any(r.init_timestep is not None for r in rows)  # img2img 带 init_timestep
     assert main(["validate-manifest", "--path", str(out / "manifest.jsonl")]) == 0
+
+
+def test_probe_cli_wires_compositing_pairs(tmp_path):
+    """compositing_pairs 须能通过 CLI（probe yaml -> run_probe）实际生效，而不是被 _cmd_probe 丢弃。"""
+    import yaml
+    from forgery_pipeline.cli import main
+    out = tmp_path / "probe_cp"
+    cfg = {
+        "out_dir": str(out), "seed": 0, "backend": "mock",
+        "generators_config": "configs/generators.yaml",
+        "n_base": 3, "strengths": [0.5], "operators": [],
+        "compositing_pairs": 2,
+    }
+    cfg_path = tmp_path / "probe_cp.yaml"
+    cfg_path.write_text(yaml.safe_dump(cfg), encoding="utf-8")
+    assert main(["probe", "--config", str(cfg_path)]) == 0
+    rows = manifest.read_jsonl(out / "manifest.jsonl")
+    pair_rows = [r for r in rows if r.probe_group == "compositing_pair"]
+    assert len(pair_rows) == 4                              # 2 组 × 2 行

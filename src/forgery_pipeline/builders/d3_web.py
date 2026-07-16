@@ -56,10 +56,11 @@ def build_d3(out_dir, base_samples: list[Sample], n: int,
         if route_from_score(score) == "reject":
             continue
         l2 = _L2[len(samples) % len(_L2)]
+        gen_name = "manual-web-edit"
         iid = ids.make_image_id("web_forgery", f"{base.image_id}-{attempts}")
-        img_rel = f"D3_web_human_forgery/{iid}.jpg"
+        img_rel = f"D3_web_human_forgery/{iid}.png"
         mask_rel = f"D3_web_human_forgery/masks/{iid}.png"
-        image_io.save_image(fake, out_dir / img_rel)
+        image_io.save_canonical(fake, out_dir / img_rel)
         image_io.save_mask(mask, out_dir / mask_rel)
         samples.append(Sample(
             image_id=iid, image_path=img_rel,
@@ -67,9 +68,11 @@ def build_d3(out_dir, base_samples: list[Sample], n: int,
             task_type=TaskType.localization,
             manipulation_level1="partial_manipulated",
             manipulation_level2=l2, manipulation_level3=_L3[l2],
-            generator_name="manual-web-edit", generator_family="editing",
+            generator_name=gen_name, generator_family="editing",
             mask_source="diff", mask_area_ratio=ratio,
             quality_score=round(score, 4), quality_bucket=bucket_from_score(score),
             source_dataset=base.source_dataset,
+            sample_kind="edited",
+            io_chain=image_io.chain("decode", f"rs{real.shape[0]}", f"edit:{gen_name}", "png"),
         ))
     return samples

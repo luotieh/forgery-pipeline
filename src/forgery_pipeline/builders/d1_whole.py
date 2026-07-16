@@ -33,7 +33,7 @@ def build_d1(out_dir, generators: list[GeneratorSpec], per_generator: int,
                 continue
             iid = ids.make_image_id("whole_gen", f"{gen.name}-{s}-{prompt}")
             rel = f"D1_whole_generated/{iid}.png"
-            image_io.save_image(img, out_dir / rel)
+            image_io.save_canonical(img, out_dir / rel)
             samples.append(Sample(
                 image_id=iid, image_path=rel, is_fake=1,
                 task_type=TaskType.whole_image_detection,
@@ -44,5 +44,7 @@ def build_d1(out_dir, generators: list[GeneratorSpec], per_generator: int,
                 prompt=prompt, seed=meta["seed"], sampler=meta["sampler"],
                 steps=meta["steps"], cfg_scale=meta["cfg_scale"],
                 quality_bucket=bucket,
+                sample_kind="edited",
+                io_chain=image_io.chain(f"gen:{gen.name}", f"rs{img.shape[0]}", "png"),
             ))
     return samples

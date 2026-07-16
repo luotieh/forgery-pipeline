@@ -53,3 +53,9 @@ class Img2ImgGenerator(ABC):
     def img2img(self, image: Image, prompt: str, strength: float,
                 params: dict) -> tuple[Image, dict]:
         ...
+
+
+class VaeRoundtrip(ABC):
+    """真实图过 VAE encode→decode（无扩散/编辑/掩码）→ DRCT 式硬负样本（PATCH 7.2）。"""
+    @abstractmethod
+    def roundtrip(self, img: np.ndarray) -> np.ndarray: ...

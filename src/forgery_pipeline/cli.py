@@ -36,7 +36,14 @@ def _cmd_validate(args) -> int:
     except Exception as e:  # noqa: BLE001
         print(f"manifest 校验失败: {e}", file=sys.stderr)
         return 1
+    from forgery_pipeline.validate import check_all
+    errs = check_all(samples, profile=args.profile)
+    if errs:
+        for e in errs:
+            print(e, file=sys.stderr)
+        return 1
     print(f"OK: {len(samples)} 条样本全部通过校验")
+    print("V1–V7 通过")
     return 0
 
 
@@ -74,6 +81,7 @@ def _cmd_probe(args) -> int:
         holdout_generators=set(data.get("holdout_generators", [])),
         backend=data.get("backend", "mock"), seed=int(data.get("seed", 0)),
         cfg_grid=data.get("cfg_grid"), steps_grid=data.get("steps_grid"),
+        compositing_pairs=int(data.get("compositing_pairs", 0)),
     )
     print(json.dumps(st, ensure_ascii=False, indent=2))
     return 0
@@ -95,6 +103,7 @@ def main(argv: list[str] | None = None) -> int:
 
     p_val = sub.add_parser("validate-manifest", help="逐行校验 manifest")
     p_val.add_argument("--path", required=True)
+    p_val.add_argument("--profile", default="auto", choices=["auto", "run"])
     p_val.set_defaults(func=_cmd_validate)
 
     p_view = sub.add_parser("viewer", help="生成数据集可视化 viewer.html")

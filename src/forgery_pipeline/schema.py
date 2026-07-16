@@ -60,6 +60,12 @@ class Sample(BaseModel):
     init_timestep: Optional[int] = None     # SDEdit 起始 timestep（可选，便于直接读 t0）
     operator: Optional[str] = None          # 显式编辑算子（对齐闸门口径），取值见 labels.EDIT_OPERATORS
     op_params: Optional[str] = None         # 算子参数容器（JSON string，如 cfg_scale/steps；PATCH 8.2 约定）
+    io_chain: Optional[str] = None          # 逐节点处理链（PATCH 7.1），如 decode>rs512>edit:sd15_inpaint>png；旧行=legacy
+    sample_kind: Optional[str] = None       # real / real_vae_rt / edited（PATCH 7.2）
+    compositing: Optional[str] = None       # none / paste / paste_feather（PATCH 7.3，masked 算子必填）
+    feather_px: Optional[int] = None        # paste_feather 羽化 σ（像素）
+    probe_group: Optional[str] = None       # 成对 probe 组名（compositing_pair / nd_pair，PATCH 7.3/8.1）
+    pair_id: Optional[str] = None           # 成对样本回链 id
     postprocess_of: Optional[str] = None    # 退化样本回链原始 fake 的 image_id；原图为 None
 
     @field_validator("is_fake")

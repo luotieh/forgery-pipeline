@@ -57,10 +57,13 @@ def validate_labels(is_fake: int, task_type: str, mask_path: Optional[str],
 
 
 # 显式编辑算子词表（对齐闸门 {img2img, inpaint, outpaint, replace, background}）
+# instruct_edit：InstructPix2Pix 系指令编辑算子（PATCH 9 addendum §8.2 新增枚举，
+# 校验口径见 validate.py V6：op_params 须含 image_guidance_scale）。
 EDIT_OPERATORS = {
     "img2img", "inpaint", "outpaint",
     "object_insertion", "object_replacement", "object_removal",
     "background_editing", "attribute_editing", "text_editing", "face_editing",
+    "instruct_edit",
 }
 
 

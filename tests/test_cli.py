@@ -7,8 +7,10 @@ from forgery_pipeline.pipeline import run_pipeline
 
 def _make_run(tmp_path):
     cfg = load_config("configs/pipeline.example.yaml")
+    # vae_rt_frac=0 → V4 在 auto profile 下跳过：CLI 冒烟只测接线，V4 的 e2e 覆盖在 test_e2e_patch7 与 test_validate_v7
     cfg = dataclasses.replace(cfg, out_dir=str(tmp_path / "run"),
-                              scales=StageScales(d0=12, d1_per_generator=1, d2=6, d3=3, d4=2))
+                              scales=StageScales(d0=12, d1_per_generator=1, d2=6, d3=3, d4=2),
+                              vae_rt_frac=0.0)
     run_pipeline(cfg)
     return Path(cfg.out_dir) / "manifest.jsonl"
 

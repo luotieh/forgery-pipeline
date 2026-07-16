@@ -30,5 +30,10 @@ def build_d4(out_dir, source_samples: list[Sample], n: int,
             generator_name=s.generator_name, generator_family=s.generator_family,
             mask_source=s.mask_source, mask_area_ratio=s.mask_area_ratio,
             explanation=expl,
+            # D4 与源行共用同一张图（未产生新像素），provenance 字段原样回链
+            # （PATCH 7 字段引入时遗漏，导致 sample_kind/io_chain 缺失使 validator V2/V3 失真）
+            io_chain=s.io_chain, sample_kind=s.sample_kind,
+            compositing=s.compositing, feather_px=s.feather_px,
+            probe_group=s.probe_group, pair_id=s.pair_id,
         ))
     return samples

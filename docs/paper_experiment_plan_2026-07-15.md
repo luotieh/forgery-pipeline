@@ -86,6 +86,20 @@
 | **cross-generator holdout (Test-B)** | **Kandinsky 2.2**(异族unCLIP), **SDXL**, (PixArt/Flux 若显存允许) | inpaint/img2img | 只出现在 test_b |
 | 非扩散对照（可选） | LaMa / MAT | inpaint | 检验 score 场对非扩散编辑的行为 |
 
+### B1.5 存储格式决定（2026-07-16 冻结，B3 前不再摇摆）
+
+**主库 = PNG 母本**（维持 PATCH 7），拒绝"两边统一压 JPEG"。理由：统一 JPEG 只把混淆从「有无 JPEG 史」换成「双压 vs 单压」（经典取证特征，仍可学），却要付出三重代价——JPEG 量化吃掉多σ残差的高频信号（自残头牌方法）、Test-E 退化轴被二次压缩污染失去解释力、且不可逆（PNG 可派生 JPEG 评测变体，反向不行）。**源头 JPEG 史混淆的正解**（非存储层）：① Phase C 训练协议加两类同施的随机 Q JPEG 增广（Wang'20/Corvi'23 标准做法）；② B2 真实源掺 RAW 派生子集（RAISE/Dresden）并提升一片进 train；③ **压缩史混淆探针**（零 GPU：仅块效应/DCT 直方图特征的浅探针判 real/fake，量化残余可利用度，数字进论文）。工程：80k×512² PNG ≈ 24–36GB，**B3 前扩 AutoDL 数据盘**。
+
+### B1.6 PATCH 9 阻断关系（2026-07-16 接受，详见 addendum PATCH 9）
+
+B3 起跑前必须完成：**9.1** 主 run nuisance（CFG{5,7.5,10}×steps{30,50} 逐图采样）+ 强度连续采样 U(0.1,0.95)（probe 网格不动）· **9.2** prompt bank（版本 hash 入行）/掩码面积分桶（V12）/分辨率组配套 real+vae_rt 行 · **9.3** base_id 字段 + V8–V10 split 防泄漏（注毒负例单测）· **9.4** 驱动加固（HEAD 断言/评估禁令/断点续跑幂等/磁盘预检 ≥100GB）· **9.5** gate2 设计冻结 + PREREG_gate2_v3（锁定先于任何 gate2 评估）。**9.6**（(7.5,30) 单元分解，零 GPU）非阻断、最先做。
+
+**⚠️ CFG 惰性发现（2026-07-16，影响 9.1/9.6 与措辞）**：全部 probe 的 img2img 均为空 prompt → CFG 项在 classifier-free guidance 中精确消去（cond≡uncond）——实验⑤的 CFG 维度实为惰性，6 单元有效坍缩为 steps 30/50 两单元，跨 CFG 差异=各单元独立 seed。后效：①补充 probe 结论内部自洽（主 confirmatory 同为空 prompt 域），但 v2 §5 脚注应精确化为「空 prompt 机制下 CFG 惰性、敏感度由 steps+seed 承载」；②主库上 prompt bank（9.2a）激活 CFG 后其敏感度未被覆盖 → 固定 CFG 无从声称安全，9.1 逐图抖动是唯一诚实选项；③9.6 免费升级：同 steps 跨 CFG 单元的 ρ 波动=纯 seed 噪声地板，分解为 base/steps/seed 三视图。
+
+### B1.7 PATCH 7 阻断解除（2026-07-16）
+
+canonical I/O（全 PNG+io_chain）、VAE 往返负样本（vae_rt_frac=0.15，V4 配比校验含 min_real=10 守卫）、compositing 显式化（D2 50/50 + 成对 probe）、validator V1–V7 全部落地（176 passed，mock e2e 冒烟过）——**PATCH 7 对 B3 的阻断解除**。剩余 B3 阻断 = PATCH 9 的 9.1–9.5（见 B1.6）+ SDVaeRoundtrip 的 GPU 侧真实冒烟。
+
 ### B2. 真实底图域（供 Test-D cross-domain / Test-F real-only）
 - [ ] in-domain：COCO-val 子集（替换现 picsum，场景分布更标准）
 - [ ] cross-domain：另一域（RAISE/Dresden 相机原图 或 不同网图集）→ Test-D
