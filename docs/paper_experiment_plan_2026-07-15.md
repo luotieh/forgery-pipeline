@@ -94,6 +94,8 @@
 
 B3 起跑前必须完成：**9.1** 主 run nuisance（CFG{5,7.5,10}×steps{30,50} 逐图采样）+ 强度连续采样 U(0.1,0.95)（probe 网格不动）· **9.2** prompt bank（版本 hash 入行）/掩码面积分桶（V12）/分辨率组配套 real+vae_rt 行 · **9.3** base_id 字段 + V8–V10 split 防泄漏（注毒负例单测）· **9.4** 驱动加固（HEAD 断言/评估禁令/断点续跑幂等/磁盘预检 ≥100GB）· **9.5** gate2 设计冻结 + PREREG_gate2_v3（锁定先于任何 gate2 评估）。**9.6**（(7.5,30) 单元分解，零 GPU）非阻断、最先做。
 
+**✅ 9.6 已执行（2026-07-16，`checking/gate1_nuisance_decomposition_2026-07-16.md`）**：steps 边际 ρ st30 **0.707**（≈主 confirmatory 0.700，主场步数完全复现）vs st50 **0.514**（Δ≈−0.19，pooled 0.092 系双峰混合低估）；seed 地板≈抽样噪声；(7.5,30) 重拟合 ρ=0.721 → base_effect≈−0.02、**nuis_effect=+0.113>0.10 → 「固定 CFG/steps」限定升级为正文 limitation**（措辞三要素见分解报告；Phase C/D 在抖动数据上训练评测后不再携带此限定）。
+
 **⚠️ CFG 惰性发现（2026-07-16，影响 9.1/9.6 与措辞）**：全部 probe 的 img2img 均为空 prompt → CFG 项在 classifier-free guidance 中精确消去（cond≡uncond）——实验⑤的 CFG 维度实为惰性，6 单元有效坍缩为 steps 30/50 两单元，跨 CFG 差异=各单元独立 seed。后效：①补充 probe 结论内部自洽（主 confirmatory 同为空 prompt 域），但 v2 §5 脚注应精确化为「空 prompt 机制下 CFG 惰性、敏感度由 steps+seed 承载」；②主库上 prompt bank（9.2a）激活 CFG 后其敏感度未被覆盖 → 固定 CFG 无从声称安全，9.1 逐图抖动是唯一诚实选项；③9.6 免费升级：同 steps 跨 CFG 单元的 ρ 波动=纯 seed 噪声地板，分解为 base/steps/seed 三视图。
 
 ### B1.7 PATCH 7 阻断解除（2026-07-16）
